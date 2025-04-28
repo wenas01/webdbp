@@ -1,0 +1,23 @@
+
+.main {
+	max-width: 320px;
+	margin: 0 auto;
+	gap: 24px;
+	text-align: center;
+	padding-block: 48px;
+
+	h1 {
+		line-height: 1;
+		margin: 0;
+	}
+}
+form, .main {
+	display: flex;
+	flex-direction: column;
+}
+form {
+	text-align: start;
+}
+a {
+	color: #d98880;
+}
