@@ -1,0 +1,19 @@
+<header>
+	<h1><b>Estrés académico</b></h1>
+	<p class="subtitle">Información, causas y soluciones</p>
+</header>
+
+<nav>
+	<ul>
+		<li><a href="/#foro">Foro</a></li>
+		<li><a href="/#consejos">Consejos</a></li>
+		<% if (user) { %>
+		<li>
+			<a href="/logout">Cerrar Sesión</a>
+		</li>
+		<% } else { %>
+		<li><a href="/login">Iniciar sesión</a></li>
+		<li><a href="/signup">Registrarse</a></li>
+		<% } %>
+	</ul>
+</nav>
