@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es-PE">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="/styles/auth.css">
+</head>
+<body>
+  <h1>Login</h1>
+  <% if (error) { %><p style="color:red"><%= error %></p><% } %>
+  <form method="post" action="/login">
+    <input name="email"    type="email"    placeholder="Correo"    required>
+    <input name="password" type="password" placeholder="Contraseña" required>
+    <button>Entrar</button>
+  </form>
+  <a href="/register">Crear cuenta</a>
+</body>
+</html>

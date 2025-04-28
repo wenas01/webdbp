@@ -1,0 +1,21 @@
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["express", "ejs", "cookie-parser", "firebase-admin"]
+  included_files = ["views/**", "public/**"]
+
+[build]
+  command    = "echo \"no build needed\""
+  functions  = "netlify/functions"
+  publish    = "."               # publica desde el root
+
+[dev]
+  functions  = "netlify/functions"
+  publish    = "."
+  port       = 8888
+  targetPort = 8888
+
+[[redirects]]
+  from    = "/*"                 # TODO: ¡todas! las rutas...
+  to      = "/.netlify/functions/api/:splat"
+  status  = 200
+  force   = true

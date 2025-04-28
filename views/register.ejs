@@ -1,0 +1,8 @@
+<h1>Registro</h1>
+<% if (error) { %><p style="color:red"><%= error %></p><% } %>
+<form method="post" action="/register">
+  <input name="email"    type="email"    placeholder="Correo"    required><br>
+  <input name="password" type="password" placeholder="Contraseña" required><br>
+  <button>Registrarme</button>
+</form>
+<a href="/login">¿Ya tienes cuenta? Inicia sesión</a>
