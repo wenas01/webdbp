@@ -538,6 +538,37 @@ footer {
 	padding: 20px;
 	margin-top: 20px;
 }
+.cuenta-container{
+	position: relative;
+}
+.boton-cuenta{
+	cursor: pointer;
+	font-weight: bold;
+	color: white;
+	padding: 10px 20px;
+	transition: background-color 0.3s;
+}
+	.boton-cuenta:hover{
+		background-color: #ec7063;
+	}
+.subcuenta{
+	display: none;
+	position: absolute;
+	top: 100%;
+	left: 0;
+	background-color: #cd6155;
+	padding: 15px 20px;
+	z-index: 1000;
+}
+	.subcuenta a{
+		color: white;
+		display: block;
+		padding: 10px 0;
+		text-decoration: none;
+	}
+		.subcuenta a:hover{
+			background-color: #ec7063;
+		}
 
 @media (max-width: 768px) {
 	.main-content {
