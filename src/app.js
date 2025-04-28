@@ -4,41 +4,35 @@ import fetch from 'node-fetch';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import path from 'path';
+import { title } from 'process';
 
 dotenv.config();
 
-// Inicializar Firebase Admin
-const serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT_JSON);
 
+// ------------ Configuración Firebase Admin -------------
+const serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT_JSON);
 admin.initializeApp({
 	credential: admin.credential.cert(serviceAccount),
 });
 
+
+// ---------------- Configuración Express ----------------
 const app = express();
-
 app.use(express.urlencoded({ extended: true }));
-
 app.use(cookieParser(process.env.COOKIE_SECRET));
-
 app.use(express.static(path.resolve('public')));
-
 app.set('view engine', 'ejs');
-
 app.set('views', path.resolve('views'));
-
 app.use((req, res, next) => {
-  // si req.body llegó como Buffer…
   if (Buffer.isBuffer(req.body)) {
-    // lo convertimos a string
     const text = req.body.toString('utf8');
-    // y lo parseamos como URLSearchParams (form-urlencoded)
     req.body = Object.fromEntries(new URLSearchParams(text));
   }
   next();
 });
 
 
-// Middleware de autenticación
+// ---------------- Middleware protected ----------------
 async function checkAuth(req, res, next) {
 	const token = req.signedCookies.__session;
 	if (!token) return res.redirect('/login');
@@ -51,27 +45,45 @@ async function checkAuth(req, res, next) {
 	}
 }
 
+export async function addUserToLocals(req, res, next) {
+	const token = req.signedCookies.__session;
+	if (token) {
+		try {
+			const decoded = await admin.auth().verifyIdToken(token);
+			res.locals.user = decoded;
+			req.user = decoded;
+		} catch (error) {
+			res.locals.user = null;
+		}
+	} else {
+		res.locals.user = null;
+	}
+	next();
+}
+
+app.use(addUserToLocals);
+
 // Rutas públicas
 app.get('/', (req, res) => {
-	res.render('index', { error: null });
+	res.render('index', { title: 'Estrés Académico - Información, Causas y Soluciones' });
 });
 
-app.get('/register', (req, res) => {
-	res.render('register', { error: null });
+app.get('/signup', (req, res) => {
+	res.render('signup', { title: 'Estrés Académico - Crear Cuenta', error: null });
 });
 
-app.post('/register', async (req, res) => {
+app.post('/signup', async (req, res) => {
 	const { email, password } = req.body;
 	try {
 		await admin.auth().createUser({ email, password });
 		res.redirect('/login');
 	} catch (err) {
-		res.render('register', { error: err.message });
+		res.render('signup', { title: 'Estrés Académico - Crear Cuenta', error: err.message });
 	}
 });
 
 app.get('/login', (req, res) => {
-	res.render('login', { error: null });
+	res.render('login', { title: 'Estrés Académico - Iniciar Sesión', error: null });
 });
 
 app.post('/login', async (req, res) => {
@@ -91,9 +103,9 @@ app.post('/login', async (req, res) => {
 		if (data.error) throw new Error(data.error.message);
 
 		res.cookie('__session', data.idToken, { httpOnly: true, signed: true });
-		res.redirect('/tests');
+		res.redirect('/');
 	} catch (err) {
-		res.render('login', { error: err.message });
+		res.render('login', { title: 'Estrés Académico - Iniciar Sesión', error: err.message });
 	}
 });
 
@@ -103,7 +115,7 @@ app.get('/tests', checkAuth, (req, res) => {
 });
 
 // Logout
-app.post('/logout', (req, res) => {
+app.get('/logout', (req, res) => {
 	res.clearCookie('__session');
 	res.redirect('/login');
 });
