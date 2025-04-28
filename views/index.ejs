@@ -302,6 +302,17 @@
 				}
 			});
 		});
+		function toggleSubcuenta(){
+			const subcuenta = document.getElementById("subcuenta");
+			subcuenta.style.display = (subcuenta.style.display === "block") ? "none":"block";
+		}
+		document.addEventListener("click" , function(event){
+			const menu = document.querySelector("nav");
+			if(!menu.contains(event.target)){
+				document.getElementById(subcuenta).style.display = "none";
+			}
+			
+		});
 	</script>
 </body>
 

@@ -8,12 +8,22 @@
 		<li><a href="/#foro">Foro</a></li>
 		<li><a href="/#consejos">Consejos</a></li>
 		<% if (user) { %>
-		<li>
-			<a href="/logout">Cerrar Sesión</a>
-		</li>
-		<% } else { %>
-		<li><a href="/login">Iniciar sesión</a></li>
-		<li><a href="/signup">Registrarse</a></li>
-		<% } %>
+		
+			<li>
+				<a href="/logout">Cerrar Sesión</a>
+			</li>
+			<% } else { %>
+			<li><a href="/login">Iniciar sesión</a></li>
+			<li><a href="/signup">Registrarse</a></li>
+			<% } %>
 	</ul>
+	<div class="cuenta-container">
+		<div class="boton-cuenta" onclick="toggleSubcuenta()">Cuenta</div>
+		<div id="subcuenta" class="subcuenta">
+			<a href="#cuenta">Log in</a>
+			<a href="#cuenta">Sign up</a>
+			<a href="#cuenta">Log out</a>
+		</div>
+	</div>
+	</div>
 </nav>
