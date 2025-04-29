@@ -114,16 +114,16 @@ app.get('/quiz', (req, res) => {
 	res.render('quiz', { title: 'Estrés Académico - Quiz' });
 });
 app.get('/nivel_bajo', (req, res) => {
-	res.render('nivel_bajo', { title: 'Estrés Académico - nivel_bajo' });
+	res.render('nivel_bajo', { title: 'Quiz - Nivel_bajo' });
 });
 app.get('/nivel_moderado', (req, res) => {
-	res.render('nivel_moderado', { title: 'Estrés Académico - nivel_moderado' });
+	res.render('nivel_moderado', { title: 'Quiz - Nivel_moderado' });
 });
 app.get('/nivel_alto', (req, res) => {
-	res.render('nivel_alto', { title: 'Estrés Académico - nivel_alto' });
+	res.render('nivel_alto', { title: 'Quiz - Nivel_alto' });
 });
 app.get('/nivel_muy_alto', (req, res) => {
-	res.render('nivel_muy_alto', { title: 'Estrés Académico - nivel_muy_alto' });
+	res.render('nivel_muy_alto', { title: 'Quiz - Nivel_muy_alto' });
 });
 
 
