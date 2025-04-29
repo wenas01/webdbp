@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz de Estrés Académico</title>
+  <style>
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      background-image: url('fondo.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-position: center;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    .quiz-container {
+      max-width: 850px;
+      margin: 40px auto;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    h1 {
+      text-align: center;
+      color: #c0392b;
+      margin-bottom: 20px;
+      font-size: 2.5rem;
+    }
+
+    p.instructions {
+      text-align: center;
+      font-size: 1.1rem;
+      margin-bottom: 40px;
+      color: #7f8c8d;
+    }
+
+    .question {
+      margin-bottom: 35px;
+    }
+
+    .question-title {
+      font-weight: 600;
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      color: #e74c3c;
+    }
+
+    .options {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      background-color: #f7f7f7;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      width: 60px;
+      font-weight: bold;
+      color: #555;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    label:hover {
+      background-color: #ffe6e6;
+      transform: translateY(-3px);
+    }
+
+    input[type="radio"] {
+      margin-bottom: 8px;
+      accent-color: #e74c3c;
+      transform: scale(1.2);
+    }
+
+    .submit-button {
+      display: block;
+      margin: 40px auto 0;
+      padding: 15px 40px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: background 0.3s;
+      box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+    }
+
+    .submit-button:hover {
+      background-color: #c0392b;
+    }
+
+    @media (max-width: 600px) {
+      .options {
+        flex-direction: row;
+        gap: 10px;
+      }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="quiz-container">
+  <h1>Quiz para Detectar Signos de Estrés Académico</h1>
+  <p class="instructions">
+    Responde las siguientes preguntas según la frecuencia:<br>
+    0: Nunca | 1: Rara vez | 2: A veces | 3: Frecuentemente | 4: Casi siempre
+  </p>
+
+  <form>
+    <!-- Preguntas -->
+    <div class="question">
+      <div class="question-title">Alteraciones del sueño: ¿Tienes dificultades para dormir debido a preocupaciones académicas?</div>
+      <div class="options">
+        <label><input type="radio" name="q1" value="0">0</label>
+        <label><input type="radio" name="q1" value="1">1</label>
+        <label><input type="radio" name="q1" value="2">2</label>
+        <label><input type="radio" name="q1" value="3">3</label>
+        <label><input type="radio" name="q1" value="4">4</label>
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="question-title">Ansiedad ante evaluaciones: ¿Sientes nerviosismo extremo antes o durante exámenes o presentaciones?</div>
+      <div class="options">
+        <label><input type="radio" name="q2" value="0">0</label>
+        <label><input type="radio" name="q2" value="1">1</label>
+        <label><input type="radio" name="q2" value="2">2</label>
+        <label><input type="radio" name="q2" value="3">3</label>
+        <label><input type="radio" name="q2" value="4">4</label>
+      </div>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Fatiga crónica: ¿Te sientes constantemente cansado/a incluso después de descansar?</div>
+        <div class="options">
+            <label><input type="radio" name="q3" value="0">0</label>
+            <label><input type="radio" name="q3" value="1">1</label>
+            <label><input type="radio" name="q3" value="2">2</label>
+            <label><input type="radio" name="q3" value="3">3</label>
+            <label><input type="radio" name="q3" value="4">4</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Dificultad para concentrarse: ¿Te cuesta mantener la atención en tus estudios?</div>
+        <div class="options">
+            <label><input type="radio" name="q4" value="0">0</label>
+            <label><input type="radio" name="q4" value="1">1</label>
+            <label><input type="radio" name="q4" value="2">2</label>
+            <label><input type="radio" name="q4" value="3">3</label>
+            <label><input type="radio" name="q4" value="4">4</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Cambios en la alimentación: ¿Has notado que comes mucho más o mucho menos de lo habitual?</div>
+        <div class="options">
+            <label><input type="radio" name="q5" value="0">0</label>
+            <label><input type="radio" name="q5" value="1">1</label>
+            <label><input type="radio" name="q5" value="2">2</label>
+            <label><input type="radio" name="q5" value="3">3</label>
+            <label><input type="radio" name="q5" value="4">4</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Procrastinación: ¿Pospones frecuentemente tus responsabilidades académicas?</div>
+        <div class="options">
+            <label><input type="radio" name="q6" value="0">0</label>
+            <label><input type="radio" name="q6" value="1">1</label>
+            <label><input type="radio" name="q6" value="2">2</label>
+            <label><input type="radio" name="q6" value="3">3</label>
+            <label><input type="radio" name="q6" value="4">4</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Irritabilidad: ¿Te sientes irritable o te enojas con facilidad?</div>
+        <div class="options">
+            <label><input type="radio" name="q7" value="0">0</label>
+            <label><input type="radio" name="q7" value="1">1</label>
+            <label><input type="radio" name="q7" value="2">2</label>
+            <label><input type="radio" name="q7" value="3">3</label>
+            <label><input type="radio" name="q7" value="4">4</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Pensamiento catastrófico: ¿Piensas en consecuencias extremadamente negativas si no alcanzas tus metas académicas?</div>
+        <div class="options">
+            <label><input type="radio" name="q8" value="0">0</label>
+            <label><input type="radio" name="q8" value="1">1</label>
+            <label><input type="radio" name="q8" value="2">2</label>
+            <label><input type="radio" name="q8" value="3">3</label>
+            <label><input type="radio" name="q8" value="4">4</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Síntomas físicos: ¿Experimentas dolores de cabeza, tensión muscular o problemas digestivos durante periodos académicos intensos?</div>
+        <div class="options">
+            <label><input type="radio" name="q9" value="0">0</label>
+            <label><input type="radio" name="q9" value="1">1</label>
+            <label><input type="radio" name="q9" value="2">2</label>
+            <label><input type="radio" name="q9" value="3">3</label>
+            <label><input type="radio" name="q9" value="4">4</label>
+        </div>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Aislamiento social: ¿Has reducido tu interacción social por dedicarte a tus estudios?</div>
+        <div class="options">
+            <label><input type="radio" name="q10" value="0">0</label>
+            <label><input type="radio" name="q10" value="1">1</label>
+            <label><input type="radio" name="q10" value="2">2</label>
+            <label><input type="radio" name="q10" value="3">3</label>
+            <label><input type="radio" name="q10" value="4">4</label>
+        </div>
+    </div>
+
+    <button type="submit" class="submit-button">Enviar</button>
+  </form>
+</div>
+</body>
+</html>
+<script>
+  document.querySelector("form").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    let total = 0;
+    for (let i = 1; i <= 10; i++) {
+      const seleccion = document.querySelector(`input[name="q${i}"]:checked`);
+      if (seleccion) {
+        total += parseInt(seleccion.value);
+      } else {
+        alert(`Debes responder la pregunta ${i}`);
+        return;
+      }
+    }
+if(total>=0 && total<=10)
+{
+	window.location.href = "/nivel_bajo";
+}
+if(total>=11 && total<=20)
+{
+	window.location.href = "/nivel_moderado";
+}
+if(total>=21 && total<=30)
+{
+	window.location.href = "/nivel_alto";
+}
+if(total>=31 && total<=40)
+{
+	window.location.href = "/nivel_muy_alto";
+}
+    
+  });
+</script>
+
