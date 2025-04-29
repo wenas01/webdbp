@@ -110,8 +110,8 @@ app.post('/login', async (req, res) => {
 });
 
 // Ruta protegida
-app.get('/quiz', checkAuth, (req, res) => {
-	res.render('quiz', { email: req.user.email });
+app.get('/quiz', (req, res) => {
+	res.render('quiz', { title: 'Estrés Académico - Quiz' });
 });
 
 
