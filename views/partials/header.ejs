@@ -20,10 +20,14 @@
 	<div class="cuenta-container">
 		<div class="boton-cuenta" onclick="toggleSubcuenta()">Cuenta</div>
 		<div id="subcuenta" class="subcuenta">
-			<a href="/login">Log in</a>
-			<a href="/signup">Sign up</a>
-			<a href="/logout">Log out</a>
-		</div>
+			<% if (user) { %>
+	
+				<a href="/logout">Cerrar Sesión</a>
+			
+			<% } else { %>
+			<a href="/login">Iniciar sesión</a>
+			<a href="/signup">Registrarse</a>
+			<% } %>		</div>
 	</div>
 	</div>
 </nav>
