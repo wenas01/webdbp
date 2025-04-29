@@ -110,9 +110,10 @@ app.post('/login', async (req, res) => {
 });
 
 // Ruta protegida
-app.get('/tests', checkAuth, (req, res) => {
-	res.render('tests', { email: req.user.email });
+app.get('/quiz', checkAuth, (req, res) => {
+	res.render('quiz', { email: req.user.email });
 });
+
 
 // Logout
 app.get('/logout', (req, res) => {
