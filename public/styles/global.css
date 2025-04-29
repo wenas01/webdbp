@@ -1,3 +1,4 @@
+
 * {
 	margin: 0;
 	padding: 0;
@@ -50,31 +51,36 @@ h2 {
 	text-transform: uppercase;
 	letter-spacing: 1px;
 }
-
 nav {
-	background-color: #cd6155;
-	padding: 15px 0;
+  background-color: #cd6155;
 }
 
 nav ul {
-	display: flex;
-	justify-content: space-around;
-	list-style: none;
-	flex-wrap: wrap;
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-nav ul li a {
-	color: white;
-	text-decoration: none;
-	padding: 10px 15px;
-	display: block;
-	transition: background-color 0.3s;
+nav ul li {
+  flex: 1;                /* mismo ancho */
+  text-align: center;     /* centra el texto/botón */
+  position: relative;     /* para el dropdown */
 }
 
-nav ul li a:hover {
-	background-color: #ec7063;
+nav ul li a,
+nav ul li .boton-cuenta {
+  display: inline-block;
+  color: white;
+  padding: 10px;
+  text-decoration: none;
+  transition: background-color 0.3s;
 }
 
+nav ul li a:hover,
+nav ul li .boton-cuenta:hover {
+  background-color: #ec7063;
+}
 .main-content {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -550,25 +556,32 @@ footer {
 }
 	.boton-cuenta:hover{
 		background-color: #ec7063;
-	}
-.subcuenta{
-	display: none;
-	position: absolute;
-	top: 100%;
-	left: 0;
-	background-color: #cd6155;
-	padding: 15px 20px;
-	z-index: 1000;
+	}.subcuenta {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: #cd6155;
+  padding: 15px 0;
+  z-index: 1000;
 }
-	.subcuenta a{
-		color: white;
-		display: block;
-		padding: 10px 0;
-		text-decoration: none;
-	}
-		.subcuenta a:hover{
-			background-color: #ec7063;
-		}
+
+.cuenta-container:hover .subcuenta {
+  display: block;
+}
+
+/* enlaces dentro del dropdown centrados */
+.subcuenta a {
+  color: white;
+  display: block;
+  padding: 10px 0;
+  text-decoration: none;
+}
+
+.subcuenta a:hover {
+  background-color: #ec7063;
+}
 
 @media (max-width: 768px) {
 	.main-content {

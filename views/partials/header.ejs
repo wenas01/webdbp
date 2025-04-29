@@ -7,18 +7,17 @@
 	<ul>
 		<li><a href="/#foro">Foro</a></li>
 		<li><a href="/#consejos">Consejos</a></li>
+        <li class="cuenta-container">
+      <div class="boton-cuenta" onclick="toggleSubcuenta()">Cuenta</div>
+      <div id="subcuenta" class="subcuenta">
+        <% if (user) { %>
+          <a href="/logout">Cerrar Sesión</a>
+        <% } else { %>
+          <a href="/login">Iniciar sesión</a>
+          <a href="/signup">Registrarse</a>
+        <% } %>
+      </div>
+    </li>
 	</ul>
-	<div class="cuenta-container">
-		<div class="boton-cuenta" onclick="toggleSubcuenta()">Cuenta</div>
-		<div id="subcuenta" class="subcuenta">
-			<% if (user) { %>
 	
-				<a href="/logout">Cerrar Sesión</a>
-			
-			<% } else { %>
-			<a href="/login">Iniciar sesión</a>
-			<a href="/signup">Registrarse</a>
-			<% } %>		</div>
-	</div>
-	</div>
 </nav>
