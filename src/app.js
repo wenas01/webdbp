@@ -113,6 +113,18 @@ app.post('/login', async (req, res) => {
 app.get('/quiz', (req, res) => {
 	res.render('quiz', { title: 'Estrés Académico - Quiz' });
 });
+app.get('/nivel_bajo', (req, res) => {
+	res.render('nivel_bajo', { title: 'Estrés Académico - nivel_bajo' });
+});
+app.get('/nivel_moderado', (req, res) => {
+	res.render('nivel_moderado', { title: 'Estrés Académico - nivel_moderado' });
+});
+app.get('/nivel_alto', (req, res) => {
+	res.render('nivel_alto', { title: 'Estrés Académico - nivel_alto' });
+});
+app.get('/nivel_muy_alto', (req, res) => {
+	res.render('nivel_muy_alto', { title: 'Estrés Académico - nivel_muy_alto' });
+});
 
 
 // Logout
