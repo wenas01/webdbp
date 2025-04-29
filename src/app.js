@@ -16,6 +16,25 @@ admin.initializeApp({
 });
 
 
+const express = require('express');
+
+// Configuración de vistas
+app.set('view engine', 'ejs');
+
+// Rutas
+app.get('/', (req, res) => {
+  res.render('index');
+});
+
+app.get('/quiz', (req, res) => {
+  res.render('quiz');
+});
+
+// Otras rutas...
+
+app.listen(puerto, () => {
+  console.log(`Servidor corriendo en el puerto ${puerto}`);
+});
 // ---------------- Configuración Express ----------------
 const app = express();
 app.use(express.urlencoded({ extended: true }));
