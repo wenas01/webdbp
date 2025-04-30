@@ -4,7 +4,7 @@ import fetch from 'node-fetch';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import path from 'path';
-import { title } from 'process';
+
 
 dotenv.config();
 
@@ -17,20 +17,32 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
-// ---------------- Configuración Express ----------------
 const app = express();
+// ---------------- Configuración Express ----------------
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(express.static(path.resolve('public')));
 app.set('view engine', 'ejs');
 app.set('views', path.resolve('views'));
+
 app.use((req, res, next) => {
-  if (Buffer.isBuffer(req.body)) {
-    const text = req.body.toString('utf8');
-    req.body = Object.fromEntries(new URLSearchParams(text));
-  }
-  next();
+	if (Buffer.isBuffer(req.body)) {
+		const contentType = req.headers['content-type'];
+
+		try {
+			if (contentType?.includes('application/json')) {
+				req.body = JSON.parse(req.body.toString('utf8'));
+			} else if (contentType?.includes('application/x-www-form-urlencoded')) {
+				req.body = Object.fromEntries(new URLSearchParams(req.body.toString('utf8')));
+			}
+		} catch (err) {
+			console.error('Error parsing body:', err.message);
+			return res.status(400).json({ error: 'Invalid body format' });
+		}
+	}
+
+	next();
 });
 
 
@@ -89,7 +101,7 @@ app.post('/temas', async(req, res) => {
     try {
         // Validar los datos recibidos
         const { title, content, tags, author } = req.body;
-        console.log("hola");
+        
         if (!title || !content) {
             return res.status(400).json({ error: 'El título y contenido son obligatorios' });
         }
@@ -104,7 +116,7 @@ app.post('/temas', async(req, res) => {
             views: 0,
             createdAt: new Date().toISOString()
         };
-        console.log(newTema);
+        
         const docRef = await db.collection("temas").add(newTema);
         
         res.status(201).json({
