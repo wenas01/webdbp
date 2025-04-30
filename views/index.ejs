@@ -99,140 +99,80 @@
 				<p>¡Bienvenido a nuestra comunidad! Comparte tus experiencias, haz preguntas y ayuda a otros estudiantes que
 					están lidiando con el estrés académico.</p>
 			</div>
-
+		
 			<div class="forum-actions">
 				<button class="btn btn-primary" id="new-topic-btn">
 					<i class="fas fa-plus"></i> Nuevo Tema
 				</button>
 			</div>
-
+		
 			<div class="forum-topics">
-				<!-- Tema 1 -->
-				<div class="forum-topic">
-					<div class="topic-title">¿Cómo manejar el estrés antes de los exámenes finales?</div>
-					<div class="topic-meta">
-						<div class="topic-author">
-							<div class="topic-avatar">MA</div>
-							<span>María Alejandra</span>
-						</div>
-						<div class="topic-stats">
-							<div class="topic-stat">
-								<i class="far fa-comment"></i> 8 respuestas
+				<% temas.forEach((tema) => { %>
+					<div class="forum-topic" data-id="<%= tema.id %>">
+						<div class="topic-title"><%= tema.title %></div>
+						<div class="topic-meta">
+							<div class="topic-author">
+								<div class="topic-avatar"><%= tema.author.substring(0, 2).toUpperCase() %></div>
+								<span><%= tema.author %></span>
 							</div>
-							<div class="topic-stat">
-								<i class="far fa-eye"></i> 124 vistas
-							</div>
-							<div class="topic-stat">
-								<i class="far fa-clock"></i> 2 días atrás
-							</div>
-						</div>
-					</div>
-					<div class="topic-content">
-						Estoy en época de exámenes finales y siento que la ansiedad me está afectando mucho. ¿Alguien tiene técnicas
-						efectivas para mantener la calma y concentrarse mejor durante los exámenes?
-					</div>
-					<div class="topic-tags">
-						<span class="topic-tag">Exámenes</span>
-						<span class="topic-tag">Ansiedad</span>
-						<span class="topic-tag">Técnicas</span>
-					</div>
-
-					<div class="topic-replies">
-						<div class="forum-reply">
-							<div class="reply-header">
-								<div class="reply-avatar">JP</div>
-								<span class="reply-username">Juan Pérez</span>
-								<span class="reply-date">Hace 1 día</span>
-							</div>
-							<div class="reply-content">
-								A mí me ayuda mucho la técnica Pomodoro: estudio 25 minutos y descanso 5. También recomiendo hacer
-								respiraciones profundas antes de empezar el examen.
-							</div>
-							<div class="reply-actions">
-								<div class="reply-action">
-									<i class="far fa-thumbs-up"></i> 12
+							<div class="topic-stats">
+								<div class="topic-stat">
+									<i class="far fa-comment"></i> <%= tema.comments ? tema.comments.length : 0 %> respuestas
 								</div>
-								<div class="reply-action">
-									<i class="fas fa-reply"></i> Responder
+								<div class="topic-stat">
+									<i class="far fa-eye"></i> <%= tema.views || 0 %> vistas
+								</div>
+								<div class="topic-stat">
+									<i class="far fa-clock"></i> <%= new Date(tema.createdAt).toLocaleDateString() %>
 								</div>
 							</div>
 						</div>
-
-						<div class="forum-reply accepted-reply">
-							<div class="reply-header">
-								<div class="reply-avatar">LC</div>
-								<span class="reply-username">Laura Camila</span>
-								<span class="reply-date">Hace 18 horas</span>
-								<span class="accepted-badge">Respuesta aceptada</span>
-							</div>
-							<div class="reply-content">
-								Yo sufro mucho de ansiedad en exámenes y lo que mejor me funciona es:
-								<ol>
-									<li>Prepararme bien con tiempo (nada de dejar todo para última hora)</li>
-									<li>La noche antes dormir al menos 7 horas</li>
-									<li>Llevar agua y algún snack ligero</li>
-									<li>Si me bloqueo, saltar esa pregunta y volver después</li>
-								</ol>
-								También ayuda mucho practicar con exámenes viejos para familiarizarse con el formato.
-							</div>
-							<div class="reply-actions">
-								<div class="reply-action">
-									<i class="far fa-thumbs-up"></i> 24
-								</div>
-								<div class="reply-action">
-									<i class="fas fa-reply"></i> Responder
-								</div>
-							</div>
+						<div class="topic-content"><%= tema.content %></div>
+						<div class="topic-tags">
+							<% tema.tags.forEach(function(tag) { %>
+								<span class="topic-tag"><%= tag %></span>
+							<% }); %>
 						</div>
-
-						<!-- Más respuestas podrían ir aquí -->
-					</div>
-
-					<div class="reply-form">
-						<div class="form-group">
-							<textarea class="comment-input" placeholder="Escribe tu respuesta..."></textarea>
+		
+						<div class="topic-replies">
+							<% if (tema.comments && tema.comments.length > 0) { %>
+								<% tema.comments.forEach(function(comment, index) { %>
+									<div class="forum-reply <%= comment.accepted ? 'accepted-reply' : '' %>" data-id="<%= comment.id %>">
+										<div class="reply-header">
+											<div class="reply-avatar"><%= comment.author ? comment.author.substring(0, 2).toUpperCase() : 'UA' %></div>
+											<span class="reply-username"><%= comment.author || 'Usuario Anónimo' %></span>
+											<span class="reply-date"><%= new Date(comment.date).toLocaleDateString() %></span>
+											<% if (comment.accepted) { %>
+												<span class="accepted-badge">Respuesta aceptada</span>
+											<% } %>
+										</div>
+										<div class="reply-content"><%= comment.text %></div>
+										<div class="reply-actions">
+											<div class="reply-action">
+												<i class="far fa-thumbs-up"></i> <%= comment.likes || 0 %>
+											</div>
+											<div class="reply-action">
+												<i class="fas fa-reply"></i> Responder
+											</div>
+										</div>
+									</div>
+								<% }); %>
+							<% } %>
 						</div>
-						<div class="form-actions">
-							<button class="btn btn-secondary">Cancelar</button>
-							<button class="btn btn-primary">Publicar respuesta</button>
-						</div>
-					</div>
-				</div>
-
-				<!-- Tema 2 -->
-				<div class="forum-topic">
-					<div class="topic-title">Consejos para organizar el tiempo con múltiples proyectos</div>
-					<div class="topic-meta">
-						<div class="topic-author">
-							<div class="topic-avatar">CR</div>
-							<span>Carlos Rodríguez</span>
-						</div>
-						<div class="topic-stats">
-							<div class="topic-stat">
-								<i class="far fa-comment"></i> 5 respuestas
+		
+						<div class="reply-form">
+							<div class="form-group">
+								<textarea class="comment-input" placeholder="Escribe tu respuesta..."></textarea>
 							</div>
-							<div class="topic-stat">
-								<i class="far fa-eye"></i> 87 vistas
-							</div>
-							<div class="topic-stat">
-								<i class="far fa-clock"></i> 5 días atrás
+							<div class="form-actions">
+								<button class="btn btn-secondary">Cancelar</button>
+								<button class="btn btn-primary">Publicar respuesta</button>
 							</div>
 						</div>
 					</div>
-					<div class="topic-content">
-						Tengo 3 proyectos grandes que entregar en las próximas 2 semanas y siento que no voy a poder con todo. ¿Qué
-						métodos de organización usan cuando tienen múltiples tareas importantes?
-					</div>
-					<div class="topic-tags">
-						<span class="topic-tag">Organización</span>
-						<span class="topic-tag">Tiempo</span>
-						<span class="topic-tag">Proyectos</span>
-					</div>
-
-					<!-- Respuestas podrían ir aquí -->
-				</div>
+				<% }); %>
 			</div>
-
+		
 			<div class="pagination">
 				<div class="page-item active">1</div>
 				<div class="page-item">2</div>
@@ -241,7 +181,7 @@
 				<div class="page-item">10</div>
 				<div class="page-item"><i class="fas fa-chevron-right"></i></div>
 			</div>
-
+		
 			<!-- Formulario para nuevo tema (oculto inicialmente) -->
 			<div class="new-topic-form" id="new-topic-form" style="display: none;">
 				<div class="form-title">Crear nuevo tema de discusión</div>
@@ -251,8 +191,7 @@
 				</div>
 				<div class="form-group">
 					<label for="topic-content">Contenido</label>
-					<textarea id="topic-content"
-						placeholder="Describe tu pregunta, experiencia o tema de discusión con detalle"></textarea>
+					<textarea id="topic-content" placeholder="Describe tu pregunta, experiencia o tema de discusión con detalle"></textarea>
 				</div>
 				<div class="form-group">
 					<label for="topic-tags">Etiquetas (separadas por comas)</label>
@@ -272,142 +211,124 @@
 
 	<script>
 		document.addEventListener('DOMContentLoaded', function() {
-			
-			const newTopicBtn = document.getElementById('new-topic-btn');
-			const newTopicForm = document.getElementById('new-topic-form');
-			const cancelTopicBtn = document.getElementById('cancel-topic-btn');
-			const forumTopics = document.querySelector('.forum-topics');
-			
-			// Mostrar/ocultar formulario de nuevo tema
-			newTopicBtn.addEventListener('click', function() {
-				newTopicForm.style.display = 'block';
-				newTopicBtn.style.display = 'none';
-				newTopicForm.scrollIntoView({ behavior: 'smooth' });
-			});
-		
-			cancelTopicBtn.addEventListener('click', function() {
-				newTopicForm.style.display = 'none';
-				newTopicBtn.style.display = 'block';
-			});
-		
-			// Funcionalidad para guardar nuevo tema
-			const publishTopicBtn = newTopicForm.querySelector('.btn.btn-primary');
-			publishTopicBtn.addEventListener('click', function() {
-				const titleInput = document.getElementById('topic-title').value.trim();
-				const contentInput = document.getElementById('topic-content').value.trim();
-				const tagsInput = document.getElementById('topic-tags').value.trim();
-				
-				if (titleInput && contentInput) {
-					const newTopic = {
-						title: titleInput,
-						content: contentInput,
-						tags: tagsInput.split(',').map(tag => tag.trim()),
-						author: 'Usuario Anónimo', // Podrías cambiarlo si hay usuarios
-						comments: [],
-						createdAt: new Date().toISOString()
-					};
-		
-					// Obtener temas actuales del localStorage
-					let topics = JSON.parse(localStorage.getItem('forumTopics')) || [];
-					topics.unshift(newTopic); // Agregar nuevo tema al principio
-					localStorage.setItem('forumTopics', JSON.stringify(topics));
-		
-					renderTopics();
-					newTopicForm.style.display = 'none';
-					newTopicBtn.style.display = 'block';
-					newTopicForm.reset();
-				} else {
-					alert('Por favor, completa el título y contenido del tema.');
-				}
-			});
-		
-			// Función para renderizar todos los temas
-			function renderTopics() {
-				forumTopics.innerHTML = '';
-		
-				let topics = JSON.parse(localStorage.getItem('forumTopics')) || [];
-		
-				topics.forEach(topic => {
-					const topicDiv = document.createElement('div');
-					topicDiv.className = 'forum-topic';
-					topicDiv.innerHTML = `
-						<div class="topic-title">${topic.title}</div>
-						<div class="topic-meta">
-							<div class="topic-author">
-								<div class="topic-avatar">UA</div>
-								<span>${topic.author}</span>
-							</div>
-							<div class="topic-stats">
-								<div class="topic-stat">
-									<i class="far fa-comment"></i> ${topic.comments.length} respuestas
-								</div>
-								<div class="topic-stat">
-									<i class="far fa-eye"></i> 0 vistas
-								</div>
-								<div class="topic-stat">
-									<i class="far fa-clock"></i> ${new Date(topic.createdAt).toLocaleDateString()}
-								</div>
-							</div>
-						</div>
-						<div class="topic-content">${topic.content}</div>
-						<div class="topic-tags">
-							${topic.tags.map(tag => `<span class="topic-tag">${tag}</span>`).join(' ')}
-						</div>
-						<div class="topic-replies">
-							${topic.comments.map(comment => `
-								<div class="forum-reply">
-									<div class="reply-header">
-										<div class="reply-avatar">UA</div>
-										<span class="reply-username">Usuario</span>
-										<span class="reply-date">${new Date(comment.date).toLocaleDateString()}</span>
-									</div>
-									<div class="reply-content">${comment.text}</div>
-								</div>
-							`).join('')}
-						</div>
-						<div class="reply-form">
-							<div class="form-group">
-								<textarea class="comment-input" placeholder="Escribe tu respuesta..."></textarea>
-							</div>
-							<div class="form-actions">
-								<button class="btn btn-primary">Publicar respuesta</button>
-							</div>
-						</div>
-					`;
-					// Manejo de nuevas respuestas
-					const replyButton = topicDiv.querySelector('.reply-form .btn-primary');
-					replyButton.addEventListener('click', function() {
-						const textarea = topicDiv.querySelector('.reply-form textarea');
-						const replyText = textarea.value.trim();
-						if (replyText) {
-							topic.comments.push({
-								text: replyText,
-								date: new Date().toISOString()
-							});
-							localStorage.setItem('forumTopics', JSON.stringify(topics));
-							renderTopics();
-						}
-					});
-		
-					forumTopics.appendChild(topicDiv);
-				});
-			}
-		
-			// Inicializar temas al cargar la página
-			renderTopics();
-		
-			// Simular "me gusta" en respuestas
-			document.querySelectorAll('.reply-action').forEach(action => {
-				if (action.querySelector('.fa-thumbs-up')) {
-					action.addEventListener('click', function() {
-						const countElement = action.querySelector('i').nextSibling;
-						let count = parseInt(countElement.nodeValue.trim());
-						countElement.nodeValue = ' ' + (count + 1);
-						action.style.color = '#a93226';
-					});
-				}
-			});
-		});
+    const newTopicBtn = document.getElementById('new-topic-btn');
+    const newTopicForm = document.getElementById('new-topic-form');
+    const cancelTopicBtn = document.getElementById('cancel-topic-btn');
+    const forumTopics = document.querySelector('.forum-topics');
+    
+    // Mostrar/ocultar formulario de nuevo tema
+    newTopicBtn.addEventListener('click', function() {
+        newTopicForm.style.display = 'block';
+        newTopicBtn.style.display = 'none';
+        newTopicForm.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    cancelTopicBtn.addEventListener('click', function() {
+        newTopicForm.style.display = 'none';
+        newTopicBtn.style.display = 'block';
+    });
+
+    // Funcionalidad para guardar nuevo tema
+    const publishTopicBtn = newTopicForm.querySelector('.btn.btn-primary');
+    publishTopicBtn.addEventListener('click', function() {
+        const titleInput = document.getElementById('topic-title').value.trim();
+        const contentInput = document.getElementById('topic-content').value.trim();
+        const tagsInput = document.getElementById('topic-tags').value.trim();
+        
+        if (titleInput && contentInput) {
+            const newTopic = {
+                title: titleInput,
+                content: contentInput,
+                tags: tagsInput.split(',').map(tag => tag.trim()),
+                author: 'Usuario Anónimo', // Podrías cambiarlo si hay usuarios
+                comments: [],
+                createdAt: new Date().toISOString()
+            };
+
+            // Aquí en lugar de guardar en localStorage, deberías enviar el nuevo tema al servidor
+            // mediante una petición POST
+            fetch('/temas', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newTopic)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Refrescar la página para mostrar el nuevo tema
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error al guardar el tema:', error);
+                alert('Ocurrió un error al guardar el tema. Por favor, intenta de nuevo.');
+            });
+
+            newTopicForm.style.display = 'none';
+            newTopicBtn.style.display = 'block';
+            document.getElementById('topic-title').value = '';
+            document.getElementById('topic-content').value = '';
+            document.getElementById('topic-tags').value = '';
+        } else {
+            alert('Por favor, completa el título y contenido del tema.');
+        }
+    });
+
+    // Función para manejar las respuestas a los temas
+    document.querySelectorAll('.forum-topic').forEach(topicDiv => {
+        const replyButton = topicDiv.querySelector('.reply-form .btn-primary');
+        if (replyButton) {
+            replyButton.addEventListener('click', function() {
+                const textarea = topicDiv.querySelector('.reply-form textarea');
+                const replyText = textarea.value.trim();
+                const topicId = topicDiv.dataset.id; // Asumiendo que has añadido data-id al div del tema
+                
+                if (replyText && topicId) {
+                    // Enviar respuesta al servidor
+                    fetch(`/temas/${topicId}/comentarios`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            text: replyText,
+                            date: new Date().toISOString()
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Refrescar la página para mostrar el nuevo comentario
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Error al guardar el comentario:', error);
+                        alert('Ocurrió un error al guardar el comentario. Por favor, intenta de nuevo.');
+                    });
+                    
+                    textarea.value = '';
+                }
+            });
+        }
+    });
+
+    // Simular "me gusta" en respuestas
+    document.querySelectorAll('.reply-action').forEach(action => {
+        if (action.querySelector('.fa-thumbs-up')) {
+            action.addEventListener('click', function() {
+                const countElement = action.querySelector('i').nextSibling;
+                let count = parseInt(countElement.nodeValue.trim());
+                countElement.nodeValue = ' ' + (count + 1);
+                action.style.color = '#a93226';
+                
+                // Aquí podrías enviar una petición al servidor para registrar el "me gusta"
+                // const replyId = action.closest('.forum-reply').dataset.id;
+                // fetch(`/comentarios/${replyId}/like`, { method: 'POST' })
+                //    .then(response => response.json())
+                //    .catch(error => console.error('Error al dar like:', error));
+            });
+        }
+    });
+});
 	</script>
 </body>
 

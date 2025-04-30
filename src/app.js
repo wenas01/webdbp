@@ -15,6 +15,7 @@ admin.initializeApp({
 	credential: admin.credential.cert(serviceAccount),
 });
 
+const db = admin.firestore();
 
 // ---------------- Configuración Express ----------------
 const app = express();
@@ -64,8 +65,132 @@ export async function addUserToLocals(req, res, next) {
 app.use(addUserToLocals);
 
 // Rutas públicas
-app.get('/', (req, res) => {
-	res.render('index', { title: 'Estrés Académico - Información, Causas y Soluciones' });
+// Rutas que necesitarás añadir a tu servidor Express
+
+// Ruta para obtener la página principal
+app.get('/', async(req, res) => {
+    try {
+        const snapshot = await db.collection("temas").get();
+        const temas = snapshot.docs.map(doc => {
+            return {
+                id: doc.id,
+                ...doc.data()
+            };
+        });
+		console.log(temas);
+        res.render('index', { title: 'Estrés Académico - Información, Causas y Soluciones', temas });
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
+// Ruta para crear un nuevo tema
+app.post('/temas', async(req, res) => {
+    try {
+        // Validar los datos recibidos
+        const { title, content, tags, author } = req.body;
+        
+        if (!title || !content) {
+            return res.status(400).json({ error: 'El título y contenido son obligatorios' });
+        }
+        
+        // Crear el nuevo documento en Firestore
+        const newTema = {
+            title,
+            content,
+            tags: Array.isArray(tags) ? tags : [],
+            author: author || 'Usuario Anónimo',
+            comments: [],
+            views: 0,
+            createdAt: new Date().toISOString()
+        };
+        
+        const docRef = await db.collection("temas").add(newTema);
+        
+        res.status(201).json({
+            id: docRef.id,
+            ...newTema
+        });
+    } catch (error) {
+        console.error('Error al crear tema:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Ruta para añadir un comentario a un tema
+app.post('/temas/:id/comentarios', async(req, res) => {
+    try {
+        const temaId = req.params.id;
+        const { text } = req.body;
+        
+        if (!text) {
+            return res.status(400).json({ error: 'El texto del comentario es obligatorio' });
+        }
+        
+        // Obtener el documento del tema
+        const temaRef = db.collection("temas").doc(temaId);
+        const temaDoc = await temaRef.get();
+        
+        if (!temaDoc.exists) {
+            return res.status(404).json({ error: 'Tema no encontrado' });
+        }
+        
+        // Crear el nuevo comentario
+        const newComment = {
+            id: Date.now().toString(), // ID simple para el ejemplo
+            text,
+            author: 'Usuario Anónimo', // Podrías obtener el usuario autenticado
+            date: new Date().toISOString(),
+            likes: 0,
+            accepted: false
+        };
+        
+        // Actualizar el documento con el nuevo comentario
+        await temaRef.update({
+            comments: admin.firestore.FieldValue.arrayUnion(newComment)
+        });
+        
+        res.status(201).json(newComment);
+    } catch (error) {
+        console.error('Error al añadir comentario:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Ruta para dar "me gusta" a un comentario
+app.post('/comentarios/:temaId/:commentId/like', async(req, res) => {
+    try {
+        const { temaId, commentId } = req.params;
+        
+        // Obtener el documento del tema
+        const temaRef = db.collection("temas").doc(temaId);
+        const temaDoc = await temaRef.get();
+        
+        if (!temaDoc.exists) {
+            return res.status(404).json({ error: 'Tema no encontrado' });
+        }
+        
+        const temaData = temaDoc.data();
+        const comments = temaData.comments || [];
+        
+        // Encontrar el comentario y actualizar los likes
+        const commentIndex = comments.findIndex(c => c.id === commentId);
+        
+        if (commentIndex === -1) {
+            return res.status(404).json({ error: 'Comentario no encontrado' });
+        }
+        
+        // Incrementar los likes
+        comments[commentIndex].likes = (comments[commentIndex].likes || 0) + 1;
+        
+        // Actualizar el documento
+        await temaRef.update({ comments });
+        
+        res.status(200).json({ likes: comments[commentIndex].likes });
+    } catch (error) {
+        console.error('Error al dar like:', error);
+        res.status(500).json({ error: error.message });
+    }
 });
 
 app.get('/signup', (req, res) => {
