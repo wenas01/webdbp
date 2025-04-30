@@ -66,11 +66,11 @@
 						</a>
 					</div>
 					<div class="resource-link">
-						<a href="https://youtu.be/X-T6Dqqy8gQ">10 signos que tu cuerpo tiene mucho estrés - Dr. Carlos Jaramillo
+						<a href="https://youtu.be/X-T6Dqqy8gQ">10 signos que tu cuerpo tiene mucho estrés
 						</a>
 					</div>
 					<div class="resource-link">
-						<a href="https://www.youtube.com/watch?v=ewtMyjjuaRY">👉¿Estrés académico? 😕
+						<a href="https://www.youtube.com/watch?v=ewtMyjjuaRY">¿Estrés académico? 
 						</a>
 					</div>
 				</div>
@@ -271,29 +271,163 @@
 	</footer>
 
 	<script>
-		// Script básico para manejar el estado de login
-		document.addEventListener('DOMContentLoaded', function () {
-			// Nuevo script para funcionalidad del foro
+		document.addEventListener('DOMContentLoaded', function() {
+			const loginBtn = document.getElementById('login-btn');
+			const signupBtn = document.getElementById('signup-btn');
+			const logoutBtn = document.getElementById('logout-btn');
 			const newTopicBtn = document.getElementById('new-topic-btn');
 			const newTopicForm = document.getElementById('new-topic-form');
 			const cancelTopicBtn = document.getElementById('cancel-topic-btn');
-
+			const forumTopics = document.querySelector('.forum-topics');
+		
+			// Funciones para manejo de estado de login
+			document.querySelector('.login-form .btn').addEventListener('click', function() {
+				loginBtn.style.display = 'none';
+				signupBtn.style.display = 'none';
+				logoutBtn.style.display = 'block';
+				document.querySelector('#cuenta h3').textContent = 'Bienvenido';
+			});
+			
+			logoutBtn.addEventListener('click', function(e) {
+				e.preventDefault();
+				loginBtn.style.display = 'block';
+				signupBtn.style.display = 'block';
+				logoutBtn.style.display = 'none';
+				document.querySelector('#cuenta h3').textContent = 'MI CUENTA';
+			});
+		
+			loginBtn.addEventListener('click', function(e) {
+				e.preventDefault();
+				document.querySelector('.login-form').scrollIntoView({ behavior: 'smooth' });
+			});
+		
+			signupBtn.addEventListener('click', function(e) {
+				e.preventDefault();
+				document.querySelector('.register-form').scrollIntoView({ behavior: 'smooth' });
+			});
+		
 			// Mostrar/ocultar formulario de nuevo tema
-			newTopicBtn.addEventListener('click', function () {
+			newTopicBtn.addEventListener('click', function() {
 				newTopicForm.style.display = 'block';
 				newTopicBtn.style.display = 'none';
 				newTopicForm.scrollIntoView({ behavior: 'smooth' });
 			});
-
-			cancelTopicBtn.addEventListener('click', function () {
+		
+			cancelTopicBtn.addEventListener('click', function() {
 				newTopicForm.style.display = 'none';
 				newTopicBtn.style.display = 'block';
 			});
-
+		
+			// Funcionalidad para guardar nuevo tema
+			const publishTopicBtn = newTopicForm.querySelector('.btn.btn-primary');
+			publishTopicBtn.addEventListener('click', function() {
+				const titleInput = document.getElementById('topic-title').value.trim();
+				const contentInput = document.getElementById('topic-content').value.trim();
+				const tagsInput = document.getElementById('topic-tags').value.trim();
+				
+				if (titleInput && contentInput) {
+					const newTopic = {
+						title: titleInput,
+						content: contentInput,
+						tags: tagsInput.split(',').map(tag => tag.trim()),
+						author: 'Usuario Anónimo', // Podrías cambiarlo si hay usuarios
+						comments: [],
+						createdAt: new Date().toISOString()
+					};
+		
+					// Obtener temas actuales del localStorage
+					let topics = JSON.parse(localStorage.getItem('forumTopics')) || [];
+					topics.unshift(newTopic); // Agregar nuevo tema al principio
+					localStorage.setItem('forumTopics', JSON.stringify(topics));
+		
+					renderTopics();
+					newTopicForm.style.display = 'none';
+					newTopicBtn.style.display = 'block';
+					newTopicForm.reset();
+				} else {
+					alert('Por favor, completa el título y contenido del tema.');
+				}
+			});
+		
+			// Función para renderizar todos los temas
+			function renderTopics() {
+				forumTopics.innerHTML = '';
+		
+				let topics = JSON.parse(localStorage.getItem('forumTopics')) || [];
+		
+				topics.forEach(topic => {
+					const topicDiv = document.createElement('div');
+					topicDiv.className = 'forum-topic';
+					topicDiv.innerHTML = `
+						<div class="topic-title">${topic.title}</div>
+						<div class="topic-meta">
+							<div class="topic-author">
+								<div class="topic-avatar">UA</div>
+								<span>${topic.author}</span>
+							</div>
+							<div class="topic-stats">
+								<div class="topic-stat">
+									<i class="far fa-comment"></i> ${topic.comments.length} respuestas
+								</div>
+								<div class="topic-stat">
+									<i class="far fa-eye"></i> 0 vistas
+								</div>
+								<div class="topic-stat">
+									<i class="far fa-clock"></i> ${new Date(topic.createdAt).toLocaleDateString()}
+								</div>
+							</div>
+						</div>
+						<div class="topic-content">${topic.content}</div>
+						<div class="topic-tags">
+							${topic.tags.map(tag => `<span class="topic-tag">${tag}</span>`).join(' ')}
+						</div>
+						<div class="topic-replies">
+							${topic.comments.map(comment => `
+								<div class="forum-reply">
+									<div class="reply-header">
+										<div class="reply-avatar">UA</div>
+										<span class="reply-username">Usuario</span>
+										<span class="reply-date">${new Date(comment.date).toLocaleDateString()}</span>
+									</div>
+									<div class="reply-content">${comment.text}</div>
+								</div>
+							`).join('')}
+						</div>
+						<div class="reply-form">
+							<div class="form-group">
+								<textarea class="comment-input" placeholder="Escribe tu respuesta..."></textarea>
+							</div>
+							<div class="form-actions">
+								<button class="btn btn-primary">Publicar respuesta</button>
+							</div>
+						</div>
+					`;
+					// Manejo de nuevas respuestas
+					const replyButton = topicDiv.querySelector('.reply-form .btn-primary');
+					replyButton.addEventListener('click', function() {
+						const textarea = topicDiv.querySelector('.reply-form textarea');
+						const replyText = textarea.value.trim();
+						if (replyText) {
+							topic.comments.push({
+								text: replyText,
+								date: new Date().toISOString()
+							});
+							localStorage.setItem('forumTopics', JSON.stringify(topics));
+							renderTopics();
+						}
+					});
+		
+					forumTopics.appendChild(topicDiv);
+				});
+			}
+		
+			// Inicializar temas al cargar la página
+			renderTopics();
+		
 			// Simular "me gusta" en respuestas
 			document.querySelectorAll('.reply-action').forEach(action => {
 				if (action.querySelector('.fa-thumbs-up')) {
-					action.addEventListener('click', function () {
+					action.addEventListener('click', function() {
 						const countElement = action.querySelector('i').nextSibling;
 						let count = parseInt(countElement.nodeValue.trim());
 						countElement.nodeValue = ' ' + (count + 1);
@@ -301,17 +435,6 @@
 					});
 				}
 			});
-		});
-		function toggleSubcuenta(){
-			const subcuenta = document.getElementById("subcuenta");
-			subcuenta.style.display = (subcuenta.style.display === "block") ? "none":"block";
-		}
-		document.addEventListener("click" , function(event){
-			const menu = document.querySelector("nav");
-			if(!menu.contains(event.target)){
-				document.getElementById(subcuenta).style.display = "none";
-			}
-			
 		});
 	</script>
 </body>
