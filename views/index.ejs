@@ -272,40 +272,12 @@
 
 	<script>
 		document.addEventListener('DOMContentLoaded', function() {
-			const loginBtn = document.getElementById('login-btn');
-			const signupBtn = document.getElementById('signup-btn');
-			const logoutBtn = document.getElementById('logout-btn');
+			
 			const newTopicBtn = document.getElementById('new-topic-btn');
 			const newTopicForm = document.getElementById('new-topic-form');
 			const cancelTopicBtn = document.getElementById('cancel-topic-btn');
 			const forumTopics = document.querySelector('.forum-topics');
-		
-			// Funciones para manejo de estado de login
-			document.querySelector('.login-form .btn').addEventListener('click', function() {
-				loginBtn.style.display = 'none';
-				signupBtn.style.display = 'none';
-				logoutBtn.style.display = 'block';
-				document.querySelector('#cuenta h3').textContent = 'Bienvenido';
-			});
 			
-			logoutBtn.addEventListener('click', function(e) {
-				e.preventDefault();
-				loginBtn.style.display = 'block';
-				signupBtn.style.display = 'block';
-				logoutBtn.style.display = 'none';
-				document.querySelector('#cuenta h3').textContent = 'MI CUENTA';
-			});
-		
-			loginBtn.addEventListener('click', function(e) {
-				e.preventDefault();
-				document.querySelector('.login-form').scrollIntoView({ behavior: 'smooth' });
-			});
-		
-			signupBtn.addEventListener('click', function(e) {
-				e.preventDefault();
-				document.querySelector('.register-form').scrollIntoView({ behavior: 'smooth' });
-			});
-		
 			// Mostrar/ocultar formulario de nuevo tema
 			newTopicBtn.addEventListener('click', function() {
 				newTopicForm.style.display = 'block';

@@ -10,12 +10,12 @@
 
 [dev]
   functions  = "netlify/functions"
-  publish    = "."
+  publish    = "public"
   port       = 8888
   targetPort = 8888
 
 [[redirects]]
-  from    = "/*"                 # TODO: ¡todas! las rutas...
-  to      = "/.netlify/functions/api/:splat"
-  status  = 200
-  force   = true
+  from = "/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = false
