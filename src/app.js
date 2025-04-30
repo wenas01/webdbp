@@ -19,6 +19,7 @@ const db = admin.firestore();
 
 // ---------------- Configuración Express ----------------
 const app = express();
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(express.static(path.resolve('public')));
@@ -77,7 +78,6 @@ app.get('/', async(req, res) => {
                 ...doc.data()
             };
         });
-		console.log(temas);
         res.render('index', { title: 'Estrés Académico - Información, Causas y Soluciones', temas });
     } catch (error) {
         res.status(500).send(error.message);
@@ -89,7 +89,7 @@ app.post('/temas', async(req, res) => {
     try {
         // Validar los datos recibidos
         const { title, content, tags, author } = req.body;
-        
+        console.log("hola");
         if (!title || !content) {
             return res.status(400).json({ error: 'El título y contenido son obligatorios' });
         }
@@ -104,7 +104,7 @@ app.post('/temas', async(req, res) => {
             views: 0,
             createdAt: new Date().toISOString()
         };
-        
+        console.log(newTema);
         const docRef = await db.collection("temas").add(newTema);
         
         res.status(201).json({

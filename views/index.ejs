@@ -165,8 +165,8 @@
 								<textarea class="comment-input" placeholder="Escribe tu respuesta..."></textarea>
 							</div>
 							<div class="form-actions">
-								<button class="btn btn-secondary">Cancelar</button>
-								<button class="btn btn-primary">Publicar respuesta</button>
+								<button type="button" class="btn btn-secondary">Cancelar</button>
+								<button type="button" class="btn btn-primary">Publicar respuesta</button>
 							</div>
 						</div>
 					</div>
@@ -244,7 +244,7 @@
                 comments: [],
                 createdAt: new Date().toISOString()
             };
-
+			console.log(newTopic);
             // Aquí en lugar de guardar en localStorage, deberías enviar el nuevo tema al servidor
             // mediante una petición POST
             fetch('/temas', {
@@ -257,7 +257,7 @@
             .then(response => response.json())
             .then(data => {
                 // Refrescar la página para mostrar el nuevo tema
-                window.location.reload();
+                //window.location.reload();
             })
             .catch(error => {
                 console.error('Error al guardar el tema:', error);
