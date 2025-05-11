@@ -243,28 +243,25 @@ app.post('/signup', async (req, res) => {
 app.get('/perfil', checkAuth, async (req, res) => {
 	try {
 		const uid = req.user.uid;
-
-		// Buscar al usuario en Firestore (colección "usuarios")
 		const userDoc = await db.collection('usuarios').doc(uid).get();
 
 		if (!userDoc.exists) {
-			return res.status(404).send('Usuario no encontrado en Firestore.');
+			return res.status(404).send('Usuario no encontrado.');
 		}
 
 		const userData = userDoc.data();
 
 		res.render('perfil', {
-			title: 'Estrés Académico - Perfil',
-			nombre: userData.nombre || '',
-			correo: userData.correo || '',
-			puntaje: userData.puntaje || 0
+			title: 'Perfil',
+			nombre: userData.nombre,
+			correo: userData.correo,
+			puntaje: userData.puntaje
 		});
 	} catch (err) {
-		console.error('Error al cargar perfil:', err.message);
-		res.status(500).send('Error interno');
+		console.error(err);
+		res.status(500).send('Error al cargar el perfil');
 	}
 });
-
 // Ruta protegida
 app.get('/quiz', (req, res) => {
 	res.render('quiz', { title: 'Estrés Académico - Quiz' });
