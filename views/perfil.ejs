@@ -7,17 +7,16 @@
 <body>
 	<%- include('partials/header') %>
 	<div class="container">
-		<div class="main-content">
-			<div class="section">
-				<h3>Nombre del Usuario</h3>
-				<p><%= nombre %></p>
-				
-				<h3>Puntaje del Usuario</h3>
-				<p><%= puntaje %></p>
-
-				<h3>Correo electrónico</h3>
-				<p><%= correo %></p>
-			</div>
-		</div>
+	  <div class="profile-section">
+	    <h2>Perfil del Usuario</h2>
+	
+	    <div class="profile-info">
+	      <p><span>Nombre:</span> <%= nombre %></p>
+	      <p><span>Correo:</span> <%= correo %></p>
+	      <p><span>Puntaje:</span> <%= puntaje %></p>
+	    </div>
+	
+	    <a href="/logout" class="btn">Cerrar sesión</a>
+	  </div>
 	</div>
 </body>
