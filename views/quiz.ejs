@@ -253,24 +253,16 @@
       }
     }
 
-    // Enviar el total calculado al servidor
+    // Guardar puntaje y luego redirigir según nivel
     fetch('/guardar-puntaje', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ puntaje: total })
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Puntaje guardado:', data);
-      })
-      .catch(error => {
-        console.error('Error al guardar el puntaje:', error);
-      });
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ puntaje: total })
+    })
     .then(response => response.json())
     .then(data => {
-      // Redirigir según el puntaje
       if (total >= 0 && total <= 10) {
         window.location.href = "/nivel_bajo";
       } else if (total >= 11 && total <= 20) {
@@ -282,7 +274,8 @@
       }
     })
     .catch(error => {
-      console.error('Error al actualizar el puntaje:', error);
+      console.error('Error al guardar el puntaje:', error);
+      alert('Hubo un problema al guardar tu puntaje. Inténtalo de nuevo.');
     });
   });
 </script>
