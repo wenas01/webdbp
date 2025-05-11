@@ -230,7 +230,7 @@ app.post('/signup', async (req, res) => {
 
 		// Guardar también en Firestore
 		await db.collection('usuarios').doc(userRecord.uid).set({
-			nombre: email.split('@')[0],  // Puedes usar un nombre por defecto
+			nombre: email.split('@')[0],
 			correo: email,
 			puntaje: 0
 		});
