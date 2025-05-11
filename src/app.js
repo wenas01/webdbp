@@ -283,8 +283,8 @@ app.get('/perfil', checkAuth, async (req, res) => {
 });
 
 // Ruta protegida
-app.get('/quiz', (req, res) => {
-	res.render('quiz', { title: 'Estrés Académico - Quiz' });
+app.get('/quiz', checkAuth, (req, res) => {
+  res.render('quiz', { title: 'Estrés Académico - Quiz' });
 });
 app.get('/nivel_bajo', (req, res) => {
 	res.render('nivel_bajo', { title: 'Quiz - Nivel_bajo' });
