@@ -232,10 +232,10 @@ app.get('/login', (req, res) => {
 	res.render('login', { title: 'Estrés Académico - Iniciar Sesión', error: null });
 });
 
-pp.post('/login', async (req, res) => {
+app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
-    // Autenticación del usuario con Firebase
+    // Autenticación con Firebase
     const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -254,7 +254,6 @@ pp.post('/login', async (req, res) => {
 
     const idToken = data.idToken;
 
-    // Guardar el token en cookies firmadas
     res.cookie('__session', idToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -273,26 +272,25 @@ pp.post('/login', async (req, res) => {
 });
 
 app.get('/perfil', checkAuth, async (req, res) => {
-	try {
-		const uid = req.user.uid;
-		const userDoc = await db.collection('usuarios').doc(uid).get();
+  try {
+    const uid = req.user.uid;
+    const userDoc = await db.collection('usuarios').doc(uid).get();
 
-		if (!userDoc.exists) {
-			return res.status(404).send('Usuario no encontrado.');
-		}
+    if (!userDoc.exists) {
+      return res.status(404).send('Usuario no encontrado.');
+    }
 
-		const userData = userDoc.data();
-
-		res.render('perfil', {
-			title: 'Perfil',
-			nombre: userData.nombre,
-			correo: userData.correo,
-			puntaje: userData.puntaje
-		});
-	} catch (err) {
-		console.error(err);
-		res.status(500).send('Error al cargar el perfil');
-	}
+    const userData = userDoc.data();
+    res.render('perfil', {
+      title: 'Perfil',
+      nombre: userData.nombre,
+      correo: userData.correo,
+      puntaje: userData.puntaje
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error al cargar el perfil');
+  }
 });
 // Ruta protegida
 app.get('/quiz', (req, res) => {
@@ -314,8 +312,8 @@ app.get('/nivel_muy_alto', (req, res) => {
 
 // Logout
 app.get('/logout', (req, res) => {
-	res.clearCookie('__session');
-	res.redirect('/login');
+  res.clearCookie('__session');
+  res.redirect('/login');
 });
 
 export { app };
