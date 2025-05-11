@@ -5,14 +5,12 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import path from 'path';
 
-
 dotenv.config();
-
 
 // ------------ Configuración Firebase Admin -------------
 const serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT_JSON);
 admin.initializeApp({
-	credential: admin.credential.cert(serviceAccount),
+  credential: admin.credential.cert(serviceAccount),
 });
 
 const db = admin.firestore();
@@ -27,37 +25,34 @@ app.set('view engine', 'ejs');
 app.set('views', path.resolve('views'));
 
 app.use((req, res, next) => {
-	if (Buffer.isBuffer(req.body)) {
-		const contentType = req.headers['content-type'];
-
-		try {
-			if (contentType?.includes('application/json')) {
-				req.body = JSON.parse(req.body.toString('utf8'));
-			} else if (contentType?.includes('application/x-www-form-urlencoded')) {
-				req.body = Object.fromEntries(new URLSearchParams(req.body.toString('utf8')));
-			}
-		} catch (err) {
-			console.error('Error parsing body:', err.message);
-			return res.status(400).json({ error: 'Invalid body format' });
-		}
-	}
-
-	next();
+  const token = req.signedCookies.__session;
+  if (token) {
+    admin.auth().verifyIdToken(token).then(decoded => {
+      res.locals.user = decoded;
+      req.user = decoded;
+    }).catch(err => {
+      res.locals.user = null;
+    });
+  } else {
+    res.locals.user = null;
+  }
+  next();
 });
 
 
 // ---------------- Middleware protected ----------------
 async function checkAuth(req, res, next) {
-	const token = req.signedCookies.__session;
-	if (!token) return res.redirect('/login');
-	try {
-		const decoded = await admin.auth().verifyIdToken(token);
-		req.user = decoded;
-		next();
-	} catch {
-		res.redirect('/login');
-	}
+  const token = req.signedCookies.__session;
+  if (!token) return res.redirect('/login');
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    req.user = decoded;
+    next();
+  } catch {
+    res.redirect('/login');
+  }
 }
+
 
 export async function addUserToLocals(req, res, next) {
 	const token = req.signedCookies.__session;
