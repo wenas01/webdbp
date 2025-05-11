@@ -47,16 +47,18 @@ app.use((req, res, next) => {
 
 
 // ---------------- Middleware protected ----------------
+// Middleware checkAuth
 async function checkAuth(req, res, next) {
-	const token = req.signedCookies.__session;
-	if (!token) return res.redirect('/login');
-	try {
-		const decoded = await admin.auth().verifyIdToken(token);
-		req.user = decoded;
-		next();
-	} catch {
-		res.redirect('/login');
-	}
+  const token = req.signedCookies.__session;  // Asegúrate de que el token esté bien guardado en la cookie
+  if (!token) return res.redirect('/login');  // Redirige a login si no hay token
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    console.error('Token inválido:', error);
+    res.redirect('/login');  // Si el token no es válido, redirige al login
+  }
 }
 
 export async function addUserToLocals(req, res, next) {
