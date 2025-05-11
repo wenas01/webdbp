@@ -5,12 +5,14 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import path from 'path';
 
+
 dotenv.config();
+
 
 // ------------ Configuración Firebase Admin -------------
 const serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT_JSON);
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+	credential: admin.credential.cert(serviceAccount),
 });
 
 const db = admin.firestore();
@@ -25,34 +27,37 @@ app.set('view engine', 'ejs');
 app.set('views', path.resolve('views'));
 
 app.use((req, res, next) => {
-  const token = req.signedCookies.__session;
-  if (token) {
-    admin.auth().verifyIdToken(token).then(decoded => {
-      res.locals.user = decoded;
-      req.user = decoded;
-    }).catch(err => {
-      res.locals.user = null;
-    });
-  } else {
-    res.locals.user = null;
-  }
-  next();
+	if (Buffer.isBuffer(req.body)) {
+		const contentType = req.headers['content-type'];
+
+		try {
+			if (contentType?.includes('application/json')) {
+				req.body = JSON.parse(req.body.toString('utf8'));
+			} else if (contentType?.includes('application/x-www-form-urlencoded')) {
+				req.body = Object.fromEntries(new URLSearchParams(req.body.toString('utf8')));
+			}
+		} catch (err) {
+			console.error('Error parsing body:', err.message);
+			return res.status(400).json({ error: 'Invalid body format' });
+		}
+	}
+
+	next();
 });
 
 
 // ---------------- Middleware protected ----------------
 async function checkAuth(req, res, next) {
-  const token = req.signedCookies.__session;
-  if (!token) return res.redirect('/login');
-  try {
-    const decoded = await admin.auth().verifyIdToken(token);
-    req.user = decoded;
-    next();
-  } catch {
-    res.redirect('/login');
-  }
+	const token = req.signedCookies.__session;
+	if (!token) return res.redirect('/login');
+	try {
+		const decoded = await admin.auth().verifyIdToken(token);
+		req.user = decoded;
+		next();
+	} catch {
+		res.redirect('/login');
+	}
 }
-
 
 export async function addUserToLocals(req, res, next) {
 	const token = req.signedCookies.__session;
@@ -204,87 +209,43 @@ app.get('/signup', (req, res) => {
 	res.render('signup', { title: 'Estrés Académico - Crear Cuenta', error: null });
 });
 
+app.post('/signup', async (req, res) => {
+	const { email, password } = req.body;
+	try {
+		await admin.auth().createUser({ email, password });
+		res.redirect('/login');
+	} catch (err) {
+		res.render('signup', { title: 'Estrés Académico - Crear Cuenta', error: err.message });
+	}
+});
 
-// GET route for the login page
 app.get('/login', (req, res) => {
-  res.render('login', { title: 'Estrés Académico - Iniciar Sesión', error: null });
+	res.render('login', { title: 'Estrés Académico - Iniciar Sesión', error: null });
 });
 
-// POST route for processing login
 app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+	console.log('body:', req.body);
+	const { email, password } = req.body;
+	try {
+		console.log('Logging in with email:', email);
+		const resp = await fetch(
+			`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_API_KEY}`,
+			{
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email, password, returnSecureToken: true }),
+			}
+		);
+		const data = await resp.json();
+		if (data.error) throw new Error(data.error.message);
 
-  // Log para verificar los datos recibidos
-  console.log('Datos recibidos:', req.body);
-
-  // Validación básica de los datos
-  if (!email || !password) {
-    return res.render('login', { 
-      title: 'Estrés Académico - Iniciar Sesión', 
-      error: 'Email y contraseña son requeridos' 
-    });
-  }
-
-  try {
-    // Lógica de autenticación con Firebase
-    const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email,
-        password,
-        returnSecureToken: true
-      })
-    });
-
-    const data = await response.json();
-    console.log('Respuesta de Firebase:', data);
-
-    if (!response.ok) {
-      throw new Error(data.error?.message || 'Error al iniciar sesión');
-    }
-
-    const idToken = data.idToken;
-
-    // Guardar el token en cookies firmadas
-    res.cookie('__session', idToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      signed: true,
-      maxAge: 60 * 60 * 1000 // 1 hora
-    });
-
-    res.redirect('/perfil');
-  } catch (err) {
-    console.error(err);
-    res.render('login', {
-      title: 'Estrés Académico - Iniciar Sesión',
-      error: err.message
-    });
-  }
+		res.cookie('__session', data.idToken, { httpOnly: true, signed: true });
+		res.redirect('/');
+	} catch (err) {
+		res.render('login', { title: 'Estrés Académico - Iniciar Sesión', error: err.message });
+	}
 });
 
-app.get('/perfil', checkAuth, async (req, res) => {
-  try {
-    const uid = req.user.uid;
-    const userDoc = await db.collection('usuarios').doc(uid).get();
-
-    if (!userDoc.exists) {
-      return res.status(404).send('Usuario no encontrado.');
-    }
-
-    const userData = userDoc.data();
-    res.render('perfil', {
-      title: 'Perfil',
-      nombre: userData.nombre,
-      correo: userData.correo,
-      puntaje: userData.puntaje
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error al cargar el perfil');
-  }
-});
 // Ruta protegida
 app.get('/quiz', (req, res) => {
 	res.render('quiz', { title: 'Estrés Académico - Quiz' });
@@ -305,8 +266,8 @@ app.get('/nivel_muy_alto', (req, res) => {
 
 // Logout
 app.get('/logout', (req, res) => {
-  res.clearCookie('__session');
-  res.redirect('/login');
+	res.clearCookie('__session');
+	res.redirect('/login');
 });
 
 export { app };
