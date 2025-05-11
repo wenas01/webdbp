@@ -205,19 +205,28 @@ app.get('/signup', (req, res) => {
 });
 
 
+// GET route for the login page
+app.get('/login', (req, res) => {
+  res.render('login', { title: 'Estrés Académico - Iniciar Sesión', error: null });
+});
+
+// POST route for processing login
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   // Log para verificar los datos recibidos
-  console.log('Datos recibidos:', req.body); // Esto debería mostrar el correo y la contraseña
+  console.log('Datos recibidos:', req.body);
 
   // Validación básica de los datos
   if (!email || !password) {
-    return res.status(400).json({ error: 'Email y contraseña son requeridos' });
+    return res.render('login', { 
+      title: 'Estrés Académico - Iniciar Sesión', 
+      error: 'Email y contraseña son requeridos' 
+    });
   }
 
   try {
-    // Aquí va la lógica de autenticación con Firebase
+    // Lógica de autenticación con Firebase
     const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -229,44 +238,7 @@ app.post('/login', async (req, res) => {
     });
 
     const data = await response.json();
-    console.log('Respuesta de Firebase:', data); // Ver la respuesta de Firebase
-
-    if (!response.ok) {
-      throw new Error(data.error?.message || 'Error al iniciar sesión');
-    }
-
-    const idToken = data.idToken;
-
-    // Guardar el token en cookies firmadas
-    res.cookie('__session', idToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      signed: true,
-      maxAge: 60 * 60 * 1000 // 1 hora
-    });
-
-    res.redirect('/perfil');
-  } catch (err) {
-    console.error(err);
-    res.render('login', {
-      title: 'Estrés Académico - Iniciar Sesión',
-      error: err.message
-    });
-  }
-});
-  try {
-    const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email,
-        password,
-        returnSecureToken: true
-      })
-    });
-
-    const data = await response.json();
-    console.log('Respuesta de Firebase:', data); // Depura la respuesta de Firebase
+    console.log('Respuesta de Firebase:', data);
 
     if (!response.ok) {
       throw new Error(data.error?.message || 'Error al iniciar sesión');
