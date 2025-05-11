@@ -254,13 +254,20 @@
     }
 
     // Enviar el total calculado al servidor
-    fetch("/actualizar-puntaje", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ puntaje: total }),
-    })
+    fetch('/guardar-puntaje', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ puntaje: total })
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Puntaje guardado:', data);
+      })
+      .catch(error => {
+        console.error('Error al guardar el puntaje:', error);
+      });
     .then(response => response.json())
     .then(data => {
       // Redirigir según el puntaje
