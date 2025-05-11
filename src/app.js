@@ -223,26 +223,45 @@ app.get('/login', (req, res) => {
 	res.render('login', { title: 'Estrés Académico - Iniciar Sesión', error: null });
 });
 
-app.post('/login', async (req, res) => {
-	console.log('body:', req.body);
+app.post('/signup', async (req, res) => {
 	const { email, password } = req.body;
 	try {
-		console.log('Logging in with email:', email);
-		const resp = await fetch(
-			`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_API_KEY}`,
-			{
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email, password, returnSecureToken: true }),
-			}
-		);
-		const data = await resp.json();
-		if (data.error) throw new Error(data.error.message);
+		const userRecord = await admin.auth().createUser({ email, password });
 
-		res.cookie('__session', data.idToken, { httpOnly: true, signed: true });
-		res.redirect('/');
+		// Guardar también en Firestore
+		await db.collection('usuarios').doc(userRecord.uid).set({
+			nombre: email.split('@')[0],  // Puedes usar un nombre por defecto
+			correo: email,
+			puntaje: 0
+		});
+
+		res.redirect('/login');
 	} catch (err) {
-		res.render('login', { title: 'Estrés Académico - Iniciar Sesión', error: err.message });
+		res.render('signup', { title: 'Estrés Académico - Crear Cuenta', error: err.message });
+	}
+});
+app.get('/perfil', checkAuth, async (req, res) => {
+	try {
+		const uid = req.user.uid;
+
+		// Buscar al usuario en Firestore (colección "usuarios")
+		const userDoc = await db.collection('usuarios').doc(uid).get();
+
+		if (!userDoc.exists) {
+			return res.status(404).send('Usuario no encontrado en Firestore.');
+		}
+
+		const userData = userDoc.data();
+
+		res.render('perfil', {
+			title: 'Estrés Académico - Perfil',
+			nombre: userData.nombre || '',
+			correo: userData.correo || '',
+			puntaje: userData.puntaje || 0
+		});
+	} catch (err) {
+		console.error('Error al cargar perfil:', err.message);
+		res.status(500).send('Error interno');
 	}
 });
 
@@ -261,9 +280,6 @@ app.get('/nivel_alto', (req, res) => {
 });
 app.get('/nivel_muy_alto', (req, res) => {
 	res.render('nivel_muy_alto', { title: 'Quiz - Nivel_muy_alto' });
-});
-app.get('/perfil', (req, res) => {
-	res.render('perfil', { title: 'Estrés Académico - Perfil' });
 });
 
 
