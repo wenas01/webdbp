@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html lang="es-PE">
 <head>
-	<%- include('partials/head') %>
+  <%- include('partials/head') %>
   <link rel="stylesheet" href="/styles/forms.css">
 </head>
 <body>
-	<%- include('partials/header') %>
-	<div class="container">
-	  <div class="profile-section">
-	    <h2>Perfil del Usuario</h2>
-	
-	    <div class="profile-info">
-	      <p><span>Nombre:</span> <%= nombre %></p>
-	      <p><span>Correo:</span> <%= correo %></p>
-	      <p><span>Puntaje:</span> <%= puntaje %></p>
-	    </div>
-	
-	    <a href="/logout" class="btn">Cerrar sesión</a>
-	  </div>
-	</div>
+  <%- include('partials/header') %>
+  <div class="container">
+    <div class="profile-section">
+      <h2>Perfil del Usuario</h2>
+
+      <div class="profile-info">
+        <p><span>Nombre:</span> <%= nombre %></p>
+        <p><span>Correo:</span> <%= correo %></p>
+        <p><span>Puntaje:</span> <%= puntaje %></p>
+      </div>
+
+      <a href="/logout" class="btn">Cerrar sesión</a>
+    </div>
+  </div>
 </body>
+</html>
