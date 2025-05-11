@@ -262,6 +262,9 @@ app.get('/nivel_alto', (req, res) => {
 app.get('/nivel_muy_alto', (req, res) => {
 	res.render('nivel_muy_alto', { title: 'Quiz - Nivel_muy_alto' });
 });
+app.get('/perfil', (req, res) => {
+	res.render('perfil', { title: 'Estrés Académico - Perfil' });
+});
 
 
 // Logout
