@@ -233,16 +233,15 @@
         </div>
     </div>
 
-    <button type="submit" class="submit-button">Enviar</button>
+    <button type="button" class="submit-button" id="quiz-submit">Enviar</button>
   </form>
 </div>
 </body>
 </html>
 <script>
-  document.querySelector("form").addEventListener("submit", function(event) {
-    event.preventDefault();
-
+  document.getElementById("quiz-submit").addEventListener("click", function () {
     let total = 0;
+
     for (let i = 1; i <= 10; i++) {
       const seleccion = document.querySelector(`input[name="q${i}"]:checked`);
       if (seleccion) {
@@ -253,7 +252,6 @@
       }
     }
 
-    // Guardar puntaje y luego redirigir según nivel
     fetch('/guardar-puntaje', {
       method: 'POST',
       headers: {
@@ -263,19 +261,19 @@
     })
     .then(response => response.json())
     .then(data => {
-      if (total >= 0 && total <= 10) {
+      if (total <= 10) {
         window.location.href = "/nivel_bajo";
-      } else if (total >= 11 && total <= 20) {
+      } else if (total <= 20) {
         window.location.href = "/nivel_moderado";
-      } else if (total >= 21 && total <= 30) {
+      } else if (total <= 30) {
         window.location.href = "/nivel_alto";
-      } else if (total >= 31 && total <= 40) {
+      } else {
         window.location.href = "/nivel_muy_alto";
       }
     })
     .catch(error => {
       console.error('Error al guardar el puntaje:', error);
-      alert('Hubo un problema al guardar tu puntaje. Inténtalo de nuevo.');
+      alert('Hubo un error al guardar el puntaje. Intenta nuevamente.');
     });
   });
 </script>
