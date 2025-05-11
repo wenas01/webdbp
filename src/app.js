@@ -299,7 +299,20 @@ app.get('/nivel_muy_alto', (req, res) => {
 	res.render('nivel_muy_alto', { title: 'Quiz - Nivel_muy_alto' });
 });
 
+app.post('/guardar-puntaje', checkAuth, async (req, res) => {
+  try {
+    const uid = req.user.uid;
+    const { puntaje } = req.body;
 
+    const userRef = db.collection('usuarios').doc(uid);
+    await userRef.set({ puntaje: Number(puntaje) }, { merge: true });
+
+    res.status(200).json({ message: 'Puntaje actualizado' });
+  } catch (err) {
+    console.error('Error al guardar el puntaje:', err);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
 // Logout
 app.get('/logout', (req, res) => {
 	res.clearCookie('__session');
