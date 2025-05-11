@@ -230,14 +230,41 @@ app.get('/login', (req, res) => {
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  console.log('Datos recibidos:', req.body); // Esto nos ayudará a verificar qué llega en el backend
+  console.log('Datos recibidos:', req.body);
 
   if (!email || !password) {
     return res.status(400).json({ error: 'Email y contraseña son requeridos' });
   }
 
   try {
-    // Código para la autenticación con Firebase...
+    const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        password,
+        returnSecureToken: true
+      })
+    });
+
+    const data = await response.json();
+    console.log('Respuesta de Firebase:', data); // Depura la respuesta de Firebase
+
+    if (!response.ok) {
+      throw new Error(data.error?.message || 'Error al iniciar sesión');
+    }
+
+    const idToken = data.idToken;
+
+    // Guardar el token en cookies firmadas
+    res.cookie('__session', idToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      signed: true,
+      maxAge: 60 * 60 * 1000 // 1 hora
+    });
+
+    res.redirect('/perfil');
   } catch (err) {
     console.error(err);
     res.render('login', {
