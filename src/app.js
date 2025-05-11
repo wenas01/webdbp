@@ -230,14 +230,14 @@ app.get('/login', (req, res) => {
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  console.log('Datos recibidos:', req.body); // Verifica los datos recibidos
+  console.log('Datos recibidos:', req.body); // Esto nos ayudará a verificar qué llega en el backend
 
   if (!email || !password) {
     return res.status(400).json({ error: 'Email y contraseña son requeridos' });
   }
 
   try {
-    // Resto de tu código para la autenticación con Firebase
+    // Código para la autenticación con Firebase...
   } catch (err) {
     console.error(err);
     res.render('login', {
