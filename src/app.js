@@ -212,7 +212,16 @@ app.get('/signup', (req, res) => {
 app.post('/signup', async (req, res) => {
 	const { email, password } = req.body;
 	try {
-		await admin.auth().createUser({ email, password });
+		// 1. Crear el usuario en Firebase Auth
+		const userRecord = await admin.auth().createUser({ email, password });
+
+		// 2. Guardar datos del usuario en Firestore
+		await db.collection('usuarios').doc(userRecord.uid).set({
+			nombre: email.split('@')[0], // Puedes pedir el nombre en el formulario también
+			correo: email,
+			puntaje: 0
+		});
+
 		res.redirect('/login');
 	} catch (err) {
 		res.render('signup', { title: 'Estrés Académico - Crear Cuenta', error: err.message });
