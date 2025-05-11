@@ -209,19 +209,6 @@ app.get('/signup', (req, res) => {
 	res.render('signup', { title: 'Estrés Académico - Crear Cuenta', error: null });
 });
 
-app.post('/signup', async (req, res) => {
-	const { email, password } = req.body;
-	try {
-		await admin.auth().createUser({ email, password });
-		res.redirect('/login');
-	} catch (err) {
-		res.render('signup', { title: 'Estrés Académico - Crear Cuenta', error: err.message });
-	}
-});
-
-app.get('/login', (req, res) => {
-	res.render('login', { title: 'Estrés Académico - Iniciar Sesión', error: null });
-});
 
 app.post('/signup', async (req, res) => {
 	const { email, password } = req.body;
@@ -240,6 +227,51 @@ app.post('/signup', async (req, res) => {
 		res.render('signup', { title: 'Estrés Académico - Crear Cuenta', error: err.message });
 	}
 });
+
+app.get('/login', (req, res) => {
+	res.render('login', { title: 'Estrés Académico - Iniciar Sesión', error: null });
+});
+
+pp.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    // Autenticación del usuario con Firebase
+    const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        password,
+        returnSecureToken: true
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error?.message || 'Error al iniciar sesión');
+    }
+
+    const idToken = data.idToken;
+
+    // Guardar el token en cookies firmadas
+    res.cookie('__session', idToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      signed: true,
+      maxAge: 60 * 60 * 1000 // 1 hora
+    });
+
+    res.redirect('/perfil');
+  } catch (err) {
+    console.error(err);
+    res.render('login', {
+      title: 'Estrés Académico - Iniciar Sesión',
+      error: err.message
+    });
+  }
+});
+
 app.get('/perfil', checkAuth, async (req, res) => {
 	try {
 		const uid = req.user.uid;
