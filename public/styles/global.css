@@ -167,14 +167,15 @@ nav ul li a:hover::before,
 */Profile avatar*/
 .profile-avatar {
   display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
+  justify-content: flex-end;
 }
 .profile-content {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
   gap: 20px;
+  margin-bottom: 30px;
 }
 
 @media (min-width: 600px) {
@@ -747,9 +748,8 @@ footer {
 }
 
 .profile-info {
-  margin: 10px 0;
-  font-size: 1.1rem;
-  color: #444;
+  text-align: left;
+  flex-grow: 1;
 }
 
 .profile-info span {
