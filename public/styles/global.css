@@ -167,14 +167,14 @@ nav ul li a:hover::before,
 */Profile avatar*/
 .profile-avatar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 .profile-content {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
-  gap: 20px;
+  gap: 30px;
   margin-bottom: 30px;
 }
 
@@ -755,6 +755,26 @@ footer {
 .profile-info span {
   font-weight: bold;
   color: #d98880;
+}
+.profile-section .btn {
+  margin-top: 30px;
+  display: inline-block;
+}
+
+/* Asegurando que el contenido quede centrado verticalmente en móviles */
+@media (max-width: 600px) {
+  .profile-content {
+    flex-direction: column;
+  }
+  
+  .profile-info {
+    text-align: center;
+  }
+  
+  .profile-avatar {
+    justify-content: center;
+    margin-bottom: 20px;
+  }
 }
 /* Responsive Adjustments */
 @media (max-width: 768px) {
