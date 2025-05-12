@@ -762,20 +762,7 @@ footer {
 }
 
 /* Asegurando que el contenido quede centrado verticalmente en móviles */
-@media (max-width: 600px) {
-  .profile-content {
-    flex-direction: column;
-  }
-  
-  .profile-info {
-    text-align: center;
-  }
-  
-  .profile-avatar {
-    justify-content: center;
-    margin-bottom: 20px;
-  }
-}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     header h1 {
