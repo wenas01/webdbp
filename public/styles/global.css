@@ -686,6 +686,42 @@ footer {
     clip-path: polygon(0 15%, 100% 0, 100% 100%, 0 100%);
 }
 
+/* enlaces dentro del dropdown centrados */
+.subcuenta a {
+  color: white;
+  display: block;
+  padding: 10px 0;
+  text-decoration: none;
+}
+
+.subcuenta a:hover {
+  background-color: #ec7063;
+}
+
+.profile-section {
+  background-color: #fff0f2;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.profile-section h2 {
+  color: #a93226;
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.profile-info {
+  margin: 10px 0;
+  font-size: 1.1rem;
+  color: #444;
+}
+
+.profile-info span {
+  font-weight: bold;
+  color: #d98880;
+}
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     header h1 {
