@@ -11,16 +11,16 @@
       <h2>Perfil del Usuario</h2>
 
       <div class="profile-content">
-        <div class="profile-avatar">
-          <div class="avatar-circle"><%= nombre.charAt(0).toUpperCase() %></div>
-        </div>
-
         <div class="profile-info">
           <p><span>Nombre:</span> <%= nombre %></p>
           <p><span>Correo:</span> <%= correo %></p>
           <p><span>Puntaje:</span> <%= puntaje %></p>
         </div>
-    </div>
+  
+        <div class="profile-avatar">
+          <div class="avatar-circle"><%= nombre.charAt(0).toUpperCase() %></div>
+        </div>
+      </div>
 
     <a href="/logout" class="btn">Cerrar sesión</a>
   </div>
