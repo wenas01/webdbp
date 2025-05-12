@@ -6,23 +6,25 @@
 </head>
 <body>
   <%- include('partials/header') %>
-
   <div class="container">
     <div class="profile-section" style="animation: fadeIn 0.5s ease backwards;">
       <h2>Perfil del Usuario</h2>
 
-      <div class="profile-avatar">
-        <div class="avatar-circle"><%= nombre.charAt(0).toUpperCase() %></div>
-      </div>
+      <div class="profile-content">
+        <div class="profile-avatar">
+          <div class="avatar-circle"><%= nombre.charAt(0).toUpperCase() %></div>
+        </div>
 
-      <div class="profile-info">
-        <p><span>Nombre:</span> <%= nombre %></p>
-        <p><span>Correo:</span> <%= correo %></p>
-        <p><span>Puntaje:</span> <%= puntaje %></p>
-      </div>
-      
-      <a href="/logout" class="btn">Cerrar sesión</a>
+        <div class="profile-info">
+          <p><span>Nombre:</span> <%= nombre %></p>
+          <p><span>Correo:</span> <%= correo %></p>
+          <p><span>Puntaje:</span> <%= puntaje %></p>
+        </div>
     </div>
+
+    <a href="/logout" class="btn">Cerrar sesión</a>
   </div>
+</div>
+
 </body>
 </html>
