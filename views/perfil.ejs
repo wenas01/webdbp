@@ -1,23 +1,41 @@
+<!-- 
+  Archivo: perfil.ejs
+  Descripción: Página de perfil de usuario
+  Propósito: Mostrar información del usuario autenticado y permitir cerrar sesión
+-->
+
 <!DOCTYPE html>
 <html lang="es-PE">
 <head>
+  <!-- Incluye los metadatos comunes del head -->
   <%- include('partials/head') %>
+  <!-- Incluye estilos específicos para formularios -->
   <link rel="stylesheet" href="/styles/forms.css">
 </head>
 <body>
+  <!-- Incluye el encabezado y navegación común -->
   <%- include('partials/header') %>
+  
+ <!-- Contenedor principal para la información del perfil -->
  <div class="profile-content">
+  <!-- Sección para el avatar del usuario -->
   <div class="profile-avatar">
+    <!-- Avatar circular con la primera letra del nombre en mayúsculas -->
     <div class="avatar-circle"><%= nombre.charAt(0).toUpperCase() %></div>
   </div>
   
+  <!-- Sección para mostrar la información del usuario -->
   <div class="profile-info">
+    <!-- Muestra el nombre del usuario -->
     <p><span>Nombre:</span> <%= nombre %></p>
+    <!-- Muestra el correo electrónico del usuario -->
     <p><span>Correo:</span> <%= correo %></p>
+    <!-- Muestra el puntaje del usuario (posiblemente del quiz de estrés) -->
     <p><span>Puntaje:</span> <%= puntaje %></p>
   </div>
 </div>
 
+<!-- Botón para cerrar sesión -->
 <a href="/logout" class="btn">Cerrar sesión</a>
 
 </body>
