@@ -217,6 +217,101 @@ app.post('/comentarios/:temaId/:commentId/like', checkAuth, async(req, res) => {
     }
 });
 
+// Modificación para el backend de Node.js (añadir al archivo server.js)
+
+// Ruta para responder a un comentario específico (protegida con autenticación)
+app.post('/temas/:id/comentarios/:commentId/respuesta', checkAuth, async(req, res) => {
+    try {
+        const { id: temaId, commentId } = req.params;
+        const { text } = req.body;
+        
+        if (!text) {
+            return res.status(400).json({ error: 'El texto de la respuesta es obligatorio' });
+        }
+        
+        // Obtener la información del usuario autenticado
+        const uid = req.user.uid;
+        const userDisplayName = req.user.name || req.user.displayName || 'Usuario Anónimo';
+        
+        // Obtener el documento del tema
+        const temaRef = db.collection("temas").doc(temaId);
+        const temaDoc = await temaRef.get();
+        
+        if (!temaDoc.exists) {
+            return res.status(404).json({ error: 'Tema no encontrado' });
+        }
+        
+        const temaData = temaDoc.data();
+        const comments = temaData.comments || [];
+        
+        // Encontrar el comentario al que se está respondiendo
+        const commentIndex = comments.findIndex(c => c.id === commentId);
+        
+        if (commentIndex === -1) {
+            return res.status(404).json({ error: 'Comentario no encontrado' });
+        }
+        
+        // Verificar si el comentario ya tiene respuestas
+        if (comments[commentIndex].replies && comments[commentIndex].replies.length > 0) {
+            return res.status(400).json({ error: 'Este comentario ya tiene una respuesta. No se permiten múltiples respuestas.' });
+        }
+        
+        // Crear la nueva respuesta
+        const replyId = Date.now().toString() + '-reply-' + uid.substring(0, 8);
+        const newReply = {
+            id: replyId,
+            text,
+            authorId: uid,
+            author: userDisplayName,
+            date: new Date().toISOString(),
+            likes: 0,
+            likedBy: []
+        };
+        
+        // Añadir la respuesta al comentario
+        if (!comments[commentIndex].replies) {
+            comments[commentIndex].replies = [];
+        }
+        
+        comments[commentIndex].replies.push(newReply);
+        
+        // Actualizar el documento con la nueva respuesta
+        await temaRef.update({ comments });
+        
+        // Si el comentario original no es del usuario actual, notificar al autor original
+        const originalAuthorId = comments[commentIndex].authorId;
+        if (originalAuthorId && originalAuthorId !== uid) {
+            try {
+                const userRef = db.collection('usuarios').doc(originalAuthorId);
+                const userDoc = await userRef.get();
+                
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    const comentariosRecibidos = userData.comentariosRecibidos || [];
+                    
+                    comentariosRecibidos.push({
+                        autorUid: userDisplayName,
+                        mensaje: `Te respondió en un tema: "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`,
+                        fecha: new Date().toISOString(),
+                        likes: 0,
+                        temaId: temaId
+                    });
+                    
+                    await userRef.update({ comentariosRecibidos });
+                }
+            } catch (notifyError) {
+                console.error('Error al notificar al autor original:', notifyError);
+                // Continuamos el flujo aunque la notificación falle
+            }
+        }
+        
+        res.status(201).json(newReply);
+    } catch (error) {
+        console.error('Error al añadir respuesta:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Registro
 app.get('/signup', (req, res) => {
   res.render('signup', {
