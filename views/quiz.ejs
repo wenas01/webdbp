@@ -1,3 +1,9 @@
+<!-- 
+  Archivo: quiz.ejs
+  Descripción: Página del cuestionario para evaluar el nivel de estrés académico
+  Propósito: Permitir a los usuarios evaluar su nivel de estrés mediante preguntas específicas
+-->
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,9 +11,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quiz de Estrés Académico</title>
   <style>
+    /* Estilos específicos para la página de quiz */
     body {
       font-family: 'Poppins', Arial, sans-serif;
-      background-image: url('fondo.jpg');
+      background-image: url('fondo.jpg'); /* Imagen de fondo para la página */
       background-size: cover;
       background-repeat: no-repeat;
       background-attachment: fixed;
@@ -17,15 +24,17 @@
       color: #333;
     }
 
+    /* Contenedor principal del cuestionario */
     .quiz-container {
       max-width: 850px;
       margin: 40px auto;
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(255, 255, 255, 0.95); /* Fondo semi-transparente */
       padding: 40px 30px;
       border-radius: 20px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     }
 
+    /* Estilo para el título principal */
     h1 {
       text-align: center;
       color: #c0392b;
@@ -33,6 +42,7 @@
       font-size: 2.5rem;
     }
 
+    /* Estilo para las instrucciones */
     p.instructions {
       text-align: center;
       font-size: 1.1rem;
@@ -40,10 +50,12 @@
       color: #7f8c8d;
     }
 
+    /* Estilo para cada pregunta */
     .question {
       margin-bottom: 35px;
     }
 
+    /* Estilo para el título de cada pregunta */
     .question-title {
       font-weight: 600;
       font-size: 1.2rem;
@@ -51,6 +63,7 @@
       color: #e74c3c;
     }
 
+    /* Contenedor para las opciones de respuesta */
     .options {
       display: flex;
       justify-content: center;
@@ -58,6 +71,7 @@
       flex-wrap: wrap;
     }
 
+    /* Estilo para las etiquetas de opciones */
     label {
       display: flex;
       flex-direction: column;
@@ -73,17 +87,20 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
+    /* Efecto hover para las etiquetas */
     label:hover {
       background-color: #ffe6e6;
       transform: translateY(-3px);
     }
 
+    /* Estilo para los inputs de tipo radio */
     input[type="radio"] {
       margin-bottom: 8px;
       accent-color: #e74c3c;
       transform: scale(1.2);
     }
 
+    /* Estilo para el botón de enviar */
     .submit-button {
       display: block;
       margin: 40px auto 0;
@@ -99,10 +116,12 @@
       box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
     }
 
+    /* Efecto hover para el botón de enviar */
     .submit-button:hover {
       background-color: #c0392b;
     }
 
+    /* Estilos responsivos para móviles */
     @media (max-width: 600px) {
       .options {
         flex-direction: row;
@@ -110,6 +129,7 @@
       }
     }
   </style>
+  <!-- Incluye la fuente Poppins de Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -122,7 +142,8 @@
   </p>
 
   <form>
-    <!-- Preguntas -->
+    <!-- Preguntas del cuestionario -->
+    <!-- Cada pregunta tiene una estructura similar con opciones de 0 a 4 -->
     <div class="question">
       <div class="question-title">Alteraciones del sueño: ¿Tienes dificultades para dormir debido a preocupaciones académicas?</div>
       <div class="options">
@@ -233,17 +254,22 @@
         </div>
     </div>
 
+    <!-- Botón para enviar el cuestionario -->
     <button type="button" class="submit-button" id="quiz-submit">Enviar</button>
   </form>
 </div>
 </body>
 </html>
+
+<!-- Script JavaScript para manejar la lógica del cuestionario -->
 <script>
   document.getElementById("quiz-submit").addEventListener("click", function () {
     let total = 0;
 
+    // Recorre todas las preguntas para sumar los valores seleccionados
     for (let i = 1; i <= 10; i++) {
       const seleccion = document.querySelector(`input[name="q${i}"]:checked`);
+      // Verifica que todas las preguntas estén respondidas
       if (seleccion) {
         total += parseInt(seleccion.value);
       } else {
@@ -252,6 +278,7 @@
       }
     }
 
+    // Envía el puntaje al servidor mediante una solicitud AJAX
     fetch('/guardar-puntaje', {
       method: 'POST',
       headers: {
@@ -261,6 +288,7 @@
     })
     .then(response => response.json())
     .then(data => {
+      // Redirige a diferentes páginas según el puntaje obtenido
       if (total <= 10) {
         window.location.href = "/nivel_bajo";
       } else if (total <= 20) {
@@ -277,4 +305,3 @@
     });
   });
 </script>
-
