@@ -1,21 +1,51 @@
+# Configuración de las funciones serverless
 [functions]
+  # Especifica el empaquetador de Node.js a utilizar (esbuild es más rápido que el predeterminado)
   node_bundler = "esbuild"
+  
+  # Lista de módulos de Node.js que no se deben incluir en el bundle
+  # Se excluyen módulos grandes que se cargarán en tiempo de ejecución
   external_node_modules = ["express", "ejs", "cookie-parser", "firebase-admin"]
+  
+  # Archivos y carpetas que deben incluirse en la implementación de las funciones
   included_files = ["views/**", "public/**"]
 
+# Configuración del proceso de construcción
 [build]
+  # Comando de construcción (en este caso, no se realiza ninguna construcción)
   command    = "echo \"no build needed\""
+  
+  # Directorio donde se encuentran las funciones serverless
   functions  = "netlify/functions"
-  publish    = "."               # publica desde el root
+  
+  # Directorio que será publicado como el sitio web estático
+  # El punto (.) significa que se publica desde el directorio raíz
+  publish    = "."
 
+# Configuración del entorno de desarrollo local
 [dev]
+  # Directorio para las funciones durante el desarrollo
   functions  = "netlify/functions"
+  
+  # Directorio que se sirve durante el desarrollo local
   publish    = "public"
+  
+  # Puerto en el que se ejecutará el servidor de desarrollo
   port       = 8888
+  
+  # Puerto de destino para las redirecciones (debe coincidir con el puerto anterior)
   targetPort = 8888
 
+# Configuración de redirecciones
 [[redirects]]
+  # Redirige todas las rutas (/*) a la función API
   from = "/*"
+  
+  # Las solicitudes se dirigen a la función API, manteniendo la ruta original (:splat)
   to = "/.netlify/functions/api/:splat"
+  
+  # Código de estado HTTP 200 (OK) para la redirección
   status = 200
+  
+  # La redirección no es forzada (puede ser sobrescrita por otras reglas)
   force = false
