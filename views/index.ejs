@@ -195,178 +195,184 @@
 		<p>&copy; 2025 - Estrés Académico</p>
 	</footer>
 
-	<script>
-		document.addEventListener('DOMContentLoaded', function() {
-    const newTopicBtn = document.getElementById('new-topic-btn');
-    const newTopicForm = document.getElementById('new-topic-form');
-    const cancelTopicBtn = document.getElementById('cancel-topic-btn');
-    const forumTopics = document.querySelector('.forum-topics');
-    
-    // Mostrar/ocultar formulario de nuevo tema
-    newTopicBtn.addEventListener('click', function() {
-        newTopicForm.style.display = 'block';
-        newTopicBtn.style.display = 'none';
-        newTopicForm.scrollIntoView({ behavior: 'smooth' });
-    });
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        console.log('Script loaded');
 
-    cancelTopicBtn.addEventListener('click', function() {
-        newTopicForm.style.display = 'none';
-        newTopicBtn.style.display = 'block';
-    });
+        const newTopicBtn = document.getElementById('new-topic-btn');
+        const newTopicForm = document.getElementById('new-topic-form');
+        const cancelTopicBtn = document.getElementById('cancel-topic-btn');
+        const forumTopics = document.querySelector('.forum-topics');
 
-    // Funcionalidad para guardar nuevo tema
-    const publishTopicBtn = newTopicForm.querySelector('.btn.btn-primary');
-    publishTopicBtn.addEventListener('click', function() {
-        const titleInput = document.getElementById('topic-title').value.trim();
-        const contentInput = document.getElementById('topic-content').value.trim();
-        const tagsInput = document.getElementById('topic-tags').value.trim();
-        
-        if (titleInput && contentInput) {
-            const newTopic = {
-                title: titleInput,
-                content: contentInput,
-                tags: tagsInput.split(',').map(tag => tag.trim()),
-                author: 'Usuario Anónimo', // Podrías cambiarlo si hay usuarios
-                comments: [],
-                createdAt: new Date().toISOString()
-            };
-            // Aquí en lugar de guardar en localStorage, deberías enviar el nuevo tema al servidor
-            // mediante una petición POST
-            fetch('/temas', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(newTopic)
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Refrescar la página para mostrar el nuevo tema
-                window.location.reload();
-            })
-            .catch(error => {
-                console.error('Error al guardar el tema:', error);
-                alert('Ocurrió un error al guardar el tema. Por favor, intenta de nuevo.');
-            });
+        // Verify button exists
+        if (!newTopicBtn) {
+            console.error('New Topic button not found in DOM');
+            return;
+        }
 
+        // Mostrar/ocultar formulario de nuevo tema
+        newTopicBtn.addEventListener('click', function() {
+            newTopicForm.style.display = 'block';
+            newTopicBtn.style.display = 'none';
+            newTopicForm.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        cancelTopicBtn.addEventListener('click', function() {
             newTopicForm.style.display = 'none';
             newTopicBtn.style.display = 'block';
-            document.getElementById('topic-title').value = '';
-            document.getElementById('topic-content').value = '';
-            document.getElementById('topic-tags').value = '';
-        } else {
-            alert('Por favor, completa el título y contenido del tema.');
-        }
-    });
+        });
 
-    // Script para manejar los comentarios en los temas con autenticación
-document.querySelectorAll('.forum-topic').forEach(topicDiv => {
-    const replyButton = topicDiv.querySelector('.reply-form .btn-primary');
-    if (replyButton) {
-        replyButton.addEventListener('click', function() {
-            // Verificar si el usuario está autenticado
-            const isAuthenticated = <%= user ? 'true' : 'false' %>;
-            
-            if (!isAuthenticated) {
-                const topicId = topicDiv.dataset.id;
-                alert('Debes iniciar sesión para comentar.');
-                window.location.href = `/login?redirect=/#${topicId}`;
-                return;
-            }
-            
-            const textarea = topicDiv.querySelector('.reply-form textarea');
-            const replyText = textarea.value.trim();
-            const topicId = topicDiv.dataset.id;
-            
-            if (replyText && topicId) {
-                // Enviar respuesta al servidor
-                fetch(`/temas/${topicId}/comentarios`, {
+        // Funcionalidad para guardar nuevo tema
+        const publishTopicBtn = newTopicForm.querySelector('.btn.btn-primary');
+        publishTopicBtn.addEventListener('click', function() {
+            const titleInput = document.getElementById('topic-title').value.trim();
+            const contentInput = document.getElementById('topic-content').value.trim();
+            const tagsInput = document.getElementById('topic-tags').value.trim();
+
+            if (titleInput && contentInput) {
+                const newTopic = {
+                    title: titleInput,
+                    content: contentInput,
+                    tags: tagsInput.split(',').map(tag => tag.trim()),
+                    author: 'Usuario Anónimo',
+                    comments: [],
+                    createdAt: new Date().toISOString()
+                };
+
+                fetch('/temas', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        text: replyText
-                    })
+                    body: JSON.stringify(newTopic)
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        // Si hay error de autenticación, redirigir al login
-                        if (response.status === 401 || response.status === 403) {
-                            alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
-                            window.location.href = `/login?redirect=/#${topicId}`;
-                            return;
-                        }
-                        throw new Error('Error al publicar comentario');
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    // Refrescar la página para mostrar el nuevo comentario
                     window.location.reload();
                 })
                 .catch(error => {
-                    console.error('Error al guardar el comentario:', error);
-                    alert('Ocurrió un error al guardar el comentario. Por favor, intenta de nuevo.');
+                    console.error('Error al guardar el tema:', error);
+                    alert('Ocurrió un error al guardar el tema. Por favor, intenta de nuevo.');
                 });
-                
-                textarea.value = '';
-            }
-        });
-    }
-});
 
-// Actualizar la funcionalidad para "me gusta" en los comentarios
-document.querySelectorAll('.reply-action').forEach(action => {
-    if (action.querySelector('.fa-thumbs-up')) {
-        action.addEventListener('click', function() {
-            // Verificar si el usuario está autenticado
-            const isAuthenticated = <%= user ? 'true' : 'false' %>;
-            
-            if (!isAuthenticated) {
-                alert('Debes iniciar sesión para dar "me gusta".');
-                window.location.href = '/login?redirect=/';
-                return;
+                newTopicForm.style.display = 'none';
+                newTopicBtn.style.display = 'block';
+                document.getElementById('topic-title').value = '';
+                document.getElementById('topic-content').value = '';
+                document.getElementById('topic-tags').value = '';
+            } else {
+                alert('Por favor, completa el título y contenido del tema.');
             }
-            
-            const replyElement = action.closest('.forum-reply');
-            const topicElement = action.closest('.forum-topic');
-            
-            if (replyElement && topicElement) {
-                const commentId = replyElement.dataset.id;
-                const topicId = topicElement.dataset.id;
-                
-                // Enviar "me gusta" al servidor
-                fetch(`/comentarios/${topicId}/${commentId}/like`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
+        });
+
+        // Manejo de comentarios
+        document.querySelectorAll('.forum-topic').forEach(topicDiv => {
+            const replyButton = topicDiv.querySelector('.reply-form .btn-primary');
+            if (replyButton) {
+                replyButton.addEventListener('click', function() {
+                    // Safer authentication check
+                    const isAuthenticated = typeof <%= user ? 'true' : 'false' %> !== 'undefined' ? <%= user ? 'true' : 'false' %> : false;
+
+                    if (!isAuthenticated) {
+                        const topicId = topicId.dataset.id;
+                        alert('Debes iniciar sesión para comentar.');
+                        window.location.href = `/login?redirect=/#${topicId}`;
+                        return;
                     }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        if (response.status === 401 || response.status === 403) {
-                            alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
-                            return;
-                        }
-                        throw new Error('Error al dar "me gusta"');
+
+                    const textarea = topicDiv.querySelector('.reply-form textarea');
+                    const replyText = textarea.value.trim();
+                    const topicId = topicDiv.dataset.id;
+
+                    if (replyText && topicId) {
+                        fetch(`/temas/${topicId}/comentarios`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                text: replyText
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                if (response.status === 401 || response.status === 403) {
+                                    alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+                                    window.location.href = `/login?redirect=/#${topicId}`;
+                                    return;
+                                }
+                                throw new Error('Error al publicar comentario');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            window.location.reload();
+                        })
+                        .catch(error => {
+                            console.error('Error al guardar el comentario:', error);
+                            alert('Ocurrió un error al guardar el comentario. Por favor, intenta de nuevo.');
+                        });
+
+                        textarea.value = '';
                     }
-                    return response.json();
-                })
-                .then(data => {
-                    // Actualizar el contador de "me gusta" en la interfaz
-                    const countElement = action.querySelector('i').nextSibling;
-                    countElement.nodeValue = ` ${data.likes}`;
-                    action.style.color = '#a93226';
-                })
-                .catch(error => {
-                    console.error('Error al dar "me gusta":', error);
                 });
             }
         });
+
+        // Manejo de "me gusta"
+        document.querySelectorAll('.reply-action').forEach(action => {
+            if (action.querySelector('.fa-thumbs-up')) {
+                action.addEventListener('click', function() {
+                    const isAuthenticated = typeof <%= user ? 'true' : 'false' %> !== 'undefined' ? <%= user ? 'true' : 'false' %> : false;
+
+                    if (!isAuthenticated) {
+                        alert('Debes iniciar sesión para dar "me gusta".');
+                        window.location.href = '/login?redirect=/';
+                        return;
+                    }
+
+                    const replyElement = action.closest('.forum-reply');
+                    const topicElement = action.closest('.forum-topic');
+
+                    if (replyElement && topicElement) {
+                        const commentId = replyElement.dataset.id;
+                        const topicId = topicElement.dataset.id;
+
+                        fetch(`/comentarios/${topicId}/${commentId}/like`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                if (response.status === 401 || response.status === 403) {
+                                    alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+                                    return;
+                                }
+                                throw new Error('Error al dar "me gusta"');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            const countElement = action.querySelector('i').nextSibling;
+                            countElement.nodeValue = ` ${data.likes}`;
+                            action.style.color = '#a93226';
+                        })
+                        .catch(error => {
+                            console.error('Error al dar "me gusta":', error);
+                        });
+                    }
+                });
+            }
+        });
+
+    } catch (error) {
+        console.error('Error in DOMContentLoaded:', error);
     }
 });
-	</script>
+</script>
 </body>
 
 </html>
