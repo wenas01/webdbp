@@ -1,30 +1,38 @@
 <!DOCTYPE html>
 <html lang="es-PE">
 <head>
+	<!-- Definición del conjunto de caracteres UTF-8 para admitir caracteres especiales -->
 	<meta charset="UTF-8">
+	<!-- Configuración de la vista adaptable para dispositivos móviles -->
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- Título de la página que aparecerá en la pestaña del navegador -->
 	<title>Estrés Académico</title>
+	<!-- Importación de la fuente Roboto desde Google Fonts en pesos normal (400) y negrita (700) -->
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 	<style>
+		/* Reset de estilos para eliminar márgenes y rellenos predeterminados */
 		* {
 			margin: 0;
 			padding: 0;
-			box-sizing: border-box;
+			box-sizing: border-box; /* Hace que el ancho incluya padding y bordes */
 		}
+		/* Estilos para el cuerpo de la página */
 		body {
-			font-family: 'Roboto', sans-serif;
+			font-family: 'Roboto', sans-serif; /* Usa la fuente Roboto importada */
 			margin: 0;
 			padding: 0;
-			background-color: #f7f7f7;
+			background-color: #f7f7f7; /* Color de fondo gris claro */
 		}
+		/* Contenedor principal con diseño responsivo */
 		main {
-			max-width: 1200px;
-			margin: 0 auto;
-			padding: 80px;
+			max-width: 1200px; /* Ancho máximo para pantallas grandes */
+			margin: 0 auto; /* Centrado horizontal */
+			padding: 80px; /* Espacio interior amplio */
 			display: flex;
-			flex-direction: column;
-			gap: 24px;
+			flex-direction: column; /* Organiza elementos en columna */
+			gap: 24px; /* Espacio entre elementos hijos */
 		}
+		/* Estilo para párrafos con altura de línea adecuada para mejorar legibilidad */
 		p {
 			line-height: 1.5;
 		}
@@ -32,10 +40,15 @@
 </head>
 <body>
 	<main>
+		<!-- Encabezado principal de la página -->
 		<h1>Ruta protegida con los tests</h1>
+		<!-- Saludo personalizado que utiliza la variable email del backend -->
+		<!-- La sintaxis <%= %> es de EJS (Embedded JavaScript) para insertar valores dinámicos -->
 		<p>Hola, <strong><%= email %></strong></p>
+		<!-- Párrafos de ejemplo con texto de relleno (lorem ipsum) -->
 		<p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Repudiandae dolore sunt ut quos sint illo eum veniam, eligendi sequi, ex quo doloribus nesciunt corrupti et deleniti? Quibusdam, quo blanditiis. Neque.</p>
 		<p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Repudiandae dolore sunt ut quos sint illo eum veniam, eligendi sequi, ex quo doloribus nesciunt corrupti et deleniti? Quibusdam, quo blanditiis. Neque.</p>
+		<!-- Formulario para cerrar sesión que envía una petición POST a la ruta /logout -->
 		<form method="post" action="/logout"><button>Logout</button></form>
 	</main>
 </body>
