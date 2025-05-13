@@ -1,67 +1,26 @@
 {
-  // Nombre del proyecto
   "name": "dbp",
-  
-  // Tipo de módulo: "module" permite utilizar la sintaxis import/export de ES6
   "type": "module",
-  
-  // Versión del proyecto (semver: major.minor.patch)
   "version": "1.0.0",
-  
-  // Descripción del proyecto (vacía por ahora)
   "description": "",
-  
-  // Punto de entrada principal de la aplicación
   "main": "index.js",
-  
-  // Scripts definidos para npm
   "scripts": {
-    // Script de construcción (no se requiere ninguna acción específica)
     "build": "echo \"No build step required\"",
-    
-    // Script para pruebas (no implementado, devuelve error)
     "test": "echo \"Error: no test specified\" && exit 1",
-    
-    // Script para iniciar la aplicación
     "start": "node index.js"
   },
-  
-  // Palabras clave para búsqueda en npm (vacías)
   "keywords": [],
-  
-  // Autor del proyecto (no especificado)
   "author": "",
-  
-  // Licencia del proyecto (ISC es similar a MIT pero más simple)
   "license": "ISC",
-  
-  // Dependencias necesarias para la ejecución del proyecto
   "dependencies": {
-    // Biblioteca para crear funciones serverless en Netlify
     "@netlify/functions": "^3.1.2",
-    
-    // Middleware para manejar cookies en Express
     "cookie-parser": "^1.4.7",
-    
-    // Manejo de variables de entorno
     "dotenv": "^16.5.0",
-    
-    // Motor de plantillas para generar HTML dinámico
     "ejs": "^3.1.10",
-    
-    // Framework web para Node.js
     "express": "^5.1.0",
-    
-    // SDK de cliente Firebase para aplicaciones web
     "firebase": "^11.6.1",
-    
-    // SDK de admin de Firebase para aplicaciones de servidor
     "firebase-admin": "^13.3.0",
-    
-    // Biblioteca para realizar peticiones HTTP (versión 2 con soporte para importación)
     "node-fetch": "^2.7.0",
-    
-    // Biblioteca para adaptar aplicaciones web a funciones serverless
     "serverless-http": "^3.2.0"
   }
 }
