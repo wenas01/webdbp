@@ -137,26 +137,26 @@ app.get('/login', (req, res) => {
 
 
 app.post('/login', async (req, res) => {
-  const { idToken } = req.body;
-  try {
-    const decodedToken = await admin.auth().verifyIdToken(idToken);
-    const expiresIn = 60 * 60 * 24 * 5 * 1000;
+	console.log('body:', req.body);
+	const { email, password } = req.body;
+	try {
+		console.log('Logging in with email:', email);
+		const resp = await fetch(
+			`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_API_KEY}`,
+			{
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email, password, returnSecureToken: true }),
+			}
+		);
+		const data = await resp.json();
+		if (data.error) throw new Error(data.error.message);
 
-    res.cookie('__session', idToken, {
-      maxAge: expiresIn,
-      httpOnly: true,
-      secure: true,
-      signed: true,
-    });
-
-    res.status(200).json({ message: 'Inicio de sesión exitoso' });
-  } catch (error) {
-    console.error('Error al iniciar sesión:', error.message);
-    res.status(401).render('login', {
-      title: 'Iniciar Sesión',
-      error: 'Token inválido'
-    });
-  }
+		res.cookie('__session', data.idToken, { httpOnly: true, signed: true });
+		res.redirect('/');
+	} catch (err) {
+		res.render('login', { title: 'Estrés Académico - Iniciar Sesión', error: err.message });
+	}
 });
 
 
