@@ -124,8 +124,8 @@ app.post('/temas', async(req, res) => {
     }
 });
 
-// Ruta para añadir un comentario a un tema
-app.post('/temas/:id/comentarios', async(req, res) => {
+// Ruta para añadir un comentario a un tema (protegida con autenticación)
+app.post('/temas/:id/comentarios', checkAuth, async(req, res) => {
     try {
         const temaId = req.params.id;
         const { text } = req.body;
@@ -133,6 +133,10 @@ app.post('/temas/:id/comentarios', async(req, res) => {
         if (!text) {
             return res.status(400).json({ error: 'El texto del comentario es obligatorio' });
         }
+        
+        // Obtener la información del usuario autenticado
+        const uid = req.user.uid;
+        const userDisplayName = req.user.name || req.user.displayName || 'Usuario Anónimo';
         
         // Obtener el documento del tema
         const temaRef = db.collection("temas").doc(temaId);
@@ -143,13 +147,14 @@ app.post('/temas/:id/comentarios', async(req, res) => {
         }
         
         // Crear el nuevo comentario
+        const commentId = Date.now().toString() + '-' + uid.substring(0, 8);
         const newComment = {
-            id: Date.now().toString(), // ID simple para el ejemplo
+            id: commentId,
             text,
-            author: 'Usuario Anónimo', // Podrías obtener el usuario autenticado
+            authorId: uid,
+            author: userDisplayName,
             date: new Date().toISOString(),
-            likes: 0,
-            accepted: false
+            likes: 0
         };
         
         // Actualizar el documento con el nuevo comentario
@@ -164,10 +169,11 @@ app.post('/temas/:id/comentarios', async(req, res) => {
     }
 });
 
-// Ruta para dar "me gusta" a un comentario
-app.post('/comentarios/:temaId/:commentId/like', async(req, res) => {
+// Ruta para dar "me gusta" a un comentario (protegida con autenticación)
+app.post('/comentarios/:temaId/:commentId/like', checkAuth, async(req, res) => {
     try {
         const { temaId, commentId } = req.params;
+        const uid = req.user.uid; // ID del usuario autenticado
         
         // Obtener el documento del tema
         const temaRef = db.collection("temas").doc(temaId);
@@ -180,15 +186,26 @@ app.post('/comentarios/:temaId/:commentId/like', async(req, res) => {
         const temaData = temaDoc.data();
         const comments = temaData.comments || [];
         
-        // Encontrar el comentario y actualizar los likes
+        // Encontrar el comentario
         const commentIndex = comments.findIndex(c => c.id === commentId);
         
         if (commentIndex === -1) {
             return res.status(404).json({ error: 'Comentario no encontrado' });
         }
         
-        // Incrementar los likes
+        // Verificar si el usuario ya dio like (basado en la lista de usuarios que dieron like)
+        if (!comments[commentIndex].likedBy) {
+            comments[commentIndex].likedBy = [];
+        }
+        
+        // Si el usuario ya dio like, no permitir otro
+        if (comments[commentIndex].likedBy.includes(uid)) {
+            return res.status(400).json({ error: 'Ya has dado "me gusta" a este comentario' });
+        }
+        
+        // Incrementar los likes y registrar quién dio el like
         comments[commentIndex].likes = (comments[commentIndex].likes || 0) + 1;
+        comments[commentIndex].likedBy.push(uid);
         
         // Actualizar el documento
         await temaRef.update({ comments });
