@@ -93,8 +93,12 @@ app.get('/', async (req, res) => {
 
 // Registro
 app.get('/signup', (req, res) => {
-  res.render('signup', { error: null });
+  res.render('signup', {
+    title: 'Registro de Usuario',
+    error: null
+  });
 });
+
 
 app.post('/signup', async (req, res) => {
   const { email, password, nombre, fechaNacimiento } = req.body;
@@ -116,14 +120,21 @@ app.post('/signup', async (req, res) => {
     res.redirect('/login');
   } catch (error) {
     console.error('Error al registrar usuario:', error.message);
-    res.render('signup', { error: error.message });
+    res.render('signup', { 
+      title: 'Registro de Usuario',
+      error: error.message 
+    });
   }
 });
 
 // Login
 app.get('/login', (req, res) => {
-  res.render('login', { error: null });
+  res.render('login', {
+    title: 'Iniciar Sesión',
+    error: null
+  });
 });
+
 
 app.post('/login', async (req, res) => {
   const { idToken } = req.body;
@@ -141,9 +152,13 @@ app.post('/login', async (req, res) => {
     res.status(200).json({ message: 'Inicio de sesión exitoso' });
   } catch (error) {
     console.error('Error al iniciar sesión:', error.message);
-    res.status(401).json({ error: 'Token inválido' });
+    res.status(401).render('login', {
+      title: 'Iniciar Sesión',
+      error: 'Token inválido'
+    });
   }
 });
+
 
 // Perfil
 app.get('/perfil', checkAuth, async (req, res) => {
