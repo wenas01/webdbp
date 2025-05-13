@@ -169,7 +169,7 @@ app.post('/temas/:id/comentarios', checkAuth, async(req, res) => {
     }
 });
 
-// Ruta para dar "me gusta" a un comentario (protegida con autenticación)
+// Mejora para la ruta de "me gusta" con verificación de un solo like por usuario
 app.post('/comentarios/:temaId/:commentId/like', checkAuth, async(req, res) => {
     try {
         const { temaId, commentId } = req.params;
@@ -186,34 +186,107 @@ app.post('/comentarios/:temaId/:commentId/like', checkAuth, async(req, res) => {
         const temaData = temaDoc.data();
         const comments = temaData.comments || [];
         
-        // Encontrar el comentario
-        const commentIndex = comments.findIndex(c => c.id === commentId);
+        // Función recursiva para buscar el comentario en comentarios y respuestas
+        const findAndUpdateLike = (commentsArray) => {
+            let found = false;
+            
+            // Buscar primero en comentarios principales
+            for (let i = 0; i < commentsArray.length; i++) {
+                // Verificar si es el comentario principal
+                if (commentsArray[i].id === commentId) {
+                    // Verificar si ya dio like
+                    if (!commentsArray[i].likedBy) {
+                        commentsArray[i].likedBy = [];
+                    }
+                    
+                    if (commentsArray[i].likedBy.includes(uid)) {
+                        throw { status: 400, message: 'Ya has dado "me gusta" a este comentario' };
+                    }
+                    
+                    // Incrementar likes y registrar usuario
+                    commentsArray[i].likes = (commentsArray[i].likes || 0) + 1;
+                    commentsArray[i].likedBy.push(uid);
+                    
+                    // Notificar al autor del comentario
+                    if (commentsArray[i].authorId && commentsArray[i].authorId !== uid) {
+                        notifyUser(commentsArray[i].authorId, uid, temaId, 'dio me gusta a tu comentario');
+                    }
+                    
+                    return { likes: commentsArray[i].likes };
+                }
+                
+                // Buscar en respuestas anidadas si existen
+                if (commentsArray[i].replies && commentsArray[i].replies.length > 0) {
+                    for (let j = 0; j < commentsArray[i].replies.length; j++) {
+                        if (commentsArray[i].replies[j].id === commentId) {
+                            // Verificar si ya dio like
+                            if (!commentsArray[i].replies[j].likedBy) {
+                                commentsArray[i].replies[j].likedBy = [];
+                            }
+                            
+                            if (commentsArray[i].replies[j].likedBy.includes(uid)) {
+                                throw { status: 400, message: 'Ya has dado "me gusta" a esta respuesta' };
+                            }
+                            
+                            // Incrementar likes y registrar usuario
+                            commentsArray[i].replies[j].likes = (commentsArray[i].replies[j].likes || 0) + 1;
+                            commentsArray[i].replies[j].likedBy.push(uid);
+                            
+                            // Notificar al autor de la respuesta
+                            if (commentsArray[i].replies[j].authorId && commentsArray[i].replies[j].authorId !== uid) {
+                                notifyUser(commentsArray[i].replies[j].authorId, uid, temaId, 'dio me gusta a tu respuesta');
+                            }
+                            
+                            return { likes: commentsArray[i].replies[j].likes };
+                        }
+                    }
+                }
+            }
+            
+            throw { status: 404, message: 'Comentario no encontrado' };
+        };
         
-        if (commentIndex === -1) {
-            return res.status(404).json({ error: 'Comentario no encontrado' });
-        }
+        // Función para notificar al usuario
+        const notifyUser = async (targetUid, sourceUid, temaId, action) => {
+            try {
+                // Obtener información del usuario que da like
+                const sourceUserInfo = req.user;
+                const sourceUserName = sourceUserInfo.name || sourceUserInfo.displayName || 'Usuario Anónimo';
+                
+                // Actualizar la colección de usuarios con la notificación
+                const userRef = db.collection('usuarios').doc(targetUid);
+                const userDoc = await userRef.get();
+                
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    const comentariosRecibidos = userData.comentariosRecibidos || [];
+                    
+                    comentariosRecibidos.push({
+                        autorUid: sourceUserName,
+                        mensaje: `${sourceUserName} ${action}`,
+                        fecha: new Date().toISOString(),
+                        temaId: temaId
+                    });
+                    
+                    await userRef.update({ comentariosRecibidos });
+                }
+            } catch (err) {
+                console.error('Error al notificar:', err);
+                // Continuamos aunque falle la notificación
+            }
+        };
         
-        // Verificar si el usuario ya dio like (basado en la lista de usuarios que dieron like)
-        if (!comments[commentIndex].likedBy) {
-            comments[commentIndex].likedBy = [];
-        }
-        
-        // Si el usuario ya dio like, no permitir otro
-        if (comments[commentIndex].likedBy.includes(uid)) {
-            return res.status(400).json({ error: 'Ya has dado "me gusta" a este comentario' });
-        }
-        
-        // Incrementar los likes y registrar quién dio el like
-        comments[commentIndex].likes = (comments[commentIndex].likes || 0) + 1;
-        comments[commentIndex].likedBy.push(uid);
+        // Buscar y actualizar el like
+        const result = findAndUpdateLike(comments);
         
         // Actualizar el documento
         await temaRef.update({ comments });
         
-        res.status(200).json({ likes: comments[commentIndex].likes });
+        res.status(200).json(result);
+        
     } catch (error) {
         console.error('Error al dar like:', error);
-        res.status(500).json({ error: error.message });
+        res.status(error.status || 500).json({ error: error.message || 'Error interno del servidor' });
     }
 });
 
