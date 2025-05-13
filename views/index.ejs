@@ -262,60 +262,112 @@
         }
     });
 
-    // Función para manejar las respuestas a los temas
-    document.querySelectorAll('.forum-topic').forEach(topicDiv => {
-        const replyButton = topicDiv.querySelector('.reply-form .btn-primary');
-        if (replyButton) {
-            replyButton.addEventListener('click', function() {
-                const textarea = topicDiv.querySelector('.reply-form textarea');
-                const replyText = textarea.value.trim();
-                const topicId = topicDiv.dataset.id; // Asumiendo que has añadido data-id al div del tema
+    // Script para manejar los comentarios en los temas con autenticación
+document.querySelectorAll('.forum-topic').forEach(topicDiv => {
+    const replyButton = topicDiv.querySelector('.reply-form .btn-primary');
+    if (replyButton) {
+        replyButton.addEventListener('click', function() {
+            // Verificar si el usuario está autenticado
+            const isAuthenticated = <%= user ? 'true' : 'false' %>;
+            
+            if (!isAuthenticated) {
+                const topicId = topicDiv.dataset.id;
+                alert('Debes iniciar sesión para comentar.');
+                window.location.href = `/login?redirect=/#${topicId}`;
+                return;
+            }
+            
+            const textarea = topicDiv.querySelector('.reply-form textarea');
+            const replyText = textarea.value.trim();
+            const topicId = topicDiv.dataset.id;
+            
+            if (replyText && topicId) {
+                // Enviar respuesta al servidor
+                fetch(`/temas/${topicId}/comentarios`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: replyText
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        // Si hay error de autenticación, redirigir al login
+                        if (response.status === 401 || response.status === 403) {
+                            alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+                            window.location.href = `/login?redirect=/#${topicId}`;
+                            return;
+                        }
+                        throw new Error('Error al publicar comentario');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Refrescar la página para mostrar el nuevo comentario
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Error al guardar el comentario:', error);
+                    alert('Ocurrió un error al guardar el comentario. Por favor, intenta de nuevo.');
+                });
                 
-                if (replyText && topicId) {
-                    // Enviar respuesta al servidor
-                    fetch(`/temas/${topicId}/comentarios`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            text: replyText,
-                            date: new Date().toISOString()
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        // Refrescar la página para mostrar el nuevo comentario
-                        window.location.reload();
-                    })
-                    .catch(error => {
-                        console.error('Error al guardar el comentario:', error);
-                        alert('Ocurrió un error al guardar el comentario. Por favor, intenta de nuevo.');
-                    });
-                    
-                    textarea.value = '';
-                }
-            });
-        }
-    });
+                textarea.value = '';
+            }
+        });
+    }
+});
 
-    // Simular "me gusta" en respuestas
-    document.querySelectorAll('.reply-action').forEach(action => {
-        if (action.querySelector('.fa-thumbs-up')) {
-            action.addEventListener('click', function() {
-                const countElement = action.querySelector('i').nextSibling;
-                let count = parseInt(countElement.nodeValue.trim());
-                countElement.nodeValue = ' ' + (count + 1);
-                action.style.color = '#a93226';
+// Actualizar la funcionalidad para "me gusta" en los comentarios
+document.querySelectorAll('.reply-action').forEach(action => {
+    if (action.querySelector('.fa-thumbs-up')) {
+        action.addEventListener('click', function() {
+            // Verificar si el usuario está autenticado
+            const isAuthenticated = <%= user ? 'true' : 'false' %>;
+            
+            if (!isAuthenticated) {
+                alert('Debes iniciar sesión para dar "me gusta".');
+                window.location.href = '/login?redirect=/';
+                return;
+            }
+            
+            const replyElement = action.closest('.forum-reply');
+            const topicElement = action.closest('.forum-topic');
+            
+            if (replyElement && topicElement) {
+                const commentId = replyElement.dataset.id;
+                const topicId = topicElement.dataset.id;
                 
-                // Aquí podrías enviar una petición al servidor para registrar el "me gusta"
-                // const replyId = action.closest('.forum-reply').dataset.id;
-                // fetch(`/comentarios/${replyId}/like`, { method: 'POST' })
-                //    .then(response => response.json())
-                //    .catch(error => console.error('Error al dar like:', error));
-            });
-        }
-    });
+                // Enviar "me gusta" al servidor
+                fetch(`/comentarios/${topicId}/${commentId}/like`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        if (response.status === 401 || response.status === 403) {
+                            alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+                            return;
+                        }
+                        throw new Error('Error al dar "me gusta"');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Actualizar el contador de "me gusta" en la interfaz
+                    const countElement = action.querySelector('i').nextSibling;
+                    countElement.nodeValue = ` ${data.likes}`;
+                    action.style.color = '#a93226';
+                })
+                .catch(error => {
+                    console.error('Error al dar "me gusta":', error);
+                });
+            }
+        });
+    }
 });
 	</script>
 </body>
