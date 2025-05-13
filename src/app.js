@@ -206,6 +206,25 @@ app.get('/perfil', checkAuth, async (req, res) => {
   }
 });
 
+
+// Ruta protegida
+app.get('/quiz', checkAuth, (req, res) => {
+  res.render('quiz', { title: 'Estrés Académico - Quiz' });
+});
+app.get('/nivel_bajo', (req, res) => {
+	res.render('nivel_bajo', { title: 'Quiz - Nivel_bajo' });
+});
+app.get('/nivel_moderado', (req, res) => {
+	res.render('nivel_moderado', { title: 'Quiz - Nivel_moderado' });
+});
+app.get('/nivel_alto', (req, res) => {
+	res.render('nivel_alto', { title: 'Quiz - Nivel_alto' });
+});
+app.get('/nivel_muy_alto', (req, res) => {
+	res.render('nivel_muy_alto', { title: 'Quiz - Nivel_muy_alto' });
+});
+
+
 // Guardar puntaje
 app.post('/guardar-puntaje', checkAuth, async (req, res) => {
   try {
