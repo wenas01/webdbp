@@ -1,3 +1,9 @@
+<!-- 
+  Archivo: header.ejs
+  Descripción: Componente de encabezado reutilizable con navegación
+  Propósito: Proporcionar una estructura de navegación consistente en todas las páginas
+-->
+
 <header>
 	<h1><b>Estrés académico</b></h1>
 	<p class="subtitle">Información, causas y soluciones</p>
@@ -5,20 +11,28 @@
 
 <nav>
 	<ul>
+		<!-- Enlaces de navegación principales -->
 		<li><a href="/#foro">Foro</a></li>
 		<li><a href="/#consejos">Consejos</a></li>
+        
+        <!-- Menú desplegable para funciones de autenticación -->
         <li class="cuenta-container">
-      <div class="boton-cuenta" onclick="toggleSubcuenta()">Cuenta</div>
-      <div id="subcuenta" class="subcuenta">
-        <% if (user) { %>
-          <a href="/logout">Cerrar Sesión</a>
-	  <a href="/perfil">Perfil</a>
-        <% } else { %>
-          <a href="/login">Iniciar sesión</a>
-          <a href="/signup">Registrarse</a>
-        <% } %>
-      </div>
-    </li>
+          <!-- Botón que activa el menú desplegable mediante una función JavaScript -->
+          <div class="boton-cuenta" onclick="toggleSubcuenta()">Cuenta</div>
+          
+          <!-- Menú desplegable que muestra diferentes opciones según el estado de autenticación -->
+          <div id="subcuenta" class="subcuenta">
+            <% if (user) { %>
+              <!-- Si hay un usuario autenticado, mostrar opciones de cerrar sesión y perfil -->
+              <a href="/logout">Cerrar Sesión</a>
+              <a href="/perfil">Perfil</a>
+            <% } else { %>
+              <!-- Si no hay usuario autenticado, mostrar opciones para iniciar sesión o registrarse -->
+              <a href="/login">Iniciar sesión</a>
+              <a href="/signup">Registrarse</a>
+            <% } %>
+          </div>
+        </li>
 	</ul>
 	
 </nav>
