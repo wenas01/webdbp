@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es-PE">
-
 <head>
   <%- include('partials/head') %>
   <link rel="stylesheet" href="/styles/forms.css">
@@ -18,6 +17,14 @@
       <div class="form-group">
         <label for="password">Contraseña:</label>
         <input type="password" id="password" name="password" required>
+      </div>
+      <div class="form-group">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required>
+      </div>
+      <div class="form-group">
+        <label for="fechaNacimiento">Fecha de Nacimiento:</label>
+        <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
       </div>
       <button class="btn btn-primary">Crear Cuenta</button>
     </form>
