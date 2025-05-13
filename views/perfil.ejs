@@ -1,8 +1,12 @@
-<!-- 
-  Archivo: perfil.ejs
-  Descripción: Página de perfil de usuario
-  Propósito: Mostrar información del usuario autenticado y permitir cerrar sesión
--->
+perfil.ejs
+
+
+
+
+
+
+
+
 
 <!DOCTYPE html>
 <html lang="es-PE">
@@ -16,27 +20,43 @@
   <!-- Incluye el encabezado y navegación común -->
   <%- include('partials/header') %>
   
- <!-- Contenedor principal para la información del perfil -->
- <div class="profile-content">
-  <!-- Sección para el avatar del usuario -->
-  <div class="profile-avatar">
-    <!-- Avatar circular con la primera letra del nombre en mayúsculas -->
-    <div class="avatar-circle"><%= nombre.charAt(0).toUpperCase() %></div>
+  <!-- Contenedor principal para la información del perfil -->
+  <div class="profile-content">
+    <!-- Sección para el avatar del usuario -->
+    <div class="profile-avatar">
+      <div class="avatar-circle"><%= nombre.charAt(0).toUpperCase() %></div>
+    </div>
+    
+    <!-- Sección para mostrar la información del usuario -->
+    <div class="profile-info">
+      <p><span>Nombre:</span> <%= nombre %></p>
+      <p><span>Correo:</span> <%= correo %></p>
+      <p><span>Fecha de nacimiento:</span> <%= fechaNacimiento || 'No registrada' %></p>
+      <p><span>Puntaje:</span> <%= puntaje %></p>
+      <p><span>Nivel de estrés:</span> <%= resultadoQuiz %></p>
+      <p><span>Consejo:</span> <%= consejo %></p>
+    </div>
   </div>
-  
-  <!-- Sección para mostrar la información del usuario -->
-  <div class="profile-info">
-    <!-- Muestra el nombre del usuario -->
-    <p><span>Nombre:</span> <%= nombre %></p>
-    <!-- Muestra el correo electrónico del usuario -->
-    <p><span>Correo:</span> <%= correo %></p>
-    <!-- Muestra el puntaje del usuario (posiblemente del quiz de estrés) -->
-    <p><span>Puntaje:</span> <%= puntaje %></p>
+
+  <!-- Sección para mostrar los comentarios recibidos -->
+  <div class="comments-section">
+    <h3>Comentarios recibidos:</h3>
+    <% if (comentariosRecibidos.length > 0) { %>
+      <ul>
+        <% comentariosRecibidos.forEach(function(comentario) { %>
+          <li class="comment-item">
+            <p><strong><%= comentario.autorUid %> dijo:</strong></p>
+            <p><%= comentario.mensaje %></p>
+            <p><span>Likes: </span><%= comentario.likes %></p>
+          </li>
+        <% }); %>
+      </ul>
+    <% } else { %>
+      <p>No tienes comentarios aún.</p>
+    <% } %>
   </div>
-</div>
 
-<!-- Botón para cerrar sesión -->
-<a href="/logout" class="btn">Cerrar sesión</a>
-
+  <!-- Botón para cerrar sesión -->
+  <a href="/logout" class="btn">Cerrar sesión</a>
 </body>
 </html>
