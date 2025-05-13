@@ -1,23 +1,33 @@
+/* 
+  Archivo: forms.css
+  Descripción: Estilos específicos para los formularios de la aplicación
+  Propósito: Estilizar los componentes de formulario compartidos entre páginas
+*/
 
 .main {
-	max-width: 320px;
-	margin: 0 auto;
-	gap: 24px;
-	text-align: center;
-	padding-block: 48px;
+	/* Contenedor principal de los formularios */
+	max-width: 320px;       /* Limita el ancho para mejor legibilidad */
+	margin: 0 auto;         /* Centra horizontalmente en la página */
+	gap: 24px;              /* Espaciado entre elementos hijos */
+	text-align: center;     /* Centra el texto */
+	padding-block: 48px;    /* Espaciado vertical */
 
 	h1 {
-		line-height: 1;
-		margin: 0;
+		line-height: 1;     /* Altura de línea ajustada para títulos */
+		margin: 0;          /* Elimina margen predeterminado */
 	}
 }
+
+/* Aplica flexbox a formularios y al contenedor principal */
 form, .main {
-	display: flex;
-	flex-direction: column;
+	display: flex;          /* Uso de flexbox para layout */
+	flex-direction: column; /* Organiza elementos en columna */
 }
+
 form {
-	text-align: start;
+	text-align: start;      /* Alinea el texto a la izquierda en formularios */
 }
+
 a {
-	color: #d98880;
+	color: #d98880;         /* Color de enlaces con tono rojizo que combina con el tema */
 }
