@@ -20,6 +20,23 @@
     --font-secondary: 'Roboto', sans-serif;
 }
 
+.auth-required-message .btn {
+    margin-right: 5px;
+    background-color: #a93226;
+    border-color: #a93226;
+    color: white;
+    text-decoration: none;
+    padding: 5px 15px;
+    border-radius: 4px;
+    display: inline-block;
+    transition: background-color 0.3s;
+}
+
+.auth-required-message .btn:hover {
+    background-color: #8e321e;
+    border-color: #8e321e;
+}
+
 /* Reset y Base Styles */
 * {
     margin: 0;
