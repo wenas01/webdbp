@@ -239,28 +239,21 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    try {
-        const newTopicBtn = document.getElementById('new-topic-btn');
-        const newTopicForm = document.getElementById('new-topic-form');
-        const cancelTopicBtn = document.getElementById('cancel-topic-btn');
-
-        if (newTopicBtn && newTopicForm && cancelTopicBtn) {
-            newTopicBtn.addEventListener('click', function() {
-                newTopicForm.style.display = 'block';
-                newTopicBtn.style.display = 'none';
-                newTopicForm.scrollIntoView({ behavior: 'smooth' });
-            });
-
-            cancelTopicBtn.addEventListener('click', function() {
-                newTopicForm.style.display = 'none';
-                newTopicBtn.style.display = 'inline-block';
-            });
-        }
-    } catch (error) {
-        console.error('Error en el script del foro:', error);
-    }
-});
-
+    const newTopicBtn = document.getElementById('new-topic-btn');
+    const newTopicForm = document.getElementById('new-topic-form');
+    const cancelTopicBtn = document.getElementById('cancel-topic-btn');
+    const forumTopics = document.querySelector('.forum-topics');
+    
+    // Mostrar/ocultar formulario de nuevo tema
+    newTopicBtn.addEventListener('click', function() {
+        newTopicForm.style.display = 'block';
+        newTopicBtn.style.display = 'none';
+        newTopicForm.scrollIntoView({ behavior: 'smooth' });
+    });  
+    cancelTopicBtn.addEventListener('click', function() {
+        newTopicForm.style.display = 'none';
+        newTopicBtn.style.display = 'block';
+    });
 
             // Funcionalidad para guardar nuevo tema
     const publishTopicBtn = newTopicForm.querySelector('.btn.btn-primary');
