@@ -4,7 +4,7 @@
 <head>
 	<%- include('partials/head') %>
 </head>
- 
+
 <body>
 	<%- include('partials/header') %>
 	<div class="container">
@@ -93,152 +93,113 @@
 			</ol>
 		</div>
 
-				<!-- Versión actualizada del HTML del foro -->
 		<div class="section forum" id="foro">
-		    <h3>FORO DE DISCUSIÓN</h3>
-		    <div class="forum-header">
-		        <p>¡Bienvenido a nuestra comunidad! Comparte tus experiencias, haz preguntas y ayuda a otros estudiantes que
-		            están lidiando con el estrés académico.</p>
-		    </div>
+			<h3>FORO DE DISCUSIÓN</h3>
+			<div class="forum-header">
+				<p>¡Bienvenido a nuestra comunidad! Comparte tus experiencias, haz preguntas y ayuda a otros estudiantes que
+					están lidiando con el estrés académico.</p>
+			</div>
 		
-		    <div class="forum-actions">
-    <% if (user) { %>
-        <button class="btn btn-primary" id="new-topic-btn">
-            <i class="fas fa-plus"></i> Nuevo Tema
-        </button>
-    <% } else { %>
-        <div class="auth-required-message">
-            <a href="/login" class="btn btn-secondary">Inicia sesión</a> para crear un nuevo tema
-        </div>
-    <% } %>
-</div>
+			<div class="forum-actions">
+				<button class="btn btn-primary" id="new-topic-btn">
+					<i class="fas fa-plus"></i> Nuevo Tema
+				</button>
+			</div>
 		
-		    <!-- Modificación del HTML para mostrar respuestas a comentarios -->
-<div class="forum-topics">
-    <% temas.forEach((tema) => { %>
-        <div class="forum-topic" data-id="<%= tema.id %>">
-            <div class="topic-title"><%= tema.title %></div>
-            <div class="topic-meta">
-                <div class="topic-author">
-                    <div class="topic-avatar"><%= tema.author.substring(0, 2).toUpperCase() %></div>
-                    <span><%= tema.author %></span>
-                </div>
-                <div class="topic-stats">
-                    <div class="topic-stat">
-                        <i class="far fa-comment"></i> <%= tema.comments ? tema.comments.length : 0 %> respuestas
-                    </div>
-                    <div class="topic-stat">
-                        <i class="far fa-clock"></i> <%= new Date(tema.createdAt).toLocaleDateString() %>
-                    </div>
-                </div>
-            </div>
-            <div class="topic-content"><%= tema.content %></div>
-            <div class="topic-tags">
-                <% tema.tags.forEach(function(tag) { %>
-                    <span class="topic-tag"><%= tag %></span>
-                <% }); %>
-            </div>
-
-            <div class="topic-replies">
-                <% if (tema.comments && tema.comments.length > 0) { %>
-                    <% tema.comments.forEach(function(comment, index) { %>
-                        <div class="forum-reply" data-id="<%= comment.id %>">
-                            <div class="reply-header">
-                                <div class="reply-avatar"><%= comment.author ? comment.author.substring(0, 2).toUpperCase() : 'UA' %></div>
-                                <span class="reply-username"><%= comment.author || 'Usuario Anónimo' %></span>
-                                <span class="reply-date"><%= new Date(comment.date).toLocaleDateString() %></span>
-                            </div>
-                            <div class="reply-content"><%= comment.text %></div>
-                            <div class="reply-actions">
-                                <div class="reply-action <%= comment.likedBy && Array.isArray(comment.likedBy) && user && comment.likedBy.includes(user.uid) ? 'liked' : '' %>" <%= comment.likedBy && Array.isArray(comment.likedBy) && user && comment.likedBy.includes(user.uid) ? 'style="color: #a93226;"' : '' %>>
-                                    <i class="far fa-thumbs-up"></i> <%= comment.likes || 0 %>
-                                </div>
-                                <div class="reply-action">
-                                    <i class="fas fa-reply"></i> Responder
-                                </div>
-                            </div>
-                            
-                            <!-- Mostrar respuestas anidadas si existen -->
-                            <% if (comment.replies && comment.replies.length > 0) { %>
-                                <div class="nested-replies">
-                                    <% comment.replies.forEach(function(reply) { %>
-                                        <div class="nested-reply" data-id="<%= reply.id %>">
-                                            <div class="reply-header">
-                                                <div class="reply-avatar"><%= reply.author ? reply.author.substring(0, 2).toUpperCase() : 'UA' %></div>
-                                                <span class="reply-username"><%= reply.author || 'Usuario Anónimo' %></span>
-                                                <span class="reply-date"><%= new Date(reply.date).toLocaleDateString() %></span>
-                                            </div>
-                                            <div class="reply-content"><%= reply.text %></div>
-                                            <div class="reply-actions">
-                                                <div class="reply-action <%= reply.likedBy && Array.isArray(reply.likedBy) && user && reply.likedBy.includes(user.uid) ? 'liked' : '' %>" <%= reply.likedBy && Array.isArray(reply.likedBy) && user && reply.likedBy.includes(user.uid) ? 'style="color: #a93226;"' : '' %>>
-                                                    <i class="far fa-thumbs-up"></i> <%= reply.likes || 0 %>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <% }); %>
-                                </div>
-                            <% } %>
-                        </div>
-                    <% }); %>
-                <% } %>
-            </div>
-
-            <div class="reply-form">
-                <div class="form-group">
-                    <textarea class="comment-input" placeholder="Escribe tu respuesta..."></textarea>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary">Cancelar</button>
-                    <button type="button" class="btn btn-primary">Publicar respuesta</button>
-                </div>
-            </div>
-        </div>
-    <% }); %>
-</div>
+			<div class="forum-topics">
+				<% temas.forEach((tema) => { %>
+					<div class="forum-topic" data-id="<%= tema.id %>">
+						<div class="topic-title"><%= tema.title %></div>
+						<div class="topic-meta">
+							<div class="topic-author">
+								<div class="topic-avatar"><%= tema.author.substring(0, 2).toUpperCase() %></div>
+								<span><%= tema.author %></span>
+							</div>
+							<div class="topic-stats">
+								<div class="topic-stat">
+									<i class="far fa-comment"></i> <%= tema.comments ? tema.comments.length : 0 %> respuestas
+								</div>
+								<div class="topic-stat">
+									<i class="far fa-clock"></i> <%= new Date(tema.createdAt).toLocaleDateString() %>
+								</div>
+							</div>
+						</div>
+						<div class="topic-content"><%= tema.content %></div>
+						<div class="topic-tags">
+							<% tema.tags.forEach(function(tag) { %>
+								<span class="topic-tag"><%= tag %></span>
+							<% }); %>
+						</div>
 		
-		    <!-- Formulario para nuevo tema (oculto inicialmente) -->
-		    <div class="new-topic-form" id="new-topic-form" style="display: none;">
-		        <div class="form-title">Crear nuevo tema de discusión</div>
-		        <div class="form-group">
-		            <label for="topic-title">Título del tema</label>
-		            <input type="text" id="topic-title" placeholder="Escribe un título claro y descriptivo">
-		        </div>
-		        <div class="form-group">
-		            <label for="topic-content">Contenido</label>
-		            <textarea id="topic-content" placeholder="Describe tu pregunta, experiencia o tema de discusión con detalle"></textarea>
-		        </div>
-		        <div class="form-group">
-		            <label for="topic-tags">Etiquetas (separadas por comas)</label>
-		            <input type="text" id="topic-tags" placeholder="Ej: exámenes, ansiedad, organización">
-		        </div>
-		        <div class="form-actions">
-		            <button class="btn btn-secondary" id="cancel-topic-btn">Cancelar</button>
-		            <button class="btn btn-primary">Publicar tema</button>
-		        </div>
-		    </div>
+						<div class="topic-replies">
+							<% if (tema.comments && tema.comments.length > 0) { %>
+								<% tema.comments.forEach(function(comment, index) { %>
+									<div class="forum-reply <%= comment.accepted ? 'accepted-reply' : '' %>" data-id="<%= comment.id %>">
+										<div class="reply-header">
+											<div class="reply-avatar"><%= comment.author ? comment.author.substring(0, 2).toUpperCase() : 'UA' %></div>
+											<span class="reply-username"><%= comment.author || 'Usuario Anónimo' %></span>
+											<span class="reply-date"><%= new Date(comment.date).toLocaleDateString() %></span>
+											<% if (comment.accepted) { %>
+												<span class="accepted-badge">Respuesta aceptada</span>
+											<% } %>
+										</div>
+										<div class="reply-content"><%= comment.text %></div>
+										<div class="reply-actions">
+											<div class="reply-action">
+												<i class="far fa-thumbs-up"></i> <%= comment.likes || 0 %>
+											</div>
+											<div class="reply-action">
+												<i class="fas fa-reply"></i> Responder
+											</div>
+										</div>
+									</div>
+								<% }); %>
+							<% } %>
+						</div>
+		
+						<div class="reply-form">
+							<div class="form-group">
+								<textarea class="comment-input" placeholder="Escribe tu respuesta..."></textarea>
+							</div>
+							<div class="form-actions">
+								<button type="button" class="btn btn-secondary">Cancelar</button>
+								<button type="button" class="btn btn-primary">Publicar respuesta</button>
+							</div>
+						</div>
+					</div>
+				<% }); %>
+			</div>
+	
+		
+			<!-- Formulario para nuevo tema (oculto inicialmente) -->
+			<div class="new-topic-form" id="new-topic-form" style="display: none;">
+				<div class="form-title">Crear nuevo tema de discusión</div>
+				<div class="form-group">
+					<label for="topic-title">Título del tema</label>
+					<input type="text" id="topic-title" placeholder="Escribe un título claro y descriptivo">
+				</div>
+				<div class="form-group">
+					<label for="topic-content">Contenido</label>
+					<textarea id="topic-content" placeholder="Describe tu pregunta, experiencia o tema de discusión con detalle"></textarea>
+				</div>
+				<div class="form-group">
+					<label for="topic-tags">Etiquetas (separadas por comas)</label>
+					<input type="text" id="topic-tags" placeholder="Ej: exámenes, ansiedad, organización">
+				</div>
+				<div class="form-actions">
+					<button class="btn btn-secondary" id="cancel-topic-btn">Cancelar</button>
+					<button class="btn btn-primary">Publicar tema</button>
+				</div>
+			</div>
 		</div>
 	</div>
 
-	<footer style="text-align: center; margin-top: 20px;">
-	    <div class="social-links" style="display: flex; justify-content: center;">
-	        <a href="https://chat.whatsapp.com/KKZivfcXCQ0KZ2C8BEzQoQ" target="_blank" style="display: flex; align-items: center; margin-right: 15px;">
-	            <img src="https://static.vecteezy.com/system/resources/previews/016/716/480/non_2x/whatsapp-icon-free-png.png" alt="WhatsApp" style="width: 30px; height: 30px; margin-right: 8px;">
-	            WhatsApp
-	        </a>
-	        <a href="https://discord.gg/SqwwJUnq" target="_blank" style="display: flex; align-items: center; margin-right: 15px;">
-	            <img src="https://static.vecteezy.com/system/resources/previews/023/986/612/non_2x/discord-logo-discord-logo-transparent-discord-icon-transparent-free-free-png.png" alt="Discord" style="width: 30px; height: 30px; margin-right: 8px;">
-	            Discord
-	        </a>
-	        <a href="https://t.me/ESTRESA_OFICIAL" target="_blank" style="display: flex; align-items: center;">
-	            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Telegram_logo.svg/2048px-Telegram_logo.svg.png" alt="Telegram" style="width: 30px; height: 30px; margin-right: 8px;">
-	            Telegram
-	        </a>
-	    </div>
+	<footer>
+		<p>&copy; 2025 - Estrés Académico</p>
 	</footer>
 
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
     const newTopicBtn = document.getElementById('new-topic-btn');
     const newTopicForm = document.getElementById('new-topic-form');
     const cancelTopicBtn = document.getElementById('cancel-topic-btn');
@@ -249,13 +210,14 @@ document.addEventListener('DOMContentLoaded', function() {
         newTopicForm.style.display = 'block';
         newTopicBtn.style.display = 'none';
         newTopicForm.scrollIntoView({ behavior: 'smooth' });
-    });  
+    });
+
     cancelTopicBtn.addEventListener('click', function() {
         newTopicForm.style.display = 'none';
         newTopicBtn.style.display = 'block';
     });
 
-            // Funcionalidad para guardar nuevo tema
+    // Funcionalidad para guardar nuevo tema
     const publishTopicBtn = newTopicForm.querySelector('.btn.btn-primary');
     publishTopicBtn.addEventListener('click', function() {
         const titleInput = document.getElementById('topic-title').value.trim();
@@ -299,256 +261,63 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Por favor, completa el título y contenido del tema.');
         }
     });
-        
-        // Añadir funcionalidad para responder a los temas principales
-        document.querySelectorAll('.forum-topic').forEach(topic => {
-            const replyForm = topic.querySelector('.reply-form');
-            if (replyForm) {
-                const cancelBtn = replyForm.querySelector('.btn.btn-secondary');
-                const submitBtn = replyForm.querySelector('.btn.btn-primary');
-                const commentInput = replyForm.querySelector('.comment-input');
-                
-                // Botón de cancelar respuesta
-                cancelBtn.addEventListener('click', function() {
-                    commentInput.value = '';
-                    replyForm.style.display = 'none';
-                });
-                
-                // Botón de publicar respuesta
-                submitBtn.addEventListener('click', function() {
-                    const isAuthenticated = <%= user ? 'true' : 'false' %>;
-                    
-                    if (!isAuthenticated) {
-                        alert('Debes iniciar sesión para comentar.');
-                        window.location.href = '/login?redirect=/';
-                        return;
-                    }
-                    
-                    const commentText = commentInput.value.trim();
-                    const topicId = topic.dataset.id;
-                    
-                    if (commentText) {
-                        fetch(`/temas/${topicId}/comentarios`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                text: commentText
-                            })
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                if (response.status === 401 || response.status === 403) {
-                                    alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
-                                    window.location.href = '/login?redirect=/';
-                                    return;
-                                }
-                                throw new Error('Error al publicar comentario');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            window.location.reload();
-                        })
-                        .catch(error => {
-                            console.error('Error al guardar el comentario:', error);
-                            alert('Ocurrió un error al guardar el comentario. Por favor, intenta de nuevo.');
-                        });
-                        
-                        commentInput.value = '';
-                    } else {
-                        alert('Por favor, escribe un comentario antes de publicar.');
-                    }
-                });
-                
-                // Mostrar el formulario de respuesta cuando se hace clic en el área de respuesta
-                topic.addEventListener('click', function(e) {
-                    // Si el clic no fue en un elemento dentro del formulario de respuesta
-                    if (!e.target.closest('.reply-form') && !e.target.closest('.forum-reply') && !e.target.closest('.new-topic-form')) {
-                        replyForm.style.display = 'block';
-                        commentInput.focus();
-                    }
-                });
-            }
-        });
 
-        // Sistema para responder a comentarios existentes
-        document.querySelectorAll('.reply-action').forEach(action => {
-            if (action.querySelector('.fa-reply')) {
-                action.addEventListener('click', function() {
-                    // Verificar autenticación
-                    const isAuthenticated = <%= user ? 'true' : 'false' %>;
+    // Función para manejar las respuestas a los temas
+    document.querySelectorAll('.forum-topic').forEach(topicDiv => {
+        const replyButton = topicDiv.querySelector('.reply-form .btn-primary');
+        if (replyButton) {
+            replyButton.addEventListener('click', function() {
+                const textarea = topicDiv.querySelector('.reply-form textarea');
+                const replyText = textarea.value.trim();
+                const topicId = topicDiv.dataset.id; // Asumiendo que has añadido data-id al div del tema
+                
+                if (replyText && topicId) {
+                    // Enviar respuesta al servidor
+                    fetch(`/temas/${topicId}/comentarios`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            text: replyText,
+                            date: new Date().toISOString()
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Refrescar la página para mostrar el nuevo comentario
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Error al guardar el comentario:', error);
+                        alert('Ocurrió un error al guardar el comentario. Por favor, intenta de nuevo.');
+                    });
                     
-                    if (!isAuthenticated) {
-                        alert('Debes iniciar sesión para responder a comentarios.');
-                        window.location.href = '/login?redirect=/';
-                        return;
-                    }
-                    
-                    const replyElement = action.closest('.forum-reply');
-                    const topicElement = action.closest('.forum-topic');
-                    
-                    if (replyElement && topicElement) {
-                        const commentId = replyElement.dataset.id;
-                        const topicId = topicElement.dataset.id;
-                        const commentAuthor = replyElement.querySelector('.reply-username').textContent;
-                        
-                        // Crear un formulario de respuesta específico para este comentario
-                        const existingReplyForm = replyElement.querySelector('.nested-reply-form');
-                        
-                        if (existingReplyForm) {
-                            // Si ya existe un formulario de respuesta, simplemente alternar su visibilidad
-                            existingReplyForm.style.display = existingReplyForm.style.display === 'none' ? 'block' : 'none';
-                        } else {
-                            // Verificar si este comentario ya tiene respuestas
-                            const hasReplies = replyElement.querySelector('.nested-replies') !== null;
-                            
-                            if (hasReplies) {
-                                alert('Este comentario ya ha sido respondido.');
-                                return;
-                            }
-                            
-                            // Crear el formulario de respuesta
-                            const replyForm = document.createElement('div');
-                            replyForm.className = 'nested-reply-form';
-                            replyForm.innerHTML = `
-                                <div class="form-group">
-                                    <textarea placeholder="Responder a ${commentAuthor}..."></textarea>
-                                </div>
-                                <div class="form-actions">
-                                    <button type="button" class="btn btn-secondary cancel-nested-reply">Cancelar</button>
-                                    <button type="button" class="btn btn-primary submit-nested-reply">Publicar respuesta</button>
-                                </div>
-                            `;
-                            
-                            replyElement.appendChild(replyForm);
+                    textarea.value = '';
+                }
+            });
+        }
+    });
 
-                            // Enfocar el campo de texto para facilitar la escritura
-                            replyForm.querySelector('textarea').focus();
-                            
-                            // Agregar eventos para los botones
-                            replyForm.querySelector('.cancel-nested-reply').addEventListener('click', function() {
-                                replyForm.remove();
-                            });
-                            
-                            replyForm.querySelector('.submit-nested-reply').addEventListener('click', function() {
-                                const replyText = replyForm.querySelector('textarea').value.trim();
-                                
-                                if (replyText) {
-                                    // Enviar respuesta al servidor
-                                    fetch(`/temas/${topicId}/comentarios/${commentId}/respuesta`, {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                        },
-                                        body: JSON.stringify({
-                                            text: replyText
-                                        })
-                                    })
-                                    .then(response => {
-                                        if (!response.ok) {
-                                            if (response.status === 401 || response.status === 403) {
-                                                alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
-                                                window.location.href = `/login?redirect=/`;
-                                                return;
-                                            }
-                                            throw new Error('Error al publicar respuesta');
-                                        }
-                                        return response.json();
-                                    })
-                                    .then(data => {
-                                        // Refrescar la página para mostrar la nueva respuesta
-                                        window.location.reload();
-                                    })
-                                    .catch(error => {
-                                        console.error('Error al guardar la respuesta:', error);
-                                        alert('Ocurrió un error al guardar la respuesta. Por favor, intenta de nuevo.');
-                                    });
-                                } else {
-                                    alert('Por favor, escribe una respuesta antes de publicar.');
-                                }
-                            });
-                        }
-                    }
-                });
-            }
-        });
-        
-        // Sistema mejorado de "me gusta" con verificación de un solo like por usuario
-        document.querySelectorAll('.reply-action').forEach(action => {
-            if (action.querySelector('.fa-thumbs-up')) {
-                action.addEventListener('click', function() {
-                    // Verificar autenticación
-                    const isAuthenticated = <%= user ? 'true' : 'false' %>;
-                    
-                    if (!isAuthenticated) {
-                        alert('Debes iniciar sesión para dar "me gusta".');
-                        window.location.href = '/login?redirect=/';
-                        return;
-                    }
-                    
-                    const replyElement = action.closest('.forum-reply') || action.closest('.nested-reply');
-                    const topicElement = action.closest('.forum-topic');
-                    
-                    // Verificar si ya ha dado like (visual check con clase)
-                    if (action.classList.contains('liked')) {
-                        alert('Ya has dado "me gusta" a este comentario.');
-                        return;
-                    }
-                    
-                    if (replyElement && topicElement) {
-                        const commentId = replyElement.dataset.id;
-                        const topicId = topicElement.dataset.id;
-                        
-                        // Enviar "me gusta" al servidor
-                        fetch(`/comentarios/${topicId}/${commentId}/like`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                if (response.status === 400) {
-                                    alert('Ya has dado "me gusta" a este comentario.');
-                                    return response.json();
-                                } else if (response.status === 401 || response.status === 403) {
-                                    alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
-                                    window.location.href = '/login?redirect=/';
-                                    throw new Error('Sesión expirada');
-                                }
-                                throw new Error('Error al dar "me gusta"');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (data.error) {
-                                alert(data.error);
-                                return;
-                            }
-                            // Actualizar el contador de "me gusta" en la interfaz
-                            const likeCount = action.querySelector('i').nextSibling;
-                            likeCount.nodeValue = ` ${data.likes}`;
-                            
-                            // Marcar visualmente como que ya dio like
-                            action.classList.add('liked');
-                            action.style.color = '#a93226';
-                        })
-                        .catch(error => {
-                            if (error.message !== 'Sesión expirada') {
-                                console.error('Error al dar "me gusta":', error);
-                            }
-                        });
-                    }
-                });
-            }
-        });
-    } catch (err) {
-        console.error('Error general en script del foro:', err);
-    }
+    // Simular "me gusta" en respuestas
+    document.querySelectorAll('.reply-action').forEach(action => {
+        if (action.querySelector('.fa-thumbs-up')) {
+            action.addEventListener('click', function() {
+                const countElement = action.querySelector('i').nextSibling;
+                let count = parseInt(countElement.nodeValue.trim());
+                countElement.nodeValue = ' ' + (count + 1);
+                action.style.color = '#a93226';
+                
+                // Aquí podrías enviar una petición al servidor para registrar el "me gusta"
+                // const replyId = action.closest('.forum-reply').dataset.id;
+                // fetch(`/comentarios/${replyId}/like`, { method: 'POST' })
+                //    .then(response => response.json())
+                //    .catch(error => console.error('Error al dar like:', error));
+            });
+        }
+    });
 });
-</script>
+	</script>
 </body>
 
 </html>
