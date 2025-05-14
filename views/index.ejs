@@ -245,20 +245,24 @@ document.addEventListener('DOMContentLoaded', function() {
         const newTopicBtn = document.getElementById('new-topic-btn');
         const newTopicForm = document.getElementById('new-topic-form');
         const cancelTopicBtn = document.getElementById('cancel-topic-btn');
-        const forumTopics = document.querySelector('.forum-topics');
 
-        // Solo proceder si existe el botón (usuario autenticado)
         if (newTopicBtn) {
-            // Mostrar/ocultar formulario de nuevo tema
             newTopicBtn.addEventListener('click', function() {
                 newTopicForm.style.display = 'block';
+                newTopicBtn.style.display = 'none'; // Oculta el botón
                 newTopicForm.scrollIntoView({ behavior: 'smooth' });
             });
 
             cancelTopicBtn.addEventListener('click', function() {
                 newTopicForm.style.display = 'none';
-                newTopicBtn.style.display = 'block';
+                newTopicBtn.style.display = 'inline-block'; // Muestra nuevamente el botón
             });
+        }
+    } catch (error) {
+        console.error('Error en el script del foro:', error);
+    }
+});
+
 
             // Funcionalidad para guardar nuevo tema
             const publishTopicBtn = newTopicForm.querySelector('.btn.btn-primary');
