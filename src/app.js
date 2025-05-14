@@ -1,11 +1,24 @@
+// Se importa la librería Express para manejar rutas y servidores HTTP
 import express from 'express';
+
+// Se importa Firebase Admin para interactuar con Firebase y manejar autenticación, base de datos y notificaciones
 import admin from 'firebase-admin';
+
+// Se importa node-fetch para hacer solicitudes HTTP a APIs externas
 import fetch from 'node-fetch';
+
+// Se importa cookie-parser para manejar cookies en el servidor
 import cookieParser from 'cookie-parser';
+
+// Se importa dotenv para cargar las variables de entorno desde un archivo .env
 import dotenv from 'dotenv';
+
+// Se importa path para manejar rutas de archivos en el sistema operativo
 import path from 'path';
 
+// Cargar las variables de entorno del archivo .env
 dotenv.config();
+
 
 // ------------ Configuración Firebase Admin -------------
 const serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT_JSON);
@@ -29,13 +42,21 @@ app.get('/pomodoro', (req, res) => {
   });
 });
 // ---------------- Configuración Express ----------------
+// Middleware para procesar JSON y datos formateados como URL
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Middleware para procesar cookies firmadas
 app.use(cookieParser(process.env.COOKIE_SECRET));
+
+// Middleware para servir archivos estáticos (como imágenes y CSS) desde el directorio 'public'
 app.use(express.static(path.resolve('public')));
+
+// Configuración de la vista para que utilice el motor de plantillas 'ejs' y la carpeta 'views' para las vistas
 app.set('view engine', 'ejs');
 app.set('views', path.resolve('views'));
 
+// Middleware que se asegura de que el cuerpo de las solicitudes sea procesado correctamente
 app.use((req, res, next) => {
   if (Buffer.isBuffer(req.body)) {
     const contentType = req.headers['content-type'];
@@ -54,8 +75,8 @@ app.use((req, res, next) => {
 
   next();
 });
-
 // ---------------- Middleware ----------------
+// Middleware para verificar si el usuario está autenticado a través del token en las cookies
 async function checkAuth(req, res, next) {
   const token = req.signedCookies.__session;
   if (!token) return res.redirect('/login');
@@ -69,6 +90,7 @@ async function checkAuth(req, res, next) {
   }
 }
 
+// Middleware para agregar la información del usuario autenticado en las vistas
 export async function addUserToLocals(req, res, next) {
   const token = req.signedCookies.__session;
   if (token) {
@@ -85,8 +107,8 @@ export async function addUserToLocals(req, res, next) {
   next();
 }
 
+// Aplicar el middleware addUserToLocals a todas las rutas
 app.use(addUserToLocals);
-
 // ---------------- Rutas ----------------
 
 // Página principal
@@ -103,7 +125,6 @@ app.get('/', async (req, res) => {
   }
 });
 
-// Ruta para crear un nuevo tema
 // Ruta para crear un nuevo tema (protegida con autenticación)
 app.post('/temas', checkAuth, async(req, res) => {
     try {
@@ -187,221 +208,7 @@ app.post('/temas/:id/comentarios', checkAuth, async(req, res) => {
     }
 });
 
-// Mejora para la ruta de "me gusta" con verificación de un solo like por usuario
-app.post('/comentarios/:temaId/:commentId/like', checkAuth, async(req, res) => {
-    try {
-        const { temaId, commentId } = req.params;
-        const uid = req.user.uid; // ID del usuario autenticado
-        
-        // Obtener el documento del tema
-        const temaRef = db.collection("temas").doc(temaId);
-        const temaDoc = await temaRef.get();
-        
-        if (!temaDoc.exists) {
-            return res.status(404).json({ error: 'Tema no encontrado' });
-        }
-        
-        const temaData = temaDoc.data();
-        const comments = temaData.comments || [];
-        
-        // Función recursiva para buscar el comentario en comentarios y respuestas
-        const findAndUpdateLike = (commentsArray) => {
-            let found = false;
-            
-            // Buscar primero en comentarios principales
-            for (let i = 0; i < commentsArray.length; i++) {
-                // Verificar si es el comentario principal
-                if (commentsArray[i].id === commentId) {
-                    // Verificar si ya dio like
-                    if (!commentsArray[i].likedBy) {
-                        commentsArray[i].likedBy = [];
-                    }
-                    
-                    if (commentsArray[i].likedBy.includes(uid)) {
-                        throw { status: 400, message: 'Ya has dado "me gusta" a este comentario' };
-                    }
-                    
-                    // Incrementar likes y registrar usuario
-                    commentsArray[i].likes = (commentsArray[i].likes || 0) + 1;
-                    commentsArray[i].likedBy.push(uid);
-                    
-                    // Notificar al autor del comentario
-                    if (commentsArray[i].authorId && commentsArray[i].authorId !== uid) {
-                        notifyUser(commentsArray[i].authorId, uid, temaId, 'dio me gusta a tu comentario');
-                    }
-                    
-                    return { likes: commentsArray[i].likes };
-                }
-                
-                // Buscar en respuestas anidadas si existen
-                if (commentsArray[i].replies && commentsArray[i].replies.length > 0) {
-                    for (let j = 0; j < commentsArray[i].replies.length; j++) {
-                        if (commentsArray[i].replies[j].id === commentId) {
-                            // Verificar si ya dio like
-                            if (!commentsArray[i].replies[j].likedBy) {
-                                commentsArray[i].replies[j].likedBy = [];
-                            }
-                            
-                            if (commentsArray[i].replies[j].likedBy.includes(uid)) {
-                                throw { status: 400, message: 'Ya has dado "me gusta" a esta respuesta' };
-                            }
-                            
-                            // Incrementar likes y registrar usuario
-                            commentsArray[i].replies[j].likes = (commentsArray[i].replies[j].likes || 0) + 1;
-                            commentsArray[i].replies[j].likedBy.push(uid);
-                            
-                            // Notificar al autor de la respuesta
-                            if (commentsArray[i].replies[j].authorId && commentsArray[i].replies[j].authorId !== uid) {
-                                notifyUser(commentsArray[i].replies[j].authorId, uid, temaId, 'dio me gusta a tu respuesta');
-                            }
-                            
-                            return { likes: commentsArray[i].replies[j].likes };
-                        }
-                    }
-                }
-            }
-            
-            throw { status: 404, message: 'Comentario no encontrado' };
-        };
-        
-        // Función para notificar al usuario
-        const notifyUser = async (targetUid, sourceUid, temaId, action) => {
-            try {
-                // Obtener información del usuario que da like
-                const sourceUserInfo = req.user;
-                const sourceUserName = sourceUserInfo.name || sourceUserInfo.displayName || 'Usuario Anónimo';
-                
-                // Actualizar la colección de usuarios con la notificación
-                const userRef = db.collection('usuarios').doc(targetUid);
-                const userDoc = await userRef.get();
-                
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    const comentariosRecibidos = userData.comentariosRecibidos || [];
-                    
-                    comentariosRecibidos.push({
-                        autorUid: sourceUserName,
-                        mensaje: `${sourceUserName} ${action}`,
-                        fecha: new Date().toISOString(),
-                        temaId: temaId
-                    });
-                    
-                    await userRef.update({ comentariosRecibidos });
-                }
-            } catch (err) {
-                console.error('Error al notificar:', err);
-                // Continuamos aunque falle la notificación
-            }
-        };
-        
-        // Buscar y actualizar el like
-        const result = findAndUpdateLike(comments);
-        
-        // Actualizar el documento
-        await temaRef.update({ comments });
-        
-        res.status(200).json(result);
-        
-    } catch (error) {
-        console.error('Error al dar like:', error);
-        res.status(error.status || 500).json({ error: error.message || 'Error interno del servidor' });
-    }
-});
 
-// Modificación para el backend de Node.js (añadir al archivo server.js)
-
-// Ruta para responder a un comentario específico (protegida con autenticación)
-app.post('/temas/:id/comentarios/:commentId/respuesta', checkAuth, async(req, res) => {
-    try {
-        const { id: temaId, commentId } = req.params;
-        const { text } = req.body;
-        
-        if (!text) {
-            return res.status(400).json({ error: 'El texto de la respuesta es obligatorio' });
-        }
-        
-        // Obtener la información del usuario autenticado
-        const uid = req.user.uid;
-        const userDisplayName = req.user.name || req.user.displayName || 'Usuario Anónimo';
-        
-        // Obtener el documento del tema
-        const temaRef = db.collection("temas").doc(temaId);
-        const temaDoc = await temaRef.get();
-        
-        if (!temaDoc.exists) {
-            return res.status(404).json({ error: 'Tema no encontrado' });
-        }
-        
-        const temaData = temaDoc.data();
-        const comments = temaData.comments || [];
-        
-        // Encontrar el comentario al que se está respondiendo
-        const commentIndex = comments.findIndex(c => c.id === commentId);
-        
-        if (commentIndex === -1) {
-            return res.status(404).json({ error: 'Comentario no encontrado' });
-        }
-        
-        // Verificar si el comentario ya tiene respuestas
-        if (comments[commentIndex].replies && comments[commentIndex].replies.length > 0) {
-            return res.status(400).json({ error: 'Este comentario ya tiene una respuesta. No se permiten múltiples respuestas.' });
-        }
-        
-        // Crear la nueva respuesta
-        const replyId = Date.now().toString() + '-reply-' + uid.substring(0, 8);
-        const newReply = {
-            id: replyId,
-            text,
-            authorId: uid,
-            author: userDisplayName,
-            date: new Date().toISOString(),
-            likes: 0,
-            likedBy: []
-        };
-        
-        // Añadir la respuesta al comentario
-        if (!comments[commentIndex].replies) {
-            comments[commentIndex].replies = [];
-        }
-        
-        comments[commentIndex].replies.push(newReply);
-        
-        // Actualizar el documento con la nueva respuesta
-        await temaRef.update({ comments });
-        
-        // Si el comentario original no es del usuario actual, notificar al autor original
-        const originalAuthorId = comments[commentIndex].authorId;
-        if (originalAuthorId && originalAuthorId !== uid) {
-            try {
-                const userRef = db.collection('usuarios').doc(originalAuthorId);
-                const userDoc = await userRef.get();
-                
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    const comentariosRecibidos = userData.comentariosRecibidos || [];
-                    
-                    comentariosRecibidos.push({
-                        autorUid: userDisplayName,
-                        mensaje: `Te respondió en un tema: "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`,
-                        fecha: new Date().toISOString(),
-                        likes: 0,
-                        temaId: temaId
-                    });
-                    
-                    await userRef.update({ comentariosRecibidos });
-                }
-            } catch (notifyError) {
-                console.error('Error al notificar al autor original:', notifyError);
-                // Continuamos el flujo aunque la notificación falle
-            }
-        }
-        
-        res.status(201).json(newReply);
-    } catch (error) {
-        console.error('Error al añadir respuesta:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
 
 // Registro
 app.get('/signup', (req, res) => {
