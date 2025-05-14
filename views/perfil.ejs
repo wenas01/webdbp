@@ -28,25 +28,5 @@
     </div>
   </div>
 
-  <!-- Sección para mostrar los comentarios recibidos -->
-  <div class="comments-section">
-    <h3>Comentarios recibidos:</h3>
-    <% if (comentariosRecibidos.length > 0) { %>
-      <ul>
-        <% comentariosRecibidos.forEach(function(comentario) { %>
-          <li class="comment-item">
-            <p><strong><%= comentario.autorUid %> dijo:</strong></p>
-            <p><%= comentario.mensaje %></p>
-            <p><span>Likes: </span><%= comentario.likes %></p>
-          </li>
-        <% }); %>
-      </ul>
-    <% } else { %>
-      <p>No tienes comentarios aún.</p>
-    <% } %>
-  </div>
-
-  <!-- Botón para cerrar sesión -->
-  <a href="/logout" class="btn">Cerrar sesión</a>
 </body>
 </html>
