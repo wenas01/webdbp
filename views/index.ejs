@@ -265,65 +265,49 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
             // Funcionalidad para guardar nuevo tema
-            const publishTopicBtn = newTopicForm.querySelector('.btn.btn-primary');
-            publishTopicBtn.addEventListener('click', function() {
-                const isAuthenticated = <%= user ? 'true' : 'false' %>;
-                
-                if (!isAuthenticated) {
-                    alert('Debes iniciar sesión para crear un tema.');
-                    window.location.href = '/login?redirect=/';
-                    return;
-                }
-                
-                const titleInput = document.getElementById('topic-title').value.trim();
-                const contentInput = document.getElementById('topic-content').value.trim();
-                const tagsInput = document.getElementById('topic-tags').value.trim();
-
-                if (titleInput && contentInput) {
-                    const newTopic = {
-                        title: titleInput,
-                        content: contentInput,
-                        tags: tagsInput ? tagsInput.split(',').map(tag => tag.trim()) : [],
-                        author: '<%= user ? (user.name || user.displayName || "Usuario " + user.uid.substring(0,5)) : "Usuario Anónimo" %>', // Usar datos del usuario autenticado
-                        comments: [],
-                        createdAt: new Date().toISOString()
-                    };
-
-                    fetch('/temas', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(newTopic)
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            if (response.status === 401 || response.status === 403) {
-                                alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
-                                window.location.href = '/login?redirect=/';
-                                return;
-                            }
-                            throw new Error('Error al guardar el tema');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        window.location.reload();
-                    })
-                    .catch(error => {
-                        console.error('Error al guardar el tema:', error);
-                        alert('Ocurrió un error al guardar el tema. Por favor, intenta de nuevo.');
-                    });
-
-                    newTopicForm.style.display = 'none';
-                    newTopicBtn.style.display = 'block';
-                    document.getElementById('topic-title').value = '';
-                    document.getElementById('topic-content').value = '';
-                    document.getElementById('topic-tags').value = '';
-                } else {
-                    alert('Por favor, completa el título y contenido del tema.');
-                }
+    const publishTopicBtn = newTopicForm.querySelector('.btn.btn-primary');
+    publishTopicBtn.addEventListener('click', function() {
+        const titleInput = document.getElementById('topic-title').value.trim();
+        const contentInput = document.getElementById('topic-content').value.trim();
+        const tagsInput = document.getElementById('topic-tags').value.trim();
+        
+        if (titleInput && contentInput) {
+            const newTopic = {
+                title: titleInput,
+                content: contentInput,
+                tags: tagsInput.split(',').map(tag => tag.trim()),
+                author: 'Usuario Anónimo', // Podrías cambiarlo si hay usuarios
+                comments: [],
+                createdAt: new Date().toISOString()
+            };
+            // Aquí en lugar de guardar en localStorage, deberías enviar el nuevo tema al servidor
+            // mediante una petición POST
+            fetch('/temas', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newTopic)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Refrescar la página para mostrar el nuevo tema
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error al guardar el tema:', error);
+                alert('Ocurrió un error al guardar el tema. Por favor, intenta de nuevo.');
             });
+
+            newTopicForm.style.display = 'none';
+            newTopicBtn.style.display = 'block';
+            document.getElementById('topic-title').value = '';
+            document.getElementById('topic-content').value = '';
+            document.getElementById('topic-tags').value = '';
+        } else {
+            alert('Por favor, completa el título y contenido del tema.');
+        }
+    });
         
         // Añadir funcionalidad para responder a los temas principales
         document.querySelectorAll('.forum-topic').forEach(topic => {
