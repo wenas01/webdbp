@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consejos para el Estrés Académico</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Roboto:wght@300;400;500&display=swap');
+    :root {
+      --pastel-pink: #f8c8dc;
+      --pastel-rose: #c56b64;
+      --pastel-rose-dark: #b15145;
+      --text-color: #4a4a4a;
+      --bg-color: #fff0f5;
+      --white: #ffffff;
+      --font-primary: 'Poppins', sans-serif;
+    }
+
+    body {
+      font-family: var(--font-primary);
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      position: relative;
+    }
+    body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url('https://www.ucentral.cl/ucentral/site/artic/20210719/imag/foto_0000000220210719160641/GettyImages-1224376846.jpg');
+        background-size: 99%; /* Ajusta */
+        background-repeat: no-repeat; /* o no-repeat si prefieres */
+        background-position: center;
+        opacity: 0.5; /* Ajusta la transparencia (0.1 = 10%) */
+        z-index: -1;
+        pointer-events: none; /* Para que no interfiera con los clicks */
+    }
+    .academic-stress-advice {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: rgba(255, 255, 255, 0.85); /* Añade transparencia al contenedor */
+        border-radius: 1rem;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        backdrop-filter: blur(2px);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.2rem;
+      margin-bottom: 2rem;
+      color: var(--pastel-rose-dark);
+    }
+
+    .category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      padding: 0.8rem 1rem;
+      background-color: var(--pastel-pink);
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      transition: background-color 0.3s ease;
+    }
+
+    .category-header:hover {
+      background-color: #f0b6d0;
+    }
+
+    .category-header h2 {
+      color: var(--pastel-rose);
+      font-size: 1.4rem;
+      margin: 0;
+    }
+
+    .toggle-icon {
+      font-size: 1.2rem;
+      color: var(--pastel-rose-dark);
+      transition: transform 0.3s ease;
+    }
+
+    .category-content {
+      padding: 0 1rem;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: 0 0 8px 8px;
+    }
+
+    .category-content.active {
+      max-height: 500px;
+      padding: 1rem;
+    }
+
+    ul {
+      list-style: disc;
+      padding-left: 1.5rem;
+    }
+
+    ul li {
+      margin-bottom: 0.5rem;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--pastel-rose-dark);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .button-container {
+      text-align: center;
+      margin-top: 2.5rem;
+    }
+
+    .pomodoro-button {
+      background-color: var(--pastel-rose);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.8rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .pomodoro-button:hover {
+      background-color: var(--pastel-rose-dark);
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.6rem;
+      }
+
+      .category-header h2 {
+        font-size: 1.2rem;
+      }
+
+      .academic-stress-advice {
+        padding: 1.2rem;
+      }
+
+      .pomodoro-button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <section class="academic-stress-advice">
+    <h1>Consejos para el Estrés Académico</h1>
+
+    <div class="category">
+      <div class="category-header" onclick="toggleCategory('study-techniques')">
+        <h2>Técnicas de Estudio</h2>
+        <span class="toggle-icon" id="study-techniques-icon">+</span>
+      </div>
+      <div class="category-content" id="study-techniques-content">
+        <ul>
+          <li>Aplica la técnica Feynman para comprender conceptos complejos.</li>
+          <li>Divide el estudio en sesiones de 25 minutos con descansos.</li>
+          <li>Utiliza mapas mentales y tarjetas de memoria (flashcards).</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="category">
+      <div class="category-header" onclick="toggleCategory('time-management')">
+        <h2>Manejo del Tiempo</h2>
+        <span class="toggle-icon" id="time-management-icon">+</span>
+      </div>
+      <div class="category-content" id="time-management-content">
+        <ul>
+          <li>Usa una agenda o planner semanal para organizar tareas.</li>
+          <li>Prioriza tareas importantes con la matriz de Eisenhower.</li>
+          <li>Evita la multitarea: concéntrate en una cosa a la vez.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="category">
+      <div class="category-header" onclick="toggleCategory('relaxation')">
+        <h2>Relajación</h2>
+        <span class="toggle-icon" id="relaxation-icon">+</span>
+      </div>
+      <div class="category-content" id="relaxation-content">
+        <ul>
+          <li>Practica respiración profunda o meditación guiada diariamente.</li>
+          <li>Realiza pausas activas durante tus estudios.</li>
+          <li>Dedica tiempo a actividades que disfrutes.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="category">
+      <div class="category-header" onclick="toggleCategory('exercise-nutrition')">
+        <h2>Ejercicio y Alimentación</h2>
+        <span class="toggle-icon" id="exercise-nutrition-icon">+</span>
+      </div>
+      <div class="category-content" id="exercise-nutrition-content">
+        <ul>
+          <li>Realiza al menos 30 minutos de actividad física al día.</li>
+          <li>Evita comidas ultraprocesadas antes de estudiar.</li>
+          <li>Hidrátate adecuadamente y consume snacks saludables.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="category">
+      <div class="category-header" onclick="toggleCategory('social-support')">
+        <h2>Vida Social y Apoyo Emocional</h2>
+        <span class="toggle-icon" id="social-support-icon">+</span>
+      </div>
+      <div class="category-content" id="social-support-content">
+        <ul>
+          <li>Habla con amigos o familiares cuando te sientas abrumado.</li>
+          <li>No dudes en acudir a un psicólogo o consejero si lo necesitas.</li>
+          <li>Participa en actividades grupales que te interesen.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="category">
+      <div class="category-header" onclick="toggleCategory('downloads')">
+        <h2>Recursos Descargables</h2>
+        <span class="toggle-icon" id="downloads-icon">+</span>
+      </div>
+      <div class="category-content" id="downloads-content">
+        <ul>
+          <li><a href="https://magicalpapers.com/download/planner_gratis.pdf" download>📅 Planner Semanal (PDF)</a></li>
+          <li><a href="https://www.unapragmatica.com/wp-content/uploads/2023/12/organizador-de-tareas-pendientes-pragma%C2%AE-unapragmatica.com.pdf" download>📌 Organizador de Tareas (PDF)</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="button-container">
+      <a href="https://pomofocus.io/" target="_blank" rel="noopener noreferrer">
+        <button class="pomodoro-button">Iniciar Temporizador Pomodoro ⏱️</button>
+      </a>
+    </div>
+  </section>
+
+  <script>
+    function toggleCategory(categoryId) {
+      const content = document.getElementById(`${categoryId}-content`);
+      const icon = document.getElementById(`${categoryId}-icon`);
+      
+      content.classList.toggle('active');
+      
+      if (content.classList.contains('active')) {
+        icon.textContent = '-';
+      } else {
+        icon.textContent = '+';
+      }
+    }
+  </script>
+
+</body>
+</html>

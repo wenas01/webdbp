@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pomodoro Rosa</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Roboto:wght@300;400;500&display=swap');
+    body {
+      background-color: #ffe6f0;
+      color: #880e4f;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 3rem;
+    }
+
+    .timer {
+      font-size: 4rem;
+      margin: 20px 0;
+    }
+
+    .buttons {
+      margin: 15px;
+    }
+
+    button {
+      background-color: #f06292;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      margin: 5px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #ec407a;
+    }
+
+    .counter {
+      margin-top: 20px;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>🍓 Temporizador Pomodoro 🍓 </h1>
+  <div class="timer" id="timer">25:00</div>
+
+  <div class="buttons">
+    <button onclick="startTimer()">Iniciar</button>
+    <button onclick="pauseTimer()">Pausar</button>
+    <button onclick="resetTimer()">Reiniciar</button>
+  </div>
+
+  <div class="counter">
+    Sesiones de estudio completadas: <span id="studyCount">0</span><br>
+    Descansos completados: <span id="breakCount">0</span>
+  </div>
+
+  <script>
+    let studyDuration = 25 * 60;
+    let breakDuration = 5 * 60;
+    let currentTime = studyDuration;
+    let isRunning = false;
+    let isStudySession = true;
+    let timerInterval;
+    let studyCount = 0;
+    let breakCount = 0;
+
+    const timerDisplay = document.getElementById("timer");
+    const studyCountDisplay = document.getElementById("studyCount");
+    const breakCountDisplay = document.getElementById("breakCount");
+
+    function updateDisplay() {
+      const minutes = String(Math.floor(currentTime / 60)).padStart(2, '0');
+      const seconds = String(currentTime % 60).padStart(2, '0');
+      timerDisplay.textContent = `${minutes}:${seconds}`;
+    }
+
+    function startTimer() {
+      if (isRunning) return;
+      isRunning = true;
+      timerInterval = setInterval(() => {
+        currentTime--;
+        updateDisplay();
+        if (currentTime <= 0) {
+          clearInterval(timerInterval);
+          isRunning = false;
+          if (isStudySession) {
+            studyCount++;
+            studyCountDisplay.textContent = studyCount;
+            currentTime = breakDuration;
+          } else {
+            breakCount++;
+            breakCountDisplay.textContent = breakCount;
+            currentTime = studyDuration;
+          }
+          isStudySession = !isStudySession;
+          updateDisplay();
+          startTimer(); // comienza automáticamente la siguiente sesión
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      clearInterval(timerInterval);
+      isRunning = false;
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      isRunning = false;
+      currentTime = isStudySession ? studyDuration : breakDuration;
+      updateDisplay();
+    }
+
+    updateDisplay();
+  </script>
+</body>
+</html>
