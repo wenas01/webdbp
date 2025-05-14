@@ -98,9 +98,14 @@
 				    <i class="fas fa-plus"></i> Nuevo Tema
 				  </button>
 				<% } else { %>
-				  <a href="/login" class="btn btn-primary" id="new-topic-btn">
+				  <button class="btn btn-primary" id="new-topic-btn">
 				    <i class="fas fa-plus"></i> Nuevo Tema
-				  </a>
+				  </button>
+				  <script>
+				    document.getElementById('new-topic-btn').addEventListener('click', function () {
+				      window.location.href = '/login';
+				    });
+				  </script>
 				<% } %>
 
 			</div>
