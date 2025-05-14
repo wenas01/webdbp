@@ -191,7 +191,7 @@ nav ul li a:hover::before,
     margin: 0 auto;
     padding: 20px;
 }
-*/Profile avatar*/
+/* Profile avatar */
 .profile-avatar {
    flex-shrink: 0;
 }
