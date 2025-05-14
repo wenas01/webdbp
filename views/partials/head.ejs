@@ -1,29 +1,45 @@
 <!-- 
   Archivo: head.ejs
   Descripción: Fragmento EJS que contiene los metadatos y enlaces comunes del <head> para todas las páginas
-  Propósito: Centralizar la configuración de metadatos, favicon y estilos CSS compartidos
 -->
 
 <meta charset="UTF-8">
-<!-- Define la codificación de caracteres para soportar correctamente caracteres especiales y acentos -->
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- Configura la vista para dispositivos móviles, ajustando la escala inicial -->
-
 <meta name="theme-color" content="#e36f6e">
-<!-- Define el color del tema para navegadores móviles, afecta la barra de direcciones en Chrome para Android -->
 
-<!-- Configuración de diferentes tamaños y formatos de favicon para compatibilidad con diversos dispositivos -->
+<!-- SEO básico -->
+<meta name="description" content="Foro de discusión sobre estrés, salud mental y bienestar. Comparte experiencias, encuentra apoyo y ayuda a otros.">
+<meta name="keywords" content="foro, estrés, salud mental, ansiedad, comunidad, apoyo, discusión">
+<meta name="author" content="TuNombre o NombreDelSitio">
+
+<!-- Open Graph (para redes sociales) -->
+<meta property="og:title" content="Foro Estrés - Apoyo y Comunidad">
+<meta property="og:description" content="Únete al foro sobre estrés y bienestar emocional. Encuentra respuestas y apoya a otros.">
+<meta property="og:image" content="/img/og-preview.jpg">
+<meta property="og:url" content="https://tusitio.com">
+<meta property="og:type" content="website">
+
+<!-- Favicon y compatibilidad con dispositivos -->
 <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="shortcut icon" href="/favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="Estrés" />
-<!-- Comentado: Manifiesto para PWA (Progressive Web App) -->
-<!-- <link rel="manifest" href="/site.webmanifest" /> -->
 
-<!-- Título dinámico de la página usando la variable 'title' pasada desde el controlador -->
+<!-- Título dinámico -->
 <title><%= title %></title>
 
-<!-- Enlace a la hoja de estilos global compartida por todas las páginas -->
+<!-- Estilos globales -->
 <link rel="stylesheet" href="/styles/global.css">
+
+<!-- Google Search Console (verificación del sitio) -->
+<meta name="google-site-verification" content="TU_CODIGO_DE_VERIFICACION" />
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PXKJNGDLV7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-PXKJNGDLV7');
+</script>
