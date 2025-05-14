@@ -36,6 +36,16 @@ body {
     scroll-behavior: smooth;
 }
 
+.auth-required-message {
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    text-align: center;
+    color: #6c757d;
+    border: 1px solid #e9ecef;
+    margin: 20px 0; /* Agregado para mejor espaciado */
+}
+
 /* Header Styles */
 header {
     background: var(--gradient-primary);
