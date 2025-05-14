@@ -92,21 +92,27 @@ app.get('/', async (req, res) => {
 });
 
 // Ruta para crear un nuevo tema
-app.post('/temas', async(req, res) => {
+// Ruta para crear un nuevo tema (protegida con autenticación)
+app.post('/temas', checkAuth, async(req, res) => {
     try {
         // Validar los datos recibidos
-        const { title, content, tags, author } = req.body;
+        const { title, content, tags } = req.body;
         
         if (!title || !content) {
             return res.status(400).json({ error: 'El título y contenido son obligatorios' });
         }
+        
+        // Obtener información del usuario autenticado
+        const uid = req.user.uid;
+        const userDisplayName = req.user.name || req.user.displayName || 'Usuario ' + uid.substring(0, 5);
         
         // Crear el nuevo documento en Firestore
         const newTema = {
             title,
             content,
             tags: Array.isArray(tags) ? tags : [],
-            author: author || 'Usuario Anónimo',
+            author: userDisplayName,
+            authorId: uid,
             comments: [],
             views: 0,
             createdAt: new Date().toISOString()
