@@ -22,6 +22,12 @@ app.get('/consejos', (req, res) => {
     title: 'Consejos para el Estrés Académico'
   });
 });
+//-----------Ruta a pomodoro--------------
+app.get('/pomodoro', (req, res) => {
+  res.render('pomodoro', {
+    title: 'Temporizador Pomodoro'
+  });
+});
 // ---------------- Configuración Express ----------------
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
