@@ -16,6 +16,12 @@ admin.initializeApp({
 const db = admin.firestore();
 
 const app = express();
+//----------Ruta de consejos---------
+app.get('/consejos', (req, res) => {
+  res.render('consejos', {
+    title: 'Consejos para el Estrés Académico'
+  });
+});
 // ---------------- Configuración Express ----------------
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
