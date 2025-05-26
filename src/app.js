@@ -372,6 +372,53 @@ app.get('/logout', (req, res) => {
   res.clearCookie('__session');
   res.redirect('/login');
 });
+//quiz
+app.post('/resultados-quiz', checkAuth, async (req, res) => {
+  try {
+    const uid = req.user.uid;
+    const { puntaje, sintomas } = req.body;
+
+    if (typeof puntaje !== 'number' || !Array.isArray(sintomas)) {
+      return res.status(400).json({ error: 'Formato inválido de datos.' });
+    }
+
+    const resultado = {
+      uid,
+      puntaje,
+      fecha: new Date().toISOString(),
+      sintomas
+    };
+
+    await db.collection('resultados_quiz').add(resultado);
+    res.status(200).json({ message: 'Resultado guardado correctamente.' });
+  } catch (err) {
+    console.error('Error guardando resultado:', err);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+});
+app.get('/resultado-usuario', checkAuth, async (req, res) => {
+  try {
+    const uid = req.user.uid;
+
+    const snapshot = await db
+      .collection('resultados_quiz')
+      .where('uid', '==', uid)
+      .orderBy('fecha', 'desc')
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) {
+      return res.status(200).json({ sintomas: [], puntaje: 0 });
+    }
+
+    const data = snapshot.docs[0].data();
+    res.status(200).json({ sintomas: data.sintomas, puntaje: data.puntaje });
+  } catch (error) {
+    console.error('Error obteniendo resultado:', error);
+    res.status(500).json({ error: 'Error interno al obtener resultado.' });
+  }
+});
+
 // Ruta para obtener el test en formato RDF (JSON-LD) y vincularlo a DBpedia con el puntaje real
 app.get('/rdf/test', checkAuth, async (req, res) => {
   try {
