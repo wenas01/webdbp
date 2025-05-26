@@ -1,3 +1,9 @@
+<!-- 
+  Archivo: quiz.ejs
+  Descripción: Página del cuestionario para evaluar el nivel de estrés académico
+  Propósito: Permitir a los usuarios evaluar su nivel de estrés mediante preguntas específicas
+-->
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -262,12 +268,12 @@
 
     // Recorre todas las preguntas para sumar los valores seleccionados
     for (let i = 1; i <= 10; i++) {
-      const seleccion = document.querySelector(input[name="q${i}"]:checked);
+      const seleccion = document.querySelector(`input[name="q${i}"]:checked`);
       // Verifica que todas las preguntas estén respondidas
       if (seleccion) {
         total += parseInt(seleccion.value);
       } else {
-        alert(Debes responder la pregunta ${i});
+        alert(`Debes responder la pregunta ${i}`);
         return;
       }
     }
