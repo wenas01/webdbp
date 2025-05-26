@@ -282,6 +282,7 @@ app.post('/login', async (req, res) => {
 
 
 // Perfil
+
 app.get('/perfil', checkAuth, async (req, res) => {
   try {
     const uid = req.user.uid;
@@ -311,6 +312,10 @@ app.get('/perfil', checkAuth, async (req, res) => {
       consejo = 'Es importante que busques ayuda profesional para manejar el estrés.';
     }
 
+    // Leer el archivo de síntomas DBpedia
+    const sintomasJsonPath = path.join(process.cwd(), 'sintomasMap.json');
+    const sintomasMap = JSON.parse(fs.readFileSync(sintomasJsonPath, 'utf8'));
+
     res.render('perfil', {
       title: 'Estrés Académico - Perfil',
       nombre: userData.nombre || 'Sin nombre',
@@ -320,12 +325,14 @@ app.get('/perfil', checkAuth, async (req, res) => {
       puntaje,
       consejo,
       comentariosRecibidos: userData.comentariosRecibidos || [],
+      sintomasMap
     });
   } catch (err) {
     console.error('Error cargando perfil:', err.message);
     res.status(500).send('Error al cargar el perfil');
   }
 });
+
 
 
 // Ruta protegida
