@@ -6,21 +6,17 @@
   <p><span>Nivel de estrés:</span> <%= resultadoQuiz %></p>
   <p><span>Consejo:</span> <%= consejo %></p>
 
-  <% if (sintomas && sintomas.length) { %>
-    <h3>Síntomas registrados:</h3>
-    <ul>
-      <% sintomas.forEach(s => { %>
-        <li>
-          <strong><%= s.nombre %></strong>: <%= s.puntaje %> puntos
-          <% if (s.uri) { %>
-            - <a href="<%= s.uri %>" target="_blank">Ver en DBpedia</a>
-          <% } else { %>
-            - (sin enlace)
-          <% } %>
-        </li>
-      <% }) %>
-    </ul>
-  <% } %>
+  <% if (sintomas && sintomas.length > 0) { %>
+  <div class="sintomas-box">
+    <% sintomas.forEach(function(sintoma) { %>
+      <div class="sintoma">
+        <strong><%= sintoma.nombre %>:</strong> <%= sintoma.descripcion %>
+      </div>
+    <% }); %>
+  </div>
+<% } else { %>
+  <p>No se encontraron síntomas asociados.</p>
+<% } %>
 
   <% if (comentariosRecibidos.length > 0) { %>
     <h3>Comentarios recibidos:</h3>
