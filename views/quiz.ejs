@@ -258,9 +258,7 @@
     <button type="button" class="submit-button" id="quiz-submit">Enviar</button>
   </form>
 </div>
-</body>
-</html>
-
+<script>
   document.getElementById("quiz-submit").addEventListener("click", async function () {
     let total = 0;
     const sintomasMap = [
@@ -295,24 +293,24 @@
       });
     }
 
-    // Guardar puntaje en el perfil del usuario
     await fetch('/guardar-puntaje', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ puntaje: total })
     });
 
-    // Guardar resultado con síntomas en la nueva colección
     await fetch('/resultados-quiz', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ puntaje: total, sintomas })
     });
 
-    // Redireccionar según el puntaje
     if (total <= 10) window.location.href = "/nivel_bajo";
     else if (total <= 20) window.location.href = "/nivel_moderado";
     else if (total <= 30) window.location.href = "/nivel_alto";
     else window.location.href = "/nivel_muy_alto";
   });
 </script>
+</body>
+</html>
+
