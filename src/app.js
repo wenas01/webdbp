@@ -408,6 +408,135 @@ app.get('/rdf/test', checkAuth, async (req, res) => {
   }
 });
 
+// Guardar puntaje (esta ruta ya la tienes, solo asegúrate de que esté bien configurada)
+app.post('/guardar-puntaje', checkAuth, async (req, res) => {
+  try {
+    const uid = req.user.uid;        // Obtienes el uid del usuario
+    const { puntaje } = req.body;    // Obtienes el puntaje del cuerpo de la solicitud
+    const userRef = db.collection('usuarios').doc(uid);  // Ref a la colección de usuarios en Firestore
+    await userRef.set({ puntaje: Number(puntaje) }, { merge: true });  // Guarda o actualiza el puntaje
+    res.status(200).json({ message: 'Puntaje actualizado' });  // Respuesta al cliente
+  } catch (err) {
+    console.error('Error al guardar el puntaje:', err);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+// Ruta para recibir las respuestas del cuestionario y generar el puntaje
+app.post('/quiz/resultados', checkAuth, async (req, res) => {
+  const respuestas = req.body.respuestas; // Recibimos las respuestas del cuestionario
+
+  if (!respuestas || respuestas.length !== 10) {
+    return res.status(400).json({ error: 'Se deben enviar todas las respuestas del cuestionario' });
+  }
+
+  // Mapeo de las preguntas, síntomas y sus correspondientes URLs de DBpedia
+  const preguntas = [
+    { pregunta: 'Alteraciones del sueño', dbpedia: 'http://dbpedia.org/resource/Sleep_disturbance' },
+    { pregunta: 'Ansiedad ante evaluaciones', dbpedia: 'http://dbpedia.org/resource/Examination_anxiety' },
+    { pregunta: 'Fatiga crónica', dbpedia: 'http://dbpedia.org/resource/Fatigue' },
+    { pregunta: 'Dificultad para concentrarse', dbpedia: 'http://dbpedia.org/resource/Attention_deficit_hyperactivity_disorder' },
+    { pregunta: 'Cambios en la alimentación', dbpedia: 'http://dbpedia.org/resource/Anorexia_nervosa' },
+    { pregunta: 'Procrastinación', dbpedia: 'http://dbpedia.org/resource/Procrastination' },
+    { pregunta: 'Irritabilidad', dbpedia: 'http://dbpedia.org/resource/Irritability' },
+    { pregunta: 'Pensamiento catastrófico', dbpedia: 'http://dbpedia.org/resource/Cognitive_distortion' },
+    { pregunta: 'Síntomas físicos', dbpedia: 'http://dbpedia.org/resource/Stress' },
+    { pregunta: 'Aislamiento social', dbpedia: 'http://dbpedia.org/resource/Social_isolation' }
+  ];
+
+  // Calculamos el puntaje total y la lista de síntomas
+  let puntajeTotal = 0;
+  const sintomas = [];
+
+  preguntas.forEach((pregunta, index) => {
+    const respuesta = respuestas[index]; // Valor de 0 a 4
+    puntajeTotal += respuesta;
+
+    // Si la respuesta es mayor que 0, agregamos el síntoma con su URL de DBpedia
+    if (respuesta > 0) {
+      sintomas.push({
+        sintoma: pregunta.pregunta,
+        puntaje: respuesta,
+        dbpedia: pregunta.dbpedia
+      });
+    }
+  });
+
+  // Determinamos el nivel de estrés según el puntaje total
+  let nivelEstres = '';
+  if (puntajeTotal <= 10) {
+    nivelEstres = 'Estrés bajo';
+  } else if (puntajeTotal <= 20) {
+    nivelEstres = 'Estrés moderado';
+  } else if (puntajeTotal <= 30) {
+    nivelEstres = 'Estrés alto';
+  } else {
+    nivelEstres = 'Estrés muy alto';
+  }
+
+  // Construimos el JSON-LD con los resultados
+  const rdfRespuesta = {
+    "@context": {
+      "dbpedia": "http://dbpedia.org/resource/",
+      "schema": "http://schema.org/"
+    },
+    "@type": "schema:Assessment",
+    "schema:name": "Test de Estrés Académico",
+    "schema:description": "Evaluación de los síntomas de estrés académico en estudiantes",
+    "schema:result": {
+      "@type": "schema:QuantitativeValue",
+      "schema:value": puntajeTotal,
+      "schema:unitText": "puntos"
+    },
+    "schema:level": nivelEstres,
+    "schema:symptoms": sintomas
+  };
+
+  // Respondemos con el modelo RDF (JSON-LD)
+  res.setHeader('Content-Type', 'application/ld+json');
+  res.json(rdfRespuesta);
+});
+// Ruta para obtener el test en formato RDF (JSON-LD)
+app.get('/quiz/rdf', checkAuth, async (req, res) => {
+  try {
+    const uid = req.user.uid;
+    const userRef = db.collection('usuarios').doc(uid);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    const userData = userDoc.data();
+    const puntaje = userData.puntaje || 0;
+
+    const testData = {
+      "@context": {
+        "dbpedia": "http://dbpedia.org/resource/",
+        "schema": "http://schema.org/"
+      },
+      "@type": "schema:Assessment",
+      "schema:name": "Test de Estrés Académico",
+      "schema:description": "Un test para medir el nivel de estrés en estudiantes",
+      "schema:result": {
+        "@type": "schema:QuantitativeValue",
+        "schema:value": puntaje,
+        "schema:unitText": "porcentaje"
+      },
+      "schema:author": {
+        "@type": "schema:Organization",
+        "schema:name": "Universidad Católica San Pablo"
+      }
+    };
+
+    // Respondemos con el modelo RDF (JSON-LD)
+    res.setHeader('Content-Type', 'application/ld+json');
+    res.json(testData);
+
+  } catch (error) {
+    console.error('Error al obtener el puntaje:', error);
+    res.status(500).send('Error al obtener el puntaje');
+  }
+});
 
 export { app };
 
