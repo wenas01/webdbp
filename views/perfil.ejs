@@ -1,29 +1,137 @@
 <div class="profile-info">
-  <p><span>Nombre:</span> <%= nombre %></p>
-  <p><span>Correo:</span> <%= correo %></p>
-  <p><span>Fecha de nacimiento:</span> <%= fechaNacimiento %></p>
-  <p><span>Puntaje:</span> <%= puntaje %></p>
-  <p><span>Nivel de estrés:</span> <%= resultadoQuiz %></p>
-  <p><span>Consejo:</span> <%= consejo %></p>
+  <h2>Mi Perfil</h2>
+  
+  <div class="profile-section">
+    <h3>Información Personal</h3>
+    <p><span>Nombre:</span> <%= nombre %></p>
+    <p><span>Correo:</span> <%= correo %></p>
+    <p><span>Fecha de nacimiento:</span> <%= fechaNacimiento %></p>
+  </div>
+
+  <div class="profile-section">
+    <h3>Resultados del Test de Estrés</h3>
+    <% if (resultadoQuiz !== 'No realizado') { %>
+      <p><span>Puntaje:</span> <%= puntaje %></p>
+      <p><span>Nivel de estrés:</span> <strong class="stress-<%= resultadoQuiz.toLowerCase().replace(' ', '-') %>"><%= resultadoQuiz %></strong></p>
+      <p><span>Consejo:</span> <%= consejo %></p>
+    <% } else { %>
+      <p class="no-results">No has realizado el test aún.</p>
+      <a href="/quiz" class="btn-test">Realizar Test</a>
+    <% } %>
+  </div>
 
   <% if (sintomas && sintomas.length > 0) { %>
-  <div class="sintomas-box">
-    <% sintomas.forEach(function(sintoma) { %>
-      <div class="sintoma">
-        <strong><%= sintoma.nombre %>:</strong> <%= sintoma.descripcion %>
-      </div>
-    <% }); %>
-  </div>
-<% } else { %>
-  <p>No se encontraron síntomas asociados.</p>
-<% } %>
+    <div class="profile-section sintomas-box">
+      <h3>Síntomas identificados</h3>
+      <% sintomas.forEach(function(sintoma) { %>
+        <div class="sintoma">
+          <strong><%= sintoma.nombre %>:</strong> 
+          <p><%= sintoma.descripcion %></p>
+        </div>
+      <% }); %>
+    </div>
+  <% } %>
 
-  <% if (comentariosRecibidos.length > 0) { %>
-    <h3>Comentarios recibidos:</h3>
-    <ul>
-      <% comentariosRecibidos.forEach(c => { %>
-        <li><%= c %></li>
-      <% }) %>
-    </ul>
+  <% if (comentariosRecibidos && comentariosRecibidos.length > 0) { %>
+    <div class="profile-section">
+      <h3>Comentarios recibidos</h3>
+      <ul class="comments-list">
+        <% comentariosRecibidos.forEach(c => { %>
+          <li class="comment-item">
+            <% if (typeof c === 'string') { %>
+              <%= c %>
+            <% } else if (c.text) { %>
+              <p><%= c.text %></p>
+              <% if (c.author) { %>
+                <small>— <%= c.author %></small>
+              <% } %>
+            <% } %>
+          </li>
+        <% }); %>
+      </ul>
+    </div>
+  <% } else { %>
+    <div class="profile-section">
+      <h3>Comentarios recibidos</h3>
+      <p class="no-results">No hay comentarios aún.</p>
+    </div>
   <% } %>
 </div>
+
+<style>
+  .profile-info {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .profile-section {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .profile-section h3 {
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  .profile-info p {
+    margin: 8px 0;
+  }
+  
+  .profile-info span {
+    font-weight: bold;
+    display: inline-block;
+    width: 150px;
+  }
+  
+  .sintomas-box {
+    background: #f0f8ff;
+    padding: 15px;
+    border-radius: 5px;
+  }
+  
+  .sintoma {
+    margin-bottom: 10px;
+    padding: 10px;
+    background: white;
+    border-radius: 4px;
+  }
+  
+  .comments-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .comment-item {
+    padding: 10px;
+    margin-bottom: 8px;
+    background: #fff;
+    border-left: 3px solid #4a90e2;
+  }
+  
+  .no-results {
+    color: #666;
+    font-style: italic;
+  }
+  
+  .btn-test {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #4a90e2;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    margin-top: 10px;
+  }
+  
+  /* Estilos para los niveles de estrés */
+  .stress-estrés-bajo { color: #2ecc71; }
+  .stress-estrés-moderado { color: #f39c12; }
+  .stress-estrés-alto { color: #e74c3c; }
+  .stress-estrés-muy-alto { color: #c0392b; font-weight: bold; }
+</style>
