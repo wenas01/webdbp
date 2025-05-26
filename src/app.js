@@ -1,3 +1,5 @@
+import fs from 'fs';
+
 // Se importa la librería Express para manejar rutas y servidores HTTP
 import express from 'express';
 
