@@ -1,23 +1,17 @@
 <!DOCTYPE html>
 <html lang="es-PE">
 <head>
-  <!-- Incluye los metadatos comunes del head -->
   <%- include('partials/head') %>
-  <!-- Incluye estilos específicos para formularios -->
   <link rel="stylesheet" href="/styles/forms.css">
 </head>
 <body>
-  <!-- Incluye el encabezado y navegación común -->
   <%- include('partials/header') %>
   
-  <!-- Contenedor principal para la información del perfil -->
   <div class="profile-content">
-    <!-- Sección para el avatar del usuario -->
     <div class="profile-avatar">
       <div class="avatar-circle"><%= nombre.charAt(0).toUpperCase() %></div>
     </div>
     
-    <!-- Sección para mostrar la información del usuario -->
     <div class="profile-info">
       <p><span>Nombre:</span> <%= nombre %></p>
       <p><span>Correo:</span> <%= correo %></p>
@@ -25,6 +19,18 @@
       <p><span>Puntaje:</span> <%= puntaje %></p>
       <p><span>Nivel de estrés:</span> <%= resultadoQuiz %></p>
       <p><span>Consejo:</span> <%= consejo %></p>
+
+      <% if (sintomas && sintomas.length) { %>
+        <h3>Síntomas registrados:</h3>
+        <ul>
+          <% sintomas.forEach(s => { %>
+            <li>
+              <strong><%= s.nombre %></strong>: <%= s.puntaje %> puntos - 
+              <a href="<%= s.uri %>" target="_blank">Ver en DBpedia</a>
+            </li>
+          <% }) %>
+        </ul>
+      <% } %>
     </div>
   </div>
 
