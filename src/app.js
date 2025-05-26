@@ -283,18 +283,41 @@ app.post('/login', async (req, res) => {
 
 // Perfil
 
-app.get('/perfil', checkAuth, async (req, res) => {
+app.get('/perfil', checkAuth, async (req, res, next) => {
   try {
     const uid = req.user.uid;
 
-    // Obtener datos del usuario
+    // Obtener datos del usuario con validación
     const userDoc = await db.collection('usuarios').doc(uid).get();
+    
     if (!userDoc.exists) {
-      return res.status(404).send('Usuario no encontrado.');
+      return res.status(404).render('error', { 
+        title: 'Error',
+        message: 'Usuario no encontrado en la base de datos' 
+      });
     }
-    const userData = userDoc.data();
 
-    // Obtener el último resultado del quiz del usuario
+    const userData = userDoc.data();
+    if (!userData) {
+      return res.status(500).render('error', {
+        title: 'Error',
+        message: 'Datos de usuario no disponibles'
+      });
+    }
+
+    // Valores por defecto para datos del usuario
+    const nombre = userData.nombre || 'Usuario';
+    const correo = userData.correo || 'No especificado';
+    const fechaNacimiento = userData.fechaNacimiento || 'No especificada';
+    const comentariosRecibidos = Array.isArray(userData.comentariosRecibidos) ? 
+      userData.comentariosRecibidos : [];
+
+    // Obtener el último resultado del quiz con validación
+    let sintomas = [];
+    let puntaje = 0;
+    let resultadoQuiz = 'No realizado';
+    let consejo = 'Realiza el test para conocer tu nivel de estrés';
+
     const resultadosSnapshot = await db
       .collection('resultados_quiz')
       .where('uid', '==', uid)
@@ -302,43 +325,50 @@ app.get('/perfil', checkAuth, async (req, res) => {
       .limit(1)
       .get();
 
-    const ultimoResultado = resultadosSnapshot.empty ? null : resultadosSnapshot.docs[0].data();
-    const puntaje = ultimoResultado?.puntaje || 0;
-    const sintomas = ultimoResultado?.sintomas || [];
+    if (!resultadosSnapshot.empty) {
+      const ultimoResultado = resultadosSnapshot.docs[0].data();
+      
+      // Validar puntaje
+      puntaje = typeof ultimoResultado.puntaje === 'number' ? ultimoResultado.puntaje : 0;
+      
+      // Validar y filtrar síntomas
+      sintomas = Array.isArray(ultimoResultado.sintomas) ? 
+        ultimoResultado.sintomas.filter(s => 
+          s && typeof s.nombre === 'string' && typeof s.descripcion === 'string'
+        ) : [];
 
-    // Evaluar el nivel de estrés según el puntaje
-    let resultadoQuiz = '';
-    let consejo = '';
-    if (puntaje <= 10) {
-      resultadoQuiz = 'ESTRÉS BAJO';
-      consejo = 'Sigue con tu ritmo. Mantén la calma y organiza bien tus tareas.';
-    } else if (puntaje <= 20) {
-      resultadoQuiz = 'ESTRÉS MODERADO';
-      consejo = 'Intenta tomar pequeños descansos y practicar técnicas de relajación.';
-    } else if (puntaje <= 30) {
-      resultadoQuiz = 'ESTRÉS ALTO';
-      consejo = 'Considera hablar con un consejero o tomar descansos más largos.';
-    } else {
-      resultadoQuiz = 'ESTRÉS MUY ALTO';
-      consejo = 'Es importante que busques ayuda profesional para manejar el estrés.';
+      // Evaluar nivel de estrés según puntaje
+      if (puntaje <= 10) {
+        resultadoQuiz = 'ESTRÉS BAJO';
+        consejo = 'Sigue con tu ritmo. Mantén la calma y organiza bien tus tareas.';
+      } else if (puntaje <= 20) {
+        resultadoQuiz = 'ESTRÉS MODERADO';
+        consejo = 'Intenta tomar pequeños descansos y practicar técnicas de relajación.';
+      } else if (puntaje <= 30) {
+        resultadoQuiz = 'ESTRÉS ALTO';
+        consejo = 'Considera hablar con un consejero o tomar descansos más largos.';
+      } else {
+        resultadoQuiz = 'ESTRÉS MUY ALTO';
+        consejo = 'Es importante que busques ayuda profesional para manejar el estrés.';
+      }
     }
 
-    // Renderizar perfil con síntomas
+    // Renderizar perfil con todos los datos validados
     res.render('perfil', {
-      title: 'Estrés Académico - Perfil',
-      nombre: userData.nombre || 'Sin nombre',
-      correo: userData.correo || 'Sin correo',
-      fechaNacimiento: userData.fechaNacimiento || 'No especificada',
+      title: 'Mi Perfil',
+      nombre,
+      correo,
+      fechaNacimiento,
       resultadoQuiz,
       puntaje,
       consejo,
-      comentariosRecibidos: userData.comentariosRecibidos || [],
-      sintomas // se pasa al EJS
+      comentariosRecibidos,
+      sintomas
     });
 
   } catch (err) {
-    console.error('Error cargando perfil:', err.message);
-    res.status(500).send('Error al cargar el perfil');
+    console.error('Error cargando perfil:', err);
+    next(err);
   }
 });
 
