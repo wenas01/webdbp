@@ -1,38 +1,33 @@
-<!DOCTYPE html>
-<html lang="es-PE">
-<head>
-  <%- include('partials/head') %>
-  <link rel="stylesheet" href="/styles/forms.css">
-</head>
-<body>
-  <%- include('partials/header') %>
-  
-  <div class="profile-content">
-    <div class="profile-avatar">
-      <div class="avatar-circle"><%= nombre.charAt(0).toUpperCase() %></div>
-    </div>
-    
-    <div class="profile-info">
-      <p><span>Nombre:</span> <%= nombre %></p>
-      <p><span>Correo:</span> <%= correo %></p>
-      <p><span>Fecha de nacimiento:</span> <%= fechaNacimiento || 'No registrada' %></p>
-      <p><span>Puntaje:</span> <%= puntaje %></p>
-      <p><span>Nivel de estrés:</span> <%= resultadoQuiz %></p>
-      <p><span>Consejo:</span> <%= consejo %></p>
+<div class="profile-info">
+  <p><span>Nombre:</span> <%= nombre %></p>
+  <p><span>Correo:</span> <%= correo %></p>
+  <p><span>Fecha de nacimiento:</span> <%= fechaNacimiento %></p>
+  <p><span>Puntaje:</span> <%= puntaje %></p>
+  <p><span>Nivel de estrés:</span> <%= resultadoQuiz %></p>
+  <p><span>Consejo:</span> <%= consejo %></p>
 
-      <% if (sintomas && sintomas.length) { %>
-        <h3>Síntomas registrados:</h3>
-        <ul>
-          <% sintomas.forEach(s => { %>
-            <li>
-              <strong><%= s.nombre %></strong>: <%= s.puntaje %> puntos - 
-              <a href="<%= s.uri %>" target="_blank">Ver en DBpedia</a>
-            </li>
-          <% }) %>
-        </ul>
-      <% } %>
-    </div>
-  </div>
+  <% if (sintomas && sintomas.length) { %>
+    <h3>Síntomas registrados:</h3>
+    <ul>
+      <% sintomas.forEach(s => { %>
+        <li>
+          <strong><%= s.nombre %></strong>: <%= s.puntaje %> puntos
+          <% if (s.uri) { %>
+            - <a href="<%= s.uri %>" target="_blank">Ver en DBpedia</a>
+          <% } else { %>
+            - (sin enlace)
+          <% } %>
+        </li>
+      <% }) %>
+    </ul>
+  <% } %>
 
-</body>
-</html>
+  <% if (comentariosRecibidos.length > 0) { %>
+    <h3>Comentarios recibidos:</h3>
+    <ul>
+      <% comentariosRecibidos.forEach(c => { %>
+        <li><%= c %></li>
+      <% }) %>
+    </ul>
+  <% } %>
+</div>
