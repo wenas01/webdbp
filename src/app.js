@@ -394,7 +394,7 @@ app.get('/rdf/test', checkAuth, async (req, res) => {
       },
       "schema:author": {
         "@type": "schema:Organization",
-        "schema:name": "Universidad de Ejemplo"
+        "schema:name": "Universidad Católica San Pablo"
       }
     };
 
