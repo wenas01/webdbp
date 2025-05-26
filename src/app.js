@@ -286,18 +286,29 @@ app.post('/login', async (req, res) => {
 app.get('/perfil', checkAuth, async (req, res) => {
   try {
     const uid = req.user.uid;
-    const userDoc = await db.collection('usuarios').doc(uid).get();
 
+    // Obtener datos del usuario
+    const userDoc = await db.collection('usuarios').doc(uid).get();
     if (!userDoc.exists) {
       return res.status(404).send('Usuario no encontrado.');
     }
-
     const userData = userDoc.data();
-    const puntaje = userData.puntaje || 0;
 
+    // Obtener el último resultado del quiz del usuario
+    const resultadosSnapshot = await db
+      .collection('resultados_quiz')
+      .where('uid', '==', uid)
+      .orderBy('fecha', 'desc')
+      .limit(1)
+      .get();
+
+    const ultimoResultado = resultadosSnapshot.empty ? null : resultadosSnapshot.docs[0].data();
+    const puntaje = ultimoResultado?.puntaje || 0;
+    const sintomas = ultimoResultado?.sintomas || [];
+
+    // Evaluar el nivel de estrés según el puntaje
     let resultadoQuiz = '';
     let consejo = '';
-
     if (puntaje <= 10) {
       resultadoQuiz = 'ESTRÉS BAJO';
       consejo = 'Sigue con tu ritmo. Mantén la calma y organiza bien tus tareas.';
@@ -312,10 +323,7 @@ app.get('/perfil', checkAuth, async (req, res) => {
       consejo = 'Es importante que busques ayuda profesional para manejar el estrés.';
     }
 
-    // Leer el archivo de síntomas DBpedia
-    const sintomasJsonPath = path.join(process.cwd(), 'sintomasMap.json');
-    const sintomasMap = JSON.parse(fs.readFileSync(sintomasJsonPath, 'utf8'));
-
+    // Renderizar perfil con síntomas
     res.render('perfil', {
       title: 'Estrés Académico - Perfil',
       nombre: userData.nombre || 'Sin nombre',
@@ -325,8 +333,9 @@ app.get('/perfil', checkAuth, async (req, res) => {
       puntaje,
       consejo,
       comentariosRecibidos: userData.comentariosRecibidos || [],
-      sintomasMap
+      sintomas // se pasa al EJS
     });
+
   } catch (err) {
     console.error('Error cargando perfil:', err.message);
     res.status(500).send('Error al cargar el perfil');
