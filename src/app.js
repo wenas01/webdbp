@@ -316,7 +316,7 @@ app.get('/perfil', checkAuth, async (req, res) => {
     if (resultadoDoc.exists) {
       const data = resultadoDoc.data();
       // Convertimos el objeto { sintoma1: valor, sintoma2: valor } en un arreglo de claves
-      sintomas = Object.keys(data.sintomas || {});
+      sintomas = Object.entries(data.sintomas || {});
     }
 
     res.render('perfil', {
