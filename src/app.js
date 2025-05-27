@@ -309,6 +309,15 @@ app.get('/perfil', checkAuth, async (req, res) => {
       consejo = 'Es importante que busques ayuda profesional para manejar el estrés.';
     }
 
+    // Obtener los síntomas desde la colección resultados_quiz
+    const resultadoDoc = await db.collection('resultados_quiz').doc(uid).get();
+    let sintomas = [];
+
+    if (resultadoDoc.exists) {
+      const data = resultadoDoc.data();
+      sintomas = data.sintomas || [];
+    }
+
     res.render('perfil', {
       title: 'Estrés Académico - Perfil',
       nombre: userData.nombre || 'Sin nombre',
@@ -317,6 +326,7 @@ app.get('/perfil', checkAuth, async (req, res) => {
       resultadoQuiz,
       puntaje,
       consejo,
+      sintomas, // ← Se pasa a la vista
       comentariosRecibidos: userData.comentariosRecibidos || [],
     });
   } catch (err) {
