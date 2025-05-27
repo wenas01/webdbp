@@ -265,20 +265,34 @@
 <script>
   document.getElementById("quiz-submit").addEventListener("click", function () {
     let total = 0;
+    const respuestas = {};
+    const sintomas = {
+      q1: "alteraciones_sueno",
+      q2: "ansiedad_evaluaciones",
+      q3: "fatiga_cronica",
+      q4: "dificultad_concentrarse",
+      q5: "cambios_alimentacion",
+      q6: "procrastinacion",
+      q7: "irritabilidad",
+      q8: "pensamiento_catastrofico",
+      q9: "sintomas_fisicos",
+      q10: "aislamiento_social"
+    };
 
-    // Recorre todas las preguntas para sumar los valores seleccionados
+    // Verifica que todas las preguntas estén respondidas
     for (let i = 1; i <= 10; i++) {
       const seleccion = document.querySelector(`input[name="q${i}"]:checked`);
-      // Verifica que todas las preguntas estén respondidas
       if (seleccion) {
-        total += parseInt(seleccion.value);
+        const valor = parseInt(seleccion.value);
+        total += valor;
+        respuestas[sintomas[`q${i}`]] = valor;
       } else {
         alert(`Debes responder la pregunta ${i}`);
         return;
       }
     }
 
-    // Envía el puntaje al servidor mediante una solicitud AJAX
+    // Enviar puntaje total
     fetch('/guardar-puntaje', {
       method: 'POST',
       headers: {
@@ -288,7 +302,17 @@
     })
     .then(response => response.json())
     .then(data => {
-      // Redirige a diferentes páginas según el puntaje obtenido
+      // Después de guardar el puntaje, enviar síntomas presentes
+      return fetch('/guardar-sintomas', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ respuestas })
+      });
+    })
+    .then(() => {
+      // Redirigir según el nivel de estrés
       if (total <= 10) {
         window.location.href = "/nivel_bajo";
       } else if (total <= 20) {
@@ -300,8 +324,8 @@
       }
     })
     .catch(error => {
-      console.error('Error al guardar el puntaje:', error);
-      alert('Hubo un error al guardar el puntaje. Intenta nuevamente.');
+      console.error('Error al guardar los datos:', error);
+      alert('Hubo un error al guardar tus respuestas. Intenta nuevamente.');
     });
   });
 </script>
