@@ -315,7 +315,8 @@ app.get('/perfil', checkAuth, async (req, res) => {
 
     if (resultadoDoc.exists) {
       const data = resultadoDoc.data();
-      sintomas = data.sintomas || [];
+      // Convertimos el objeto { sintoma1: valor, sintoma2: valor } en un arreglo de claves
+      sintomas = Object.keys(data.sintomas || {});
     }
 
     res.render('perfil', {
@@ -326,7 +327,7 @@ app.get('/perfil', checkAuth, async (req, res) => {
       resultadoQuiz,
       puntaje,
       consejo,
-      sintomas, // ← Se pasa a la vista
+      sintomas,
       comentariosRecibidos: userData.comentariosRecibidos || [],
     });
   } catch (err) {
