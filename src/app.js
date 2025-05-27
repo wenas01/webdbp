@@ -19,6 +19,10 @@ import path from 'path';
 // Cargar las variables de entorno del archivo .env
 dotenv.config();
 
+// Se importa DataFactory y Writer desde la librería N3 para trabajar con RDF
+// - DataFactory permite crear nodos RDF como recursos (namedNode), literales y tripletas (quad)
+// - Writer se utiliza para generar y serializar las tripletas RDF en formato Turtle (TTL)
+import { DataFactory, Writer } from 'n3';
 
 // ------------ Configuración Firebase Admin -------------
 const serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT_JSON);
