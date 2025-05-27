@@ -376,29 +376,36 @@ app.get('/perfil/rdf', checkAuth, async (req, res) => {
     };
 
     sintomas.forEach(([sintoma, valor]) => {
-  if (typeof sintoma !== 'string' || valor === undefined) {
-    console.warn('Síntoma inválido o valor ausente:', sintoma, valor);
-    return;
-   }
- 
-   const sintomaURI = `https://estresa.netlify.app/sintoma/${encodeURIComponent(sintoma)}`;
- 
-   writer.addQuad(quad(
-     namedNode(sintomaURI),
-     namedNode('https://estresa.netlify.app/valor'),
-     literal(valor.toString(), namedNode('http://www.w3.org/2001/XMLSchema#int'))
-   ));
-
-   if (dbpediaMap[sintoma]) {
-     writer.addQuad(quad(
-       namedNode(sintomaURI),
-       namedNode('http://www.w3.org/2002/07/owl#sameAs'),
-       namedNode(`http://dbpedia.org/resource/${dbpediaMap[sintoma]}`)
+      const sintomaURI = `https://estresa.netlify.app/sintoma/${encodeURIComponent(sintoma)}`;
+      
+      writer.addQuad(quad(
+        namedNode(sintomaURI),
+        namedNode('https://estresa.netlify.app/valor'),
+        literal(valor.toString(), namedNode('http://www.w3.org/2001/XMLSchema#int'))
       ));
-    }
-   });
 
-    writer.end((err, result) => {
+      if (dbpediaMap[sintoma]) {
+        writer.addQuad(quad(
+          namedNode(sintomaURI),
+          namedNode('http://www.w3.org/2002/07/owl#sameAs'),
+          namedNode(`http://dbpedia.org/resource/${dbpediaMap[sintoma]}`)
+        ));
+      }
+    });
+
+    writer.end(async (err, result) => {
+      if (err) {
+        console.error('Error generando RDF:', err);
+        return res.status(500).send('Error al generar RDF');
+      }
+
+      // ✅ GUARDAR EN FIRESTORE
+      const rdfRef = db.collection('rdf_perfiles').doc(uid);
+      await rdfRef.set({
+        rdf: result,
+        generadoEn: new Date().toISOString()
+      });
+
       res.setHeader('Content-Type', 'text/turtle');
       res.send(result);
     });
