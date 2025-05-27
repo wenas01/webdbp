@@ -282,96 +282,50 @@ app.post('/login', async (req, res) => {
 
 
 // Perfil
-
-app.get('/perfil', checkAuth, async (req, res, next) => {
+app.get('/perfil', checkAuth, async (req, res) => {
   try {
     const uid = req.user.uid;
-
-    // Obtener datos del usuario con validación
     const userDoc = await db.collection('usuarios').doc(uid).get();
-    
+
     if (!userDoc.exists) {
-      return res.status(404).render('error', { 
-        title: 'Error',
-        message: 'Usuario no encontrado en la base de datos' 
-      });
+      return res.status(404).send('Usuario no encontrado.');
     }
 
     const userData = userDoc.data();
-    if (!userData) {
-      return res.status(500).render('error', {
-        title: 'Error',
-        message: 'Datos de usuario no disponibles'
-      });
+    const puntaje = userData.puntaje || 0;
+
+    let resultadoQuiz = '';
+    let consejo = '';
+
+    if (puntaje <= 10) {
+      resultadoQuiz = 'ESTRÉS BAJO';
+      consejo = 'Sigue con tu ritmo. Mantén la calma y organiza bien tus tareas.';
+    } else if (puntaje <= 20) {
+      resultadoQuiz = 'ESTRÉS MODERADO';
+      consejo = 'Intenta tomar pequeños descansos y practicar técnicas de relajación.';
+    } else if (puntaje <= 30) {
+      resultadoQuiz = 'ESTRÉS ALTO';
+      consejo = 'Considera hablar con un consejero o tomar descansos más largos.';
+    } else {
+      resultadoQuiz = 'ESTRÉS MUY ALTO';
+      consejo = 'Es importante que busques ayuda profesional para manejar el estrés.';
     }
 
-    // Valores por defecto para datos del usuario
-    const nombre = userData.nombre || 'Usuario';
-    const correo = userData.correo || 'No especificado';
-    const fechaNacimiento = userData.fechaNacimiento || 'No especificada';
-    const comentariosRecibidos = Array.isArray(userData.comentariosRecibidos) ? 
-      userData.comentariosRecibidos : [];
-
-    // Obtener el último resultado del quiz con validación
-    let sintomas = [];
-    let puntaje = 0;
-    let resultadoQuiz = 'No realizado';
-    let consejo = 'Realiza el test para conocer tu nivel de estrés';
-
-    const resultadosSnapshot = await db
-      .collection('resultados_quiz')
-      .where('uid', '==', uid)
-      .orderBy('fecha', 'desc')
-      .limit(1)
-      .get();
-
-    if (!resultadosSnapshot.empty) {
-      const ultimoResultado = resultadosSnapshot.docs[0].data();
-      
-      // Validar puntaje
-      puntaje = typeof ultimoResultado.puntaje === 'number' ? ultimoResultado.puntaje : 0;
-      
-      // Validar y filtrar síntomas
-      sintomas = Array.isArray(ultimoResultado.sintomas) ? 
-        ultimoResultado.sintomas.filter(s => 
-          s && typeof s.nombre === 'string' && typeof s.descripcion === 'string'
-        ) : [];
-
-      // Evaluar nivel de estrés según puntaje
-      if (puntaje <= 10) {
-        resultadoQuiz = 'ESTRÉS BAJO';
-        consejo = 'Sigue con tu ritmo. Mantén la calma y organiza bien tus tareas.';
-      } else if (puntaje <= 20) {
-        resultadoQuiz = 'ESTRÉS MODERADO';
-        consejo = 'Intenta tomar pequeños descansos y practicar técnicas de relajación.';
-      } else if (puntaje <= 30) {
-        resultadoQuiz = 'ESTRÉS ALTO';
-        consejo = 'Considera hablar con un consejero o tomar descansos más largos.';
-      } else {
-        resultadoQuiz = 'ESTRÉS MUY ALTO';
-        consejo = 'Es importante que busques ayuda profesional para manejar el estrés.';
-      }
-    }
-
-    // Renderizar perfil con todos los datos validados
     res.render('perfil', {
-      title: 'Mi Perfil',
-      nombre,
-      correo,
-      fechaNacimiento,
+      title: 'Estrés Académico - Perfil',
+      nombre: userData.nombre || 'Sin nombre',
+      correo: userData.correo || 'Sin correo',
+      fechaNacimiento: userData.fechaNacimiento || 'No especificada',
       resultadoQuiz,
       puntaje,
       consejo,
-      comentariosRecibidos,
-      sintomas
+      comentariosRecibidos: userData.comentariosRecibidos || [],
     });
-
   } catch (err) {
-    console.error('Error cargando perfil:', err);
-    next(err);
+    console.error('Error cargando perfil:', err.message);
+    res.status(500).send('Error al cargar el perfil');
   }
 });
-
 
 
 // Ruta protegida
@@ -411,52 +365,8 @@ app.get('/logout', (req, res) => {
   res.clearCookie('__session');
   res.redirect('/login');
 });
-//quiz
-app.post('/resultados-quiz', checkAuth, async (req, res) => {
-  try {
-    const uid = req.user.uid;
-    const { puntaje, sintomas } = req.body;
 
-    if (typeof puntaje !== 'number' || !Array.isArray(sintomas)) {
-      return res.status(400).json({ error: 'Formato inválido de datos.' });
-    }
-
-    const resultado = {
-      uid,
-      puntaje,
-      fecha: new Date().toISOString(),
-      sintomas
-    };
-
-    await db.collection('resultados_quiz').add(resultado);
-    res.status(200).json({ message: 'Resultado guardado correctamente.' });
-  } catch (err) {
-    console.error('Error guardando resultado:', err);
-    res.status(500).json({ error: 'Error interno del servidor.' });
-  }
-});
-app.get('/resultado-usuario', checkAuth, async (req, res) => {
-  try {
-    const uid = req.user.uid;
-
-    const snapshot = await db
-      .collection('resultados_quiz')
-      .where('uid', '==', uid)
-      .orderBy('fecha', 'desc')
-      .limit(1)
-      .get();
-
-    if (snapshot.empty) {
-      return res.status(200).json({ sintomas: [], puntaje: 0 });
-    }
-
-    const data = snapshot.docs[0].data();
-    res.status(200).json({ sintomas: data.sintomas, puntaje: data.puntaje });
-  } catch (error) {
-    console.error('Error obteniendo resultado:', error);
-    res.status(500).json({ error: 'Error interno al obtener resultado.' });
-  }
-});
+export { app };
 
 // Ruta para obtener el test en formato RDF (JSON-LD) y vincularlo a DBpedia con el puntaje real
 app.get('/rdf/test', checkAuth, async (req, res) => {
