@@ -1,18 +1,53 @@
 <!DOCTYPE html>
 <style>
-  .profile-symptoms {
-    margin-top: 20px;
-    background-color: #f7f9fc;
-    padding: 15px;
+   .perfil-sintomas {
+    background-color: #fdfdfd;
+    border: 1px solid #e0e0e0;
+    border-left: 5px solid #a93226; /* Color rojo para dar énfasis */
     border-radius: 8px;
-    border-left: 4px solid #4a90e2;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: var(--shadow-soft);
   }
-  .profile-symptoms ul {
+  
+  .perfil-sintomas h3 {
+    font-size: 1.4rem;
+    color: #a93226;
+    margin-bottom: 10px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .perfil-sintomas ul {
+    list-style: none;
+    padding-left: 0;
     margin: 0;
-    padding-left: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
   }
-  .profile-symptoms li {
-    margin-bottom: 5px;
+  
+  .perfil-sintomas li {
+    background-color: #f5f5f5;
+    color: #333;
+    padding: 10px 15px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    font-size: 0.95rem;
+    font-weight: 500;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: background-color 0.3s ease;
+  }
+  
+  .perfil-sintomas li::before {
+    content: "✅ ";
+    color: #28a745;
+  }
+  
+  .perfil-sintomas li:hover {
+    background-color: #eaeaea;
   }
 </style>
 <html lang="es-PE">
@@ -42,16 +77,16 @@
       <p><span>Nivel de estrés:</span> <%= resultadoQuiz %></p>
       <p><span>Consejo:</span> <%= consejo %></p>
     </div>
-  <% if (sintomas && sintomas.length > 0) { %>
-    <div class="profile-symptoms">
-      <p><span>Síntomas presentes:</span></p>
-      <ul>
-        <% sintomas.forEach(function(s) { %>
-          <li><%= s.replace(/_/g, ' ') %></li>
-        <% }) %>
-      </ul>
-    </div>
-  <% } else { %>
+<% if (sintomas && sintomas.length > 0) { %>
+  <div class="perfil-sintomas">
+    <h3>Síntomas detectados</h3>
+    <ul>
+      <% sintomas.forEach(sintoma => { %>
+        <li><%= sintoma %></li>
+      <% }) %>
+    </ul>
+  </div>
+<% } else { %>
     <div class="profile-symptoms">
       <p><span>Síntomas presentes:</span> No se encontraron síntomas registrados.</p>
     </div>
