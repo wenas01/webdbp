@@ -376,22 +376,27 @@ app.get('/perfil/rdf', checkAuth, async (req, res) => {
     };
 
     sintomas.forEach(([sintoma, valor]) => {
-      const sintomaURI = `https://estresa.netlify.app/sintoma/${encodeURIComponent(sintoma)}`;
-      
-      writer.addQuad(quad(
-        namedNode(sintomaURI),
-        namedNode('https://estresa.netlify.app/valor'),
-        literal(valor.toString(), namedNode('http://www.w3.org/2001/XMLSchema#int'))
-      ));
+  if (typeof sintoma !== 'string' || valor === undefined) {
+    console.warn('Síntoma inválido o valor ausente:', sintoma, valor);
+    return;
+   }
+ 
+   const sintomaURI = `https://estresa.netlify.app/sintoma/${encodeURIComponent(sintoma)}`;
+ 
+   writer.addQuad(quad(
+     namedNode(sintomaURI),
+     namedNode('https://estresa.netlify.app/valor'),
+     literal(valor.toString(), namedNode('http://www.w3.org/2001/XMLSchema#int'))
+   ));
 
-      if (dbpediaMap[sintoma]) {
-        writer.addQuad(quad(
-          namedNode(sintomaURI),
-          namedNode('http://www.w3.org/2002/07/owl#sameAs'),
-          namedNode(`http://dbpedia.org/resource/${dbpediaMap[sintoma]}`)
-        ));
-      }
-    });
+   if (dbpediaMap[sintoma]) {
+     writer.addQuad(quad(
+       namedNode(sintomaURI),
+       namedNode('http://www.w3.org/2002/07/owl#sameAs'),
+       namedNode(`http://dbpedia.org/resource/${dbpediaMap[sintoma]}`)
+      ));
+    }
+   });
 
     writer.end((err, result) => {
       res.setHeader('Content-Type', 'text/turtle');
