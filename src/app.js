@@ -353,12 +353,14 @@ app.get('/perfil/rdf', checkAuth, async (req, res) => {
     const sintomas = Object.entries(data.sintomas || {});
 
     const { namedNode, literal, quad } = DataFactory;
-    const writer = new Writer({ prefixes: { 
-      ex: 'http://example.org/',
-      dbpedia: 'http://dbpedia.org/resource/',
-      owl: 'http://www.w3.org/2002/07/owl#',
-      xsd: 'http://www.w3.org/2001/XMLSchema#'
-    } });
+    const writer = new Writer({
+      prefixes: {
+        estresa: 'https://estresa.netlify.app/',
+        dbpedia: 'http://dbpedia.org/resource/',
+        owl: 'http://www.w3.org/2002/07/owl#',
+        xsd: 'http://www.w3.org/2001/XMLSchema#'
+      }
+    });
 
     const dbpediaMap = {
       aislamiento_social: 'Social_withdrawal',
@@ -374,10 +376,11 @@ app.get('/perfil/rdf', checkAuth, async (req, res) => {
     };
 
     sintomas.forEach(([sintoma, valor]) => {
-      const sintomaURI = `http://example.org/sintoma/${sintoma}`;
+      const sintomaURI = `https://estresa.netlify.app/sintoma/${encodeURIComponent(sintoma)}`;
+      
       writer.addQuad(quad(
         namedNode(sintomaURI),
-        namedNode('http://example.org/valor'),
+        namedNode('https://estresa.netlify.app/valor'),
         literal(valor.toString(), namedNode('http://www.w3.org/2001/XMLSchema#int'))
       ));
 
