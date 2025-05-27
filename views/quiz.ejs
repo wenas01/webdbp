@@ -264,69 +264,72 @@
 <!-- Script JavaScript para manejar la lógica del cuestionario -->
 <script>
   document.getElementById("quiz-submit").addEventListener("click", function () {
-    let total = 0;
-    const respuestas = {};
-    
-    // Mapa de preguntas a síntomas
-    const sintomas = {
-      q1: "alteraciones_sueno",
-      q2: "ansiedad_evaluaciones",
-      q3: "fatiga_cronica",
-      q4: "dificultad_concentrarse",
-      q5: "cambios_alimentacion",
-      q6: "procrastinacion",
-      q7: "irritabilidad",
-      q8: "pensamiento_catastrofico",
-      q9: "sintomas_fisicos",
-      q10: "aislamiento_social"
-    };
+  let total = 0;
+  const respuestas = {};
 
-    // Recolectar respuestas
-    for (let i = 1; i <= 10; i++) {
-      const seleccion = document.querySelector(`input[name="q${i}"]:checked`);
-      if (!seleccion) {
-        alert(`Debes responder la pregunta ${i}`);
-        return;
-      }
+  const sintomas = {
+    q1: "alteraciones_sueno",
+    q2: "ansiedad_evaluaciones",
+    q3: "fatiga_cronica",
+    q4: "dificultad_concentrarse",
+    q5: "cambios_alimentacion",
+    q6: "procrastinacion",
+    q7: "irritabilidad",
+    q8: "pensamiento_catastrofico",
+    q9: "sintomas_fisicos",
+    q10: "aislamiento_social"
+  };
 
-      const valor = parseInt(seleccion.value);
-      total += valor;
-
-      const claveSintoma = sintomas[`q${i}`];
-      respuestas[claveSintoma] = valor; // Guardamos sintoma: puntaje
+  for (let i = 1; i <= 10; i++) {
+    const seleccion = document.querySelector(`input[name="q${i}"]:checked`);
+    if (!seleccion) {
+      alert(`Debes responder la pregunta ${i}`);
+      return;
     }
 
-    // Enviar puntaje total primero
-    fetch('/guardar-puntaje', {
+    const valor = parseInt(seleccion.value);
+    total += valor;
+
+    const claveSintoma = sintomas[`q${i}`];
+    respuestas[claveSintoma] = valor;
+  }
+
+  // Paso 1: guardar el puntaje total
+  fetch('/guardar-puntaje', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ puntaje: total })
+  })
+  .then(response => response.json())
+  .then(() => {
+    // Paso 2: guardar los síntomas
+    return fetch('/guardar-sintomas', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ puntaje: total })
-    })
-    .then(response => response.json())
-    .then(() => {
-      // Luego enviar el objeto completo de respuestas (sintoma: puntaje)
-      return fetch('/guardar-sintomas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ respuestas }) // <-- objeto con todos los síntomas y sus puntajes
-      });
-    })
-    .then(() => {
-      // Redirección según el nivel de estrés
-      if (total <= 10) {
-        window.location.href = "/nivel_bajo";
-      } else if (total <= 20) {
-        window.location.href = "/nivel_moderado";
-      } else if (total <= 30) {
-        window.location.href = "/nivel_alto";
-      } else {
-        window.location.href = "/nivel_muy_alto";
-      }
-    })
-    .catch(error => {
-      console.error('Error al guardar los datos:', error);
-      alert('Hubo un error al guardar tus respuestas. Intenta nuevamente.');
+      body: JSON.stringify({ respuestas })
     });
+  })
+  .then(() => {
+    // ✅ Paso 3: Generar RDF automáticamente e invisiblemente
+    return fetch('/perfil/rdf');
+  })
+  .then(() => {
+    // Paso 4: redirigir según nivel de estrés
+    if (total <= 10) {
+      window.location.href = "/nivel_bajo";
+    } else if (total <= 20) {
+      window.location.href = "/nivel_moderado";
+    } else if (total <= 30) {
+      window.location.href = "/nivel_alto";
+    } else {
+      window.location.href = "/nivel_muy_alto";
+    }
+  })
+  .catch(error => {
+    console.error('Error al guardar los datos o generar RDF:', error);
+    alert('Hubo un error al guardar tus respuestas. Intenta nuevamente.');
   });
+});
+
 </script>
 
