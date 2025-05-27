@@ -339,7 +339,67 @@ app.get('/perfil', checkAuth, async (req, res) => {
     res.status(500).send('Error al cargar el perfil');
   }
 });
+// Ruta para obtener el RDF de los síntomas del usuario actual
+app.get('/perfil/rdf', checkAuth, async (req, res) => {
+  try {
+    const uid = req.user.uid;
+    const resultadoDoc = await db.collection('resultados_quiz').doc(uid).get();
 
+    if (!resultadoDoc.exists) {
+      return res.status(404).send('No se encontraron síntomas');
+    }
+
+    const data = resultadoDoc.data();
+    const sintomas = Object.entries(data.sintomas || {});
+
+    const { namedNode, literal, quad } = DataFactory;
+    const writer = new Writer({ prefixes: { 
+      ex: 'http://example.org/',
+      dbpedia: 'http://dbpedia.org/resource/',
+      owl: 'http://www.w3.org/2002/07/owl#',
+      xsd: 'http://www.w3.org/2001/XMLSchema#'
+    } });
+
+    const dbpediaMap = {
+      aislamiento_social: 'Social_withdrawal',
+      alteraciones_sueno: 'Insomnia',
+      ansiedad_evaluaciones: 'Anxiety',
+      cambios_alimentacion: 'Eating_disorder',
+      dificultad_concentrarse: 'Attention',
+      fatiga_cronica: 'Fatigue',
+      irritabilidad: 'Irritability',
+      pensamiento_catastrofico: 'Catastrophic_thinking',
+      procrastinacion: 'Procrastination',
+      sintomas_fisicos: 'Somatic_symptom_disorder'
+    };
+
+    sintomas.forEach(([sintoma, valor]) => {
+      const sintomaURI = `http://example.org/sintoma/${sintoma}`;
+      writer.addQuad(quad(
+        namedNode(sintomaURI),
+        namedNode('http://example.org/valor'),
+        literal(valor.toString(), namedNode('http://www.w3.org/2001/XMLSchema#int'))
+      ));
+
+      if (dbpediaMap[sintoma]) {
+        writer.addQuad(quad(
+          namedNode(sintomaURI),
+          namedNode('http://www.w3.org/2002/07/owl#sameAs'),
+          namedNode(`http://dbpedia.org/resource/${dbpediaMap[sintoma]}`)
+        ));
+      }
+    });
+
+    writer.end((err, result) => {
+      res.setHeader('Content-Type', 'text/turtle');
+      res.send(result);
+    });
+
+  } catch (err) {
+    console.error('Error generando RDF:', err);
+    res.status(500).send('Error interno al generar RDF');
+  }
+});
 
 // Ruta protegida
 app.get('/quiz', checkAuth, (req, res) => {
