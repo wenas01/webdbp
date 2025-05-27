@@ -19,10 +19,6 @@ import path from 'path';
 // Cargar las variables de entorno del archivo .env
 dotenv.config();
 
-// Se importa DataFactory y Writer desde la librería N3 para trabajar con RDF
-// - DataFactory permite crear nodos RDF como recursos (namedNode), literales y tripletas (quad)
-// - Writer se utiliza para generar y serializar las tripletas RDF en formato Turtle (TTL)
-import { DataFactory, Writer } from 'n3';
 
 // ------------ Configuración Firebase Admin -------------
 const serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT_JSON);
@@ -110,67 +106,6 @@ export async function addUserToLocals(req, res, next) {
   }
   next();
 }
-
-const generarPerfilRDF = async (uid, sintomas, db) => {
-  const { namedNode, literal, quad } = DataFactory;
-
-  const writer = new Writer({
-    prefixes: {
-      estresa: 'https://estresa.netlify.app/',
-      dbpedia: 'http://dbpedia.org/resource/',
-      owl: 'http://www.w3.org/2002/07/owl#',
-      xsd: 'http://www.w3.org/2001/XMLSchema#'
-    }
-  });
-
-  const dbpediaMap = {
-    aislamiento_social: 'Social_withdrawal',
-    alteraciones_sueno: 'Insomnia',
-    ansiedad_evaluaciones: 'Anxiety',
-    cambios_alimentacion: 'Eating_disorder',
-    dificultad_concentrarse: 'Attention',
-    fatiga_cronica: 'Fatigue',
-    irritabilidad: 'Irritability',
-    pensamiento_catastrofico: 'Catastrophic_thinking',
-    procrastinacion: 'Procrastination',
-    sintomas_fisicos: 'Somatic_symptom_disorder'
-  };
-
-  sintomas.forEach(([sintoma, valor]) => {
-    const sintomaURI = `https://estresa.netlify.app/sintoma/${encodeURIComponent(sintoma)}`;
-    
-    writer.addQuad(quad(
-      namedNode(sintomaURI),
-      namedNode('https://estresa.netlify.app/valor'),
-      literal(valor.toString(), namedNode('http://www.w3.org/2001/XMLSchema#int'))
-    ));
-
-    if (dbpediaMap[sintoma]) {
-      writer.addQuad(quad(
-        namedNode(sintomaURI),
-        namedNode('http://www.w3.org/2002/07/owl#sameAs'),
-        namedNode(`http://dbpedia.org/resource/${dbpediaMap[sintoma]}`)
-      ));
-    }
-  });
-
-  return new Promise((resolve, reject) => {
-	  writer.end(async (err, result) => {
-	    if (err) return reject(err);
-	
-	    try {
-	      const ref = db.collection('rdf_perfiles').doc(uid); // usamos 'ref' como en tu ejemplo funcional
-	      await ref.set({
-	        rdf: result,
-	        generadoEn: new Date().toISOString()
-	      });
-	      resolve(result);
-	    } catch (firestoreErr) {
-	      reject(firestoreErr);
-	    }
-	  });
-	});
-};
 
 // Aplicar el middleware addUserToLocals a todas las rutas
 app.use(addUserToLocals);
@@ -400,83 +335,7 @@ app.get('/perfil', checkAuth, async (req, res) => {
     res.status(500).send('Error al cargar el perfil');
   }
 });
-// Ruta para obtener el RDF de los síntomas del usuario actual
-app.get('/perfil/rdf', checkAuth, async (req, res) => {
-  try {
-    const uid = req.user.uid;
-    const resultadoDoc = await db.collection('resultados_quiz').doc(uid).get();
 
-    if (!resultadoDoc.exists) {
-      return res.status(404).send('No se encontraron síntomas');
-    }
-
-    const data = resultadoDoc.data();
-    const sintomas = Object.entries(data.sintomas || {});
-
-    const { namedNode, literal, quad } = DataFactory;
-    const writer = new Writer({
-      prefixes: {
-        estresa: 'https://estresa.netlify.app/',
-        dbpedia: 'http://dbpedia.org/resource/',
-        owl: 'http://www.w3.org/2002/07/owl#',
-        xsd: 'http://www.w3.org/2001/XMLSchema#'
-      }
-    });
-
-    const dbpediaMap = {
-      aislamiento_social: 'Social_withdrawal',
-      alteraciones_sueno: 'Insomnia',
-      ansiedad_evaluaciones: 'Anxiety',
-      cambios_alimentacion: 'Eating_disorder',
-      dificultad_concentrarse: 'Attention',
-      fatiga_cronica: 'Fatigue',
-      irritabilidad: 'Irritability',
-      pensamiento_catastrofico: 'Catastrophic_thinking',
-      procrastinacion: 'Procrastination',
-      sintomas_fisicos: 'Somatic_symptom_disorder'
-    };
-
-    sintomas.forEach(([sintoma, valor]) => {
-      const sintomaURI = `https://estresa.netlify.app/sintoma/${encodeURIComponent(sintoma)}`;
-      
-      writer.addQuad(quad(
-        namedNode(sintomaURI),
-        namedNode('https://estresa.netlify.app/valor'),
-        literal(valor.toString(), namedNode('http://www.w3.org/2001/XMLSchema#int'))
-      ));
-
-      if (dbpediaMap[sintoma]) {
-        writer.addQuad(quad(
-          namedNode(sintomaURI),
-          namedNode('http://www.w3.org/2002/07/owl#sameAs'),
-          namedNode(`http://dbpedia.org/resource/${dbpediaMap[sintoma]}`)
-        ));
-      }
-    });
-
-    writer.end(async (err, result) => {
-      if (err) {
-        console.error('Error generando RDF:', err);
-        return res.status(500).send('Error al generar RDF');
-      }
-
-      // ✅ GUARDAR EN FIRESTORE
-      const rdfRef = db.collection('rdf_perfiles').doc(uid);
-      await rdfRef.set({
-        rdf: result,
-        generadoEn: new Date().toISOString()
-      });
-
-      res.setHeader('Content-Type', 'text/turtle');
-      res.setHeader('Content-Disposition', 'attachment; filename="perfil.ttl"');
-      res.send(result);
-    });
-
-  } catch (err) {
-    console.error('Error generando RDF:', err);
-    res.status(500).send('Error interno al generar RDF');
-  }
-});
 
 // Ruta protegida
 app.get('/quiz', checkAuth, (req, res) => {
@@ -512,39 +371,33 @@ app.post('/guardar-puntaje', checkAuth, async (req, res) => {
 app.post('/guardar-sintomas', checkAuth, async (req, res) => {
   try {
     const uid = req.user.uid;
-    const { respuestas } = req.body;
+    const { respuestas } = req.body; // Debe ser un objeto con sintoma: puntaje
 
-    // Filtrar los síntomas con puntaje >= 2
+    // Filtrar los síntomas presentes (puntaje >= 2) y conservar el puntaje
     const sintomasFiltrados = Object.entries(respuestas)
       .filter(([_, valor]) => Number(valor) >= 2)
-      .map(([clave, valor]) => [clave, Number(valor)]); // array de [sintoma, puntaje]
+      .reduce((acc, [clave, valor]) => {
+        acc[clave] = Number(valor);
+        return acc;
+      }, {});
 
-    // Convertir a objeto para guardar en Firestore
-    const sintomasObj = Object.fromEntries(sintomasFiltrados);
-
-    // Guardar en Firestore
+    // Guardar en la colección 'resultados_quiz' bajo el UID
     const ref = db.collection('resultados_quiz').doc(uid);
     await ref.set({
-      sintomas: sintomasObj,
+      sintomas: sintomasFiltrados, // ahora es un objeto {sintoma1: puntaje1, sintoma2: puntaje2}
       fecha: new Date().toISOString()
     });
 
-    // Generar y guardar RDF usando tu función reutilizable
-    if (sintomasFiltrados.length > 0) {
-	  await generarPerfilRDF(uid, sintomasFiltrados, db);
-	} else {
-	  console.log('No se generó RDF porque no hubo síntomas con puntaje >= 2');
-	}
-
-    res.status(200).json({
-      message: 'Síntomas y RDF guardados correctamente',
-      rdf // Opcional: lo puedes omitir si no quieres enviarlo al cliente
-    });
+    res.status(200).json({ message: 'Síntomas y puntajes guardados correctamente' });
   } catch (err) {
     console.error('Error al guardar los síntomas:', err);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
+// Logout
+app.get('/logout', (req, res) => {
+  res.clearCookie('__session');
+  res.redirect('/login');
+});
 
 export { app };
-
