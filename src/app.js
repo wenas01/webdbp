@@ -372,19 +372,22 @@ app.post('/guardar-sintomas', checkAuth, async (req, res) => {
     const uid = req.user.uid;
     const { respuestas } = req.body; // Debe ser un objeto con sintoma: puntaje
 
-    // Filtrar los síntomas presentes (puntaje >= 2)
-    const sintomasPresentes = Object.entries(respuestas)
+    // Filtrar los síntomas presentes (puntaje >= 2) y conservar el puntaje
+    const sintomasFiltrados = Object.entries(respuestas)
       .filter(([_, valor]) => Number(valor) >= 2)
-      .map(([clave]) => clave);
+      .reduce((acc, [clave, valor]) => {
+        acc[clave] = Number(valor);
+        return acc;
+      }, {});
 
     // Guardar en la colección 'resultados_quiz' bajo el UID
     const ref = db.collection('resultados_quiz').doc(uid);
     await ref.set({
-      sintomas: sintomasPresentes,
+      sintomas: sintomasFiltrados, // ahora es un objeto {sintoma1: puntaje1, sintoma2: puntaje2}
       fecha: new Date().toISOString()
     });
 
-    res.status(200).json({ message: 'Síntomas guardados correctamente' });
+    res.status(200).json({ message: 'Síntomas y puntajes guardados correctamente' });
   } catch (err) {
     console.error('Error al guardar los síntomas:', err);
     res.status(500).json({ error: 'Error interno del servidor' });
