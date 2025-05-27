@@ -1,5 +1,3 @@
-import fs from 'fs';
-
 // Se importa la librería Express para manejar rutas y servidores HTTP
 import express from 'express';
 
@@ -368,47 +366,3 @@ app.get('/logout', (req, res) => {
 
 export { app };
 
-// Ruta para obtener el test en formato RDF (JSON-LD) y vincularlo a DBpedia con el puntaje real
-app.get('/rdf/test', checkAuth, async (req, res) => {
-  try {
-    const uid = req.user.uid;
-    const userRef = db.collection('usuarios').doc(uid);
-    const userDoc = await userRef.get();
-
-    if (!userDoc.exists) {
-      return res.status(404).json({ error: 'Usuario no encontrado' });
-    }
-
-    const userData = userDoc.data();
-    const puntaje = userData.puntaje || 0;
-
-    const testData = {
-      "@context": {
-        "dbpedia": "http://dbpedia.org/resource/",
-        "schema": "http://schema.org/"
-      },
-      "@type": "schema:Assessment",
-      "schema:name": "Test de Estrés Académico",
-      "schema:description": "Un test para medir el nivel de estrés en estudiantes",
-      "schema:relatedLink": "http://dbpedia.org/resource/Academic_stress",
-      "schema:result": {
-        "@type": "schema:QuantitativeValue",
-        "schema:value": puntaje,
-        "schema:unitText": "porcentaje"
-      },
-      "schema:author": {
-        "@type": "schema:Organization",
-        "schema:name": "Universidad Católica San Pablo"
-      }
-    };
-
-    // Respondemos con el modelo RDF (JSON-LD)
-    res.setHeader('Content-Type', 'application/ld+json');
-    res.json(testData);
-
-  } catch (error) {
-    console.error('Error al obtener el puntaje:', error);
-    res.status(500).send('Error al obtener el puntaje');
-  }
-});
-export { app };
