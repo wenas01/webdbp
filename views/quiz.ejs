@@ -266,6 +266,8 @@
   document.getElementById("quiz-submit").addEventListener("click", function () {
     let total = 0;
     const respuestas = {};
+    
+    // Mapa de preguntas a síntomas
     const sintomas = {
       q1: "alteraciones_sueno",
       q2: "ansiedad_evaluaciones",
@@ -279,40 +281,38 @@
       q10: "aislamiento_social"
     };
 
-    // Verifica que todas las preguntas estén respondidas
+    // Recolectar respuestas
     for (let i = 1; i <= 10; i++) {
       const seleccion = document.querySelector(`input[name="q${i}"]:checked`);
-      if (seleccion) {
-        const valor = parseInt(seleccion.value);
-        total += valor;
-        respuestas[sintomas[`q${i}`]] = valor;
-      } else {
+      if (!seleccion) {
         alert(`Debes responder la pregunta ${i}`);
         return;
       }
+
+      const valor = parseInt(seleccion.value);
+      total += valor;
+
+      const claveSintoma = sintomas[`q${i}`];
+      respuestas[claveSintoma] = valor; // Guardamos sintoma: puntaje
     }
 
-    // Enviar puntaje total
+    // Enviar puntaje total primero
     fetch('/guardar-puntaje', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ puntaje: total })
     })
     .then(response => response.json())
-    .then(data => {
-      // Después de guardar el puntaje, enviar síntomas presentes
+    .then(() => {
+      // Luego enviar el objeto completo de respuestas (sintoma: puntaje)
       return fetch('/guardar-sintomas', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ respuestas })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ respuestas }) // <-- objeto con todos los síntomas y sus puntajes
       });
     })
     .then(() => {
-      // Redirigir según el nivel de estrés
+      // Redirección según el nivel de estrés
       if (total <= 10) {
         window.location.href = "/nivel_bajo";
       } else if (total <= 20) {
