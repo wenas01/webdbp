@@ -357,7 +357,29 @@ app.post('/guardar-puntaje', checkAuth, async (req, res) => {
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
+app.post('/guardar-sintomas', checkAuth, async (req, res) => {
+  try {
+    const uid = req.user.uid;
+    const { respuestas } = req.body; // Debe ser un objeto con sintoma: puntaje
 
+    // Filtrar los síntomas presentes (puntaje >= 2)
+    const sintomasPresentes = Object.entries(respuestas)
+      .filter(([_, valor]) => Number(valor) >= 2)
+      .map(([clave]) => clave);
+
+    // Guardar en la colección 'resultados_quiz' bajo el UID
+    const ref = db.collection('resultados_quiz').doc(uid);
+    await ref.set({
+      sintomas: sintomasPresentes,
+      fecha: new Date().toISOString()
+    });
+
+    res.status(200).json({ message: 'Síntomas guardados correctamente' });
+  } catch (err) {
+    console.error('Error al guardar los síntomas:', err);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
 // Logout
 app.get('/logout', (req, res) => {
   res.clearCookie('__session');
