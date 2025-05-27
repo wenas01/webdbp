@@ -155,21 +155,21 @@ const generarPerfilRDF = async (uid, sintomas, db) => {
   });
 
   return new Promise((resolve, reject) => {
-    writer.end(async (err, result) => {
-	  if (err) return reject(err);
+	  writer.end(async (err, result) => {
+	    if (err) return reject(err);
 	
-	  try {
-	    const rdfRef = db.collection('rdf_perfiles').doc(uid);
-	    await rdfRef.set({
-	      rdf: result,
-	      generadoEn: new Date().toISOString()
-	    });
-	    resolve(result);
-	  } catch (firestoreErr) {
-	    reject(firestoreErr);
-	  }
+	    try {
+	      const ref = db.collection('rdf_perfiles').doc(uid); // usamos 'ref' como en tu ejemplo funcional
+	      await ref.set({
+	        rdf: result,
+	        generadoEn: new Date().toISOString()
+	      });
+	      resolve(result);
+	    } catch (firestoreErr) {
+	      reject(firestoreErr);
+	    }
+	  });
 	});
-  });
 };
 
 // Aplicar el middleware addUserToLocals a todas las rutas
@@ -530,7 +530,11 @@ app.post('/guardar-sintomas', checkAuth, async (req, res) => {
     });
 
     // Generar y guardar RDF usando tu función reutilizable
-    const rdf = await generarPerfilRDF(uid, sintomasFiltrados, db);
+    if (sintomasFiltrados.length > 0) {
+	  await generarPerfilRDF(uid, sintomasFiltrados, db);
+	} else {
+	  console.log('No se generó RDF porque no hubo síntomas con puntaje >= 2');
+	}
 
     res.status(200).json({
       message: 'Síntomas y RDF guardados correctamente',
