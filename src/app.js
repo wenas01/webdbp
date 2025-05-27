@@ -156,17 +156,19 @@ const generarPerfilRDF = async (uid, sintomas, db) => {
 
   return new Promise((resolve, reject) => {
     writer.end(async (err, result) => {
-      if (err) return reject(err);
-
-      // Guardar en Firestore
-      const rdfRef = db.collection('rdf_perfiles').doc(uid);
-      await rdfRef.set({
-        rdf: result,
-        generadoEn: new Date().toISOString()
-      });
-
-      resolve(result);
-    });
+	  if (err) return reject(err);
+	
+	  try {
+	    const rdfRef = db.collection('rdf_perfiles').doc(uid);
+	    await rdfRef.set({
+	      rdf: result,
+	      generadoEn: new Date().toISOString()
+	    });
+	    resolve(result);
+	  } catch (firestoreErr) {
+	    reject(firestoreErr);
+	  }
+	});
   });
 };
 
