@@ -780,7 +780,7 @@ footer {
 }
 
 .profile-info {
-  text-align: left;
+  text-align: center;
   flex-grow: 0;  /* No estira el contenedor */
   min-width: 200px;
 }
