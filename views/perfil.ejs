@@ -1,4 +1,20 @@
 <!DOCTYPE html>
+<style>
+  .profile-symptoms {
+    margin-top: 20px;
+    background-color: #f7f9fc;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #4a90e2;
+  }
+  .profile-symptoms ul {
+    margin: 0;
+    padding-left: 20px;
+  }
+  .profile-symptoms li {
+    margin-bottom: 5px;
+  }
+</style>
 <html lang="es-PE">
 <head>
   <!-- Incluye los metadatos comunes del head -->
@@ -26,7 +42,21 @@
       <p><span>Nivel de estrés:</span> <%= resultadoQuiz %></p>
       <p><span>Consejo:</span> <%= consejo %></p>
     </div>
-  </div>
+  <% if (sintomas && sintomas.length > 0) { %>
+    <div class="profile-symptoms">
+      <p><span>Síntomas presentes:</span></p>
+      <ul>
+        <% sintomas.forEach(function(s) { %>
+          <li><%= s.replace(/_/g, ' ') %></li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } else { %>
+    <div class="profile-symptoms">
+      <p><span>Síntomas presentes:</span> No se encontraron síntomas registrados.</p>
+    </div>
+  <% } %>
+    </div>
 
 </body>
 </html>
