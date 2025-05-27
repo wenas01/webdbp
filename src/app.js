@@ -111,6 +111,65 @@ export async function addUserToLocals(req, res, next) {
   next();
 }
 
+const generarPerfilRDF = async (uid, sintomas, db) => {
+  const { namedNode, literal, quad } = DataFactory;
+
+  const writer = new Writer({
+    prefixes: {
+      estresa: 'https://estresa.netlify.app/',
+      dbpedia: 'http://dbpedia.org/resource/',
+      owl: 'http://www.w3.org/2002/07/owl#',
+      xsd: 'http://www.w3.org/2001/XMLSchema#'
+    }
+  });
+
+  const dbpediaMap = {
+    aislamiento_social: 'Social_withdrawal',
+    alteraciones_sueno: 'Insomnia',
+    ansiedad_evaluaciones: 'Anxiety',
+    cambios_alimentacion: 'Eating_disorder',
+    dificultad_concentrarse: 'Attention',
+    fatiga_cronica: 'Fatigue',
+    irritabilidad: 'Irritability',
+    pensamiento_catastrofico: 'Catastrophic_thinking',
+    procrastinacion: 'Procrastination',
+    sintomas_fisicos: 'Somatic_symptom_disorder'
+  };
+
+  sintomas.forEach(([sintoma, valor]) => {
+    const sintomaURI = `https://estresa.netlify.app/sintoma/${encodeURIComponent(sintoma)}`;
+    
+    writer.addQuad(quad(
+      namedNode(sintomaURI),
+      namedNode('https://estresa.netlify.app/valor'),
+      literal(valor.toString(), namedNode('http://www.w3.org/2001/XMLSchema#int'))
+    ));
+
+    if (dbpediaMap[sintoma]) {
+      writer.addQuad(quad(
+        namedNode(sintomaURI),
+        namedNode('http://www.w3.org/2002/07/owl#sameAs'),
+        namedNode(`http://dbpedia.org/resource/${dbpediaMap[sintoma]}`)
+      ));
+    }
+  });
+
+  return new Promise((resolve, reject) => {
+    writer.end(async (err, result) => {
+      if (err) return reject(err);
+
+      // Guardar en Firestore
+      const rdfRef = db.collection('rdf_perfiles').doc(uid);
+      await rdfRef.set({
+        rdf: result,
+        generadoEn: new Date().toISOString()
+      });
+
+      resolve(result);
+    });
+  });
+};
+
 // Aplicar el middleware addUserToLocals a todas las rutas
 app.use(addUserToLocals);
 // ---------------- Rutas ----------------
@@ -451,33 +510,34 @@ app.post('/guardar-puntaje', checkAuth, async (req, res) => {
 app.post('/guardar-sintomas', checkAuth, async (req, res) => {
   try {
     const uid = req.user.uid;
-    const { respuestas } = req.body; // Debe ser un objeto con sintoma: puntaje
+    const { respuestas } = req.body;
 
-    // Filtrar los síntomas presentes (puntaje >= 2) y conservar el puntaje
+    // Filtrar los síntomas con puntaje >= 2
     const sintomasFiltrados = Object.entries(respuestas)
       .filter(([_, valor]) => Number(valor) >= 2)
-      .reduce((acc, [clave, valor]) => {
-        acc[clave] = Number(valor);
-        return acc;
-      }, {});
+      .map(([clave, valor]) => [clave, Number(valor)]); // array de [sintoma, puntaje]
 
-    // Guardar en la colección 'resultados_quiz' bajo el UID
+    // Convertir a objeto para guardar en Firestore
+    const sintomasObj = Object.fromEntries(sintomasFiltrados);
+
+    // Guardar en Firestore
     const ref = db.collection('resultados_quiz').doc(uid);
     await ref.set({
-      sintomas: sintomasFiltrados, // ahora es un objeto {sintoma1: puntaje1, sintoma2: puntaje2}
+      sintomas: sintomasObj,
       fecha: new Date().toISOString()
     });
 
-    res.status(200).json({ message: 'Síntomas y puntajes guardados correctamente' });
+    // Generar y guardar RDF usando tu función reutilizable
+    const rdf = await generarPerfilRDF(uid, sintomasFiltrados, db);
+
+    res.status(200).json({
+      message: 'Síntomas y RDF guardados correctamente',
+      rdf // Opcional: lo puedes omitir si no quieres enviarlo al cliente
+    });
   } catch (err) {
     console.error('Error al guardar los síntomas:', err);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
-});
-// Logout
-app.get('/logout', (req, res) => {
-  res.clearCookie('__session');
-  res.redirect('/login');
 });
 
 export { app };
