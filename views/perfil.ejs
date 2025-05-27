@@ -61,39 +61,45 @@
   <!-- Incluye el encabezado y navegación común -->
   <%- include('partials/header') %>
   
-  <!-- Contenedor principal para la información del perfil -->
-  <div class="profile-content">
-    <!-- Sección para el avatar del usuario -->
-    <div class="profile-avatar">
-      <div class="avatar-circle"><%= nombre.charAt(0).toUpperCase() %></div>
+<!-- Contenedor principal para la información del perfil -->
+<div class="profile-content">
+  
+  <!-- Sección para el avatar del usuario -->
+  <div class="profile-avatar">
+    <div class="avatar-circle"><%= nombre.charAt(0).toUpperCase() %></div>
+  </div>
+  
+  <!-- Agrupa info y síntomas en vertical -->
+  <div class="profile-details">
+    <!-- Información del usuario -->
+    <div class="profile-info">
+      <p><span>Nombre:</span> <%= nombre %></p>
+      <p><span>Correo:</span> <%= correo %></p>
+      <p><span>Fecha de nacimiento:</span> <%= fechaNacimiento || 'No registrada' %></p>
+      <p><span>Puntaje:</span> <%= puntaje %></p>
+      <p><span>Nivel de estrés:</span> <%= resultadoQuiz %></p>
+      <p><span>Consejo:</span> <%= consejo %></p>
     </div>
-    
-   <!-- Sección para mostrar la información del usuario -->
-<div class="profile-info">
-  <p><span>Nombre:</span> <%= nombre %></p>
-  <p><span>Correo:</span> <%= correo %></p>
-  <p><span>Fecha de nacimiento:</span> <%= fechaNacimiento || 'No registrada' %></p>
-  <p><span>Puntaje:</span> <%= puntaje %></p>
-  <p><span>Nivel de estrés:</span> <%= resultadoQuiz %></p>
-  <p><span>Consejo:</span> <%= consejo %></p>
-</div>
 
-<!-- Muestra los síntomas detectados (ahora fuera del bloque anterior) -->
-<% if (sintomas && sintomas.length > 0) { %>
-  <div class="perfil-sintomas">
-    <h3>Síntomas detectados</h3>
-    <ul>
-      <% sintomas.forEach(sintoma => { %>
-        <li><%= sintoma.replace(/_/g, ' ') %></li>
-      <% }) %>
-    </ul>
+    <!-- Síntomas debajo -->
+    <% if (sintomas && sintomas.length > 0) { %>
+      <div class="perfil-sintomas">
+        <h3>Síntomas detectados</h3>
+        <ul>
+          <% sintomas.forEach(sintoma => { %>
+            <li><%= sintoma.replace(/_/g, ' ') %></li>
+          <% }) %>
+        </ul>
+      </div>
+    <% } else { %>
+      <div class="perfil-sintomas">
+        <h3>Síntomas detectados</h3>
+        <p>No se encontraron síntomas registrados.</p>
+      </div>
+    <% } %>
   </div>
-<% } else { %>
-  <div class="perfil-sintomas">
-    <h3>Síntomas detectados</h3>
-    <p>No se encontraron síntomas registrados.</p>
-  </div>
-<% } %>
+
+</div>
 
 </body>
 </html>
