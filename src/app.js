@@ -407,6 +407,7 @@ app.get('/perfil/rdf', checkAuth, async (req, res) => {
       });
 
       res.setHeader('Content-Type', 'text/turtle');
+      res.setHeader('Content-Disposition', 'attachment; filename="perfil.ttl"');
       res.send(result);
     });
 
