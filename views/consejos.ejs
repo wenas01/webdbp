@@ -375,8 +375,14 @@ async function getRDF() {
       const res = await fetch(url);
       if (!res.ok) throw new Error(`No se pudo obtener RDF/XML en español de ${uri}`);
       const rdfXml = await res.text();
+
       const newWindow = window.open();
+      if (!newWindow || !newWindow.document) {
+        throw new Error("No se pudo abrir una nueva ventana o acceder a su documento.");
+      }
+
       newWindow.document.write(`<pre>${escapeHtml(rdfXml)}</pre>`);
+      newWindow.document.close();
     } catch (err) {
       alert(`Error al obtener RDF/XML: ${err.message}`);
     }
@@ -388,6 +394,7 @@ function escapeHtml(text) {
   div.textContent = text;
   return div.innerHTML;
 }
+
 </script>
 
 </body>
