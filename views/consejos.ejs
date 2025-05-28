@@ -275,42 +275,48 @@
     }
   }
 
-  async function fetchDbpediaDefinition(uri) {
-    const endpoint = 'https://dbpedia.org/sparql';
+ async function fetchDbpediaDefinition(uri) {
+  const endpoint = 'https://dbpedia.org/sparql';
 
-    const buildQuery = (lang) => `
-      SELECT ?comment WHERE {
-        <${uri}> rdfs:comment ?comment .
-        FILTER (lang(?comment) = '${lang}')
-      } LIMIT 1
-    `;
+  const buildQuery = (lang) => `
+    SELECT ?comment WHERE {
+      <${uri}> rdfs:comment ?comment .
+      FILTER (lang(?comment) = '${lang}')
+    } LIMIT 1
+  `;
 
-    const fetchComment = async (lang) => {
-      const url = `${endpoint}?query=${encodeURIComponent(buildQuery(lang))}&format=json`;
-      try {
-        const response = await fetch(url, {
-          headers: {
-            'Accept': 'application/sparql-results+json'
-          }
-        });
-        const data = await response.json();
-        if (data.results.bindings.length > 0) {
-          return data.results.bindings[0].comment.value;
+  const fetchComment = async (lang) => {
+    const url = `${endpoint}?query=${encodeURIComponent(buildQuery(lang))}&format=json`;
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/sparql-results+json'
         }
-      } catch (error) {
-        console.error(`Error al consultar DBpedia (${lang}):`, error);
+      });
+      const data = await response.json();
+      if (data.results.bindings.length > 0) {
+        return data.results.bindings[0].comment.value;
       }
-      return null;
-    };
-
-    const commentEs = await fetchComment('es');
-    if (commentEs) return commentEs;
-
-    const commentEn = await fetchComment('en');
-    if (commentEn) return await translateText(commentEn, 'en', 'es');
-
+    } catch (error) {
+      console.error(`Error al consultar DBpedia (${lang}):`, error);
+    }
     return null;
+  };
+
+  // Intenta español
+  const commentEs = await fetchComment('es');
+  if (commentEs) return commentEs;
+
+  // Si no hay en español, intenta en inglés y traduce
+  const commentEn = await fetchComment('en');
+  if (commentEn) {
+    const translated = await translateText(commentEn, 'en', 'es');
+    return translated;
   }
+
+  // Nada disponible
+  return "(Definición no disponible)";
+}
 
   document.addEventListener("DOMContentLoaded", async () => {
     console.log("Buscando definiciones de DBpedia...");
