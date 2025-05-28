@@ -123,22 +123,33 @@
       margin-top: 2.5rem;
     }
 
-    .pomodoro-button {
-      background-color: var(--pastel-rose);
-      color: white;
-      border: none;
-      padding: 0.8rem 1.8rem;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
+.pomodoro-button, .home-button {
+  background-color: var(--pastel-rose);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.8rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin: 0.5rem;
+  text-decoration: none;
+  display: inline-block;
+}
 
-    .pomodoro-button:hover {
-      background-color: var(--pastel-rose-dark);
-    }
+.pomodoro-button:hover, .home-button:hover {
+  background-color: var(--pastel-rose-dark);
+}
+
+.home-button {
+  background-color: #6c757d;
+}
+
+.home-button:hover {
+  background-color: #5a6268;
+}
 
     @media (max-width: 600px) {
       h1 {
@@ -153,8 +164,9 @@
         padding: 1.2rem;
       }
 
-      .pomodoro-button {
-        width: 100%;
+      .pomodoro-button, .home-button {
+        width: calc(100% - 1rem);
+        margin: 0.5rem 0;
       }
     }
   </style>
@@ -257,6 +269,9 @@
   <div class="button-container">
     <a href="/pomodoro">
       <button class="pomodoro-button">Iniciar Temporizador Pomodoro ⏱️</button>
+    </a>
+    <a href="/">
+      <button class="home-button">🏠 Regresar al Inicio</button>
     </a>
   </div>
 </section>
