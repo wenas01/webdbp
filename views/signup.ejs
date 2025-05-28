@@ -41,45 +41,44 @@
     <a href="/login">¿Ya tienes cuenta? Inicia sesión</a>
   </div>
 
-  <script>
-    // Referencias al formulario y a los campos de contraseña
-    const form = document.getElementById('signupForm');
-    const passwordInput = document.getElementById('password');
-    const confirmPasswordInput = document.getElementById('confirmPassword');
-    const passwordMessage = document.getElementById('passwordMessage');
+<script>
+  // Referencias al formulario y a los campos de contraseña
+  const form = document.getElementById('signupForm');
+  const passwordInput = document.getElementById('password');
+  const confirmPasswordInput = document.getElementById('confirmPassword');
+  const passwordMessage = document.getElementById('passwordMessage');
+  const togglePassword = document.getElementById('togglePassword');
 
-    // Función que compara ambas contraseñas
-    function validatePassword() {
-      if (passwordInput.value !== confirmPasswordInput.value) {
-        passwordMessage.style.display = "block";
-        return false;
-      } else {
-        passwordMessage.style.display = "none";
-        return true;
-      }
+  // Función que compara ambas contraseñas
+  function validatePassword() {
+    if (passwordInput.value !== confirmPasswordInput.value) {
+      passwordMessage.style.display = "block";
+      return false;
+    } else {
+      passwordMessage.style.display = "none";
+      return true;
     }
+  }
 
-    // Validación en tiempo real en el campo de confirmación
-    confirmPasswordInput.addEventListener('keyup', validatePassword);
+  // Validación en tiempo real en el campo de confirmación
+  confirmPasswordInput.addEventListener('keyup', validatePassword);
 
-    // Previene el envío si las contraseñas no coinciden
-    form.addEventListener('submit', function(e) {
-      if (!validatePassword()){
-        e.preventDefault();
-      }
-    });
+  // Previene el envío si las contraseñas no coinciden
+  form.addEventListener('submit', function(e) {
+    if (!validatePassword()){
+      e.preventDefault();
+    }
+  });
 
-    const passwordInput = document.getElementById('password');
-    const togglePassword = document.getElementById('togglePassword');
-    
-    togglePassword.addEventListener('click', () => {
-      if (passwordInput.type === "password") {
-        passwordInput.type = "text";
-      } else {
-        passwordInput.type = "password";
-      }
-    });
+  // Alterna entre mostrar y ocultar la contraseña
+  togglePassword.addEventListener('click', () => {
+    if (passwordInput.type === "password") {
+      passwordInput.type = "text";
+    } else {
+      passwordInput.type = "password";
+    }
+  });
+</script>
 
-  </script>
 </body>
 </html>
