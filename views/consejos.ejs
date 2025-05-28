@@ -260,29 +260,55 @@
 </section>
 
 <script>
+  async function translateText(text, from = 'en', to = 'es') {
+    try {
+      const res = await fetch('https://libretranslate.de/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ q: text, source: from, target: to, format: 'text' })
+      });
+      const data = await res.json();
+      return data.translatedText + ' (Traducido automáticamente)';
+    } catch (err) {
+      console.error('Error al traducir:', err);
+      return text;
+    }
+  }
+
   async function fetchDbpediaDefinition(uri) {
     const endpoint = 'https://dbpedia.org/sparql';
-    const query = `
+
+    const buildQuery = (lang) => `
       SELECT ?comment WHERE {
         <${uri}> rdfs:comment ?comment .
-        FILTER (lang(?comment) = 'es')
+        FILTER (lang(?comment) = '${lang}')
       } LIMIT 1
     `;
-    const url = `${endpoint}?query=${encodeURIComponent(query)}&format=json`;
 
-    try {
-      const response = await fetch(url, {
-        headers: {
-          'Accept': 'application/sparql-results+json'
+    const fetchComment = async (lang) => {
+      const url = `${endpoint}?query=${encodeURIComponent(buildQuery(lang))}&format=json`;
+      try {
+        const response = await fetch(url, {
+          headers: {
+            'Accept': 'application/sparql-results+json'
+          }
+        });
+        const data = await response.json();
+        if (data.results.bindings.length > 0) {
+          return data.results.bindings[0].comment.value;
         }
-      });
-      const data = await response.json();
-      if (data.results.bindings.length > 0) {
-        return data.results.bindings[0].comment.value;
+      } catch (error) {
+        console.error(`Error al consultar DBpedia (${lang}):`, error);
       }
-    } catch (error) {
-      console.error('Error al consultar DBpedia:', error);
-    }
+      return null;
+    };
+
+    const commentEs = await fetchComment('es');
+    if (commentEs) return commentEs;
+
+    const commentEn = await fetchComment('en');
+    if (commentEn) return await translateText(commentEn, 'en', 'es');
+
     return null;
   }
 
@@ -292,11 +318,9 @@
 
     for (let header of headers) {
       const uri = header.getAttribute("data-uri");
-      // Inferimos el ID del div "definition" desde el ID del span/icono (por convención)
-      const h2Text = header.querySelector("h2")?.textContent || "sin nombre";
       const iconSpan = header.querySelector("span.toggle-icon");
-      const fullId = iconSpan?.id || ""; // ejemplo: "study-techniques-icon"
-      const baseId = fullId.replace("-icon", ""); // nos queda "study-techniques"
+      const fullId = iconSpan?.id || "";
+      const baseId = fullId.replace("-icon", "");
       const definitionEl = document.getElementById(`${baseId}-definition`);
 
       console.log(`Consultando ${uri} → #${baseId}-definition`);
@@ -306,7 +330,7 @@
         if (definition) {
           definitionEl.textContent = definition;
         } else {
-          definitionEl.textContent = "(Definición no disponible en español)";
+          definitionEl.textContent = "(Definición no disponible)";
         }
       }
     }
