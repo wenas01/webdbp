@@ -352,25 +352,37 @@
     icon.textContent = content.classList.contains('active') ? '-' : '+';
   }
 async function getRDF() {
+  const endpoint = 'https://dbpedia.org/sparql';
   const resourceUris = Array.from(document.querySelectorAll('.category-header'))
     .map(header => header.getAttribute('data-uri'))
     .filter(Boolean);
 
   for (const uri of resourceUris) {
-    const rdfUrl = `https://dbpedia.org/data/${uri.split('/').pop()}.rdf`;
+    const resource = `<${uri}>`;
+    const query = `
+      CONSTRUCT {
+        ${resource} ?p ?o .
+      }
+      WHERE {
+        ${resource} ?p ?o .
+        FILTER (lang(?o) = 'es' || !isLiteral(?o))
+      }
+    `;
+
+    const url = `${endpoint}?query=${encodeURIComponent(query)}&format=application/rdf+xml`;
+
     try {
-      const res = await fetch(rdfUrl);
-      if (!res.ok) throw new Error(`No se pudo obtener RDF de ${uri}`);
-      const rdfText = await res.text();
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`No se pudo obtener RDF/XML en español de ${uri}`);
+      const rdfXml = await res.text();
       const newWindow = window.open();
-      newWindow.document.write(`<pre>${escapeHtml(rdfText)}</pre>`);
+      newWindow.document.write(`<pre>${escapeHtml(rdfXml)}</pre>`);
     } catch (err) {
-      alert(`Error al obtener RDF de ${uri}: ${err.message}`);
+      alert(`Error al obtener RDF/XML: ${err.message}`);
     }
   }
 }
 
-// Función auxiliar para mostrar el XML correctamente como texto
 function escapeHtml(text) {
   const div = document.createElement("div");
   div.textContent = text;
