@@ -259,59 +259,67 @@
   </div>
 </section>
 
-  <script>
-    async function fetchDbpediaDefinition(uri) {
-      const endpoint = 'https://dbpedia.org/sparql';
-      const query = `
-        SELECT ?comment WHERE {
-          <${uri}> rdfs:comment ?comment .
-          FILTER (lang(?comment) = 'es')
-        } LIMIT 1
-      `;
-      const url = `${endpoint}?query=${encodeURIComponent(query)}&format=json`;
-  
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-        if (data.results.bindings.length > 0) {
-          return data.results.bindings[0].comment.value;
+<script>
+  async function fetchDbpediaDefinition(uri) {
+    const endpoint = 'https://dbpedia.org/sparql';
+    const query = `
+      SELECT ?comment WHERE {
+        <${uri}> rdfs:comment ?comment .
+        FILTER (lang(?comment) = 'es')
+      } LIMIT 1
+    `;
+    const url = `${endpoint}?query=${encodeURIComponent(query)}&format=json`;
+
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/sparql-results+json'
         }
-      } catch (error) {
-        console.error('Error al consultar DBpedia:', error);
+      });
+      const data = await response.json();
+      if (data.results.bindings.length > 0) {
+        return data.results.bindings[0].comment.value;
       }
-      return null;
+    } catch (error) {
+      console.error('Error al consultar DBpedia:', error);
     }
-  
-    document.addEventListener("DOMContentLoaded", async () => {
-      const headers = document.querySelectorAll(".category-header");
-      for (let header of headers) {
-        const uri = header.dataset.uri;
-        const match = header.getAttribute("onclick").match(/'([^']+)'/);
-        const id = match ? match[1] : null;
-        const definitionEl = document.getElementById(`${id}-definition`);
-        if (uri && definitionEl) {
-          const definition = await fetchDbpediaDefinition(uri);
-          if (definition) {
-            definitionEl.textContent = definition;
-          } else {
-            definitionEl.textContent = "(Definición no disponible en español)";
-          }
+    return null;
+  }
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    console.log("Buscando definiciones de DBpedia...");
+    const headers = document.querySelectorAll(".category-header");
+
+    for (let header of headers) {
+      const uri = header.getAttribute("data-uri");
+      // Inferimos el ID del div "definition" desde el ID del span/icono (por convención)
+      const h2Text = header.querySelector("h2")?.textContent || "sin nombre";
+      const iconSpan = header.querySelector("span.toggle-icon");
+      const fullId = iconSpan?.id || ""; // ejemplo: "study-techniques-icon"
+      const baseId = fullId.replace("-icon", ""); // nos queda "study-techniques"
+      const definitionEl = document.getElementById(`${baseId}-definition`);
+
+      console.log(`Consultando ${uri} → #${baseId}-definition`);
+
+      if (uri && definitionEl) {
+        const definition = await fetchDbpediaDefinition(uri);
+        if (definition) {
+          definitionEl.textContent = definition;
+        } else {
+          definitionEl.textContent = "(Definición no disponible en español)";
         }
       }
-    });
-    function toggleCategory(categoryId) {
-      const content = document.getElementById(`${categoryId}-content`);
-      const icon = document.getElementById(`${categoryId}-icon`);
-      
-      content.classList.toggle('active');
-      
-      if (content.classList.contains('active')) {
-        icon.textContent = '-';
-      } else {
-        icon.textContent = '+';
-      }
     }
-  </script>
+  });
+
+  function toggleCategory(categoryId) {
+    const content = document.getElementById(`${categoryId}-content`);
+    const icon = document.getElementById(`${categoryId}-icon`);
+    
+    content.classList.toggle('active');
+    icon.textContent = content.classList.contains('active') ? '-' : '+';
+  }
+</script>
 
 </body>
 </html>
