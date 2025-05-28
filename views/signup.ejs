@@ -47,6 +47,12 @@
     const confirmPasswordInput = document.getElementById('confirmPassword');
     const passwordMessage = document.getElementById('passwordMessage');
 
+  <div class="form-group password-container">
+  <label for="password">Contraseña:</label>
+  <input type="password" id="password" name="password" required>
+  <button type="button" id="togglePassword">👁️</button>
+</div>
+
     // Función que compara ambas contraseñas
     function validatePassword() {
       if (passwordInput.value !== confirmPasswordInput.value) {
@@ -67,6 +73,23 @@
         e.preventDefault();
       }
     });
+
+  const passwordInput = document.getElementById('password');
+const togglePassword = document.getElementById('togglePassword');
+
+togglePassword.addEventListener('mousedown', () => {
+  passwordInput.type = "text";
+});
+
+togglePassword.addEventListener('mouseup', () => {
+  passwordInput.type = "password";
+});
+
+// Para evitar que se quede en modo texto al salir del botón
+togglePassword.addEventListener('mouseleave', () => {
+  passwordInput.type = "password";
+});
+
   </script>
 </body>
 </html>
