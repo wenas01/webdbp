@@ -351,6 +351,24 @@
     content.classList.toggle('active');
     icon.textContent = content.classList.contains('active') ? '-' : '+';
   }
+async function getRDF() {
+  const resourceUris = Array.from(document.querySelectorAll('.category-header'))
+    .map(header => header.getAttribute('data-uri'))
+    .filter(Boolean);
+
+  for (const uri of resourceUris) {
+    const rdfUrl = `https://dbpedia.org/data/${uri.split('/').pop()}.ttl`;
+    try {
+      const res = await fetch(rdfUrl);
+      if (!res.ok) throw new Error(`No se pudo obtener RDF de ${uri}`);
+      const rdfText = await res.text();
+      const newWindow = window.open();
+      newWindow.document.write(`<pre>${rdfText}</pre>`);
+    } catch (err) {
+      alert(`Error al obtener RDF de ${uri}: ${err.message}`);
+    }
+  }
+}
 </script>
 
 </body>
