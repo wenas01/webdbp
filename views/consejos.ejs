@@ -161,101 +161,144 @@
 </head>
 <body>
 
-  <section class="academic-stress-advice">
-    <h1>Consejos para el Estrés Académico</h1>
+<section class="academic-stress-advice">
+  <h1>Consejos para el Estrés Académico</h1>
 
-    <div class="category">
-      <div class="category-header" onclick="toggleCategory('study-techniques')">
-        <h2>Técnicas de Estudio</h2>
-        <span class="toggle-icon" id="study-techniques-icon">+</span>
-      </div>
-      <div class="category-content" id="study-techniques-content">
-        <ul>
-          <li>Aplica la técnica Feynman para comprender conceptos complejos.</li>
-          <li>Divide el estudio en sesiones de 25 minutos con descansos.</li>
-          <li>Utiliza mapas mentales y tarjetas de memoria (flashcards).</li>
-        </ul>
-      </div>
+  <div class="category">
+    <div class="category-header" onclick="toggleCategory('study-techniques')" data-uri="http://dbpedia.org/resource/Study_skills">
+      <h2>Técnicas de Estudio</h2>
+      <span class="toggle-icon" id="study-techniques-icon">+</span>
     </div>
-
-    <div class="category">
-      <div class="category-header" onclick="toggleCategory('time-management')">
-        <h2>Manejo del Tiempo</h2>
-        <span class="toggle-icon" id="time-management-icon">+</span>
-      </div>
-      <div class="category-content" id="time-management-content">
-        <ul>
-          <li>Usa una agenda o planner semanal para organizar tareas.</li>
-          <li>Prioriza tareas importantes con la matriz de Eisenhower.</li>
-          <li>Evita la multitarea: concéntrate en una cosa a la vez.</li>
-        </ul>
-      </div>
+    <div class="category-definition" id="study-techniques-definition"></div>
+    <div class="category-content" id="study-techniques-content">
+      <ul>
+        <li>Aplica la técnica Feynman para comprender conceptos complejos.</li>
+        <li>Divide el estudio en sesiones de 25 minutos con descansos.</li>
+        <li>Utiliza mapas mentales y tarjetas de memoria (flashcards).</li>
+      </ul>
     </div>
+  </div>
 
-    <div class="category">
-      <div class="category-header" onclick="toggleCategory('relaxation')">
-        <h2>Relajación</h2>
-        <span class="toggle-icon" id="relaxation-icon">+</span>
-      </div>
-      <div class="category-content" id="relaxation-content">
-        <ul>
-          <li>Practica respiración profunda o meditación guiada diariamente.</li>
-          <li>Realiza pausas activas durante tus estudios.</li>
-          <li>Dedica tiempo a actividades que disfrutes.</li>
-        </ul>
-      </div>
+  <div class="category">
+    <div class="category-header" onclick="toggleCategory('time-management')" data-uri="http://dbpedia.org/resource/Time_management">
+      <h2>Manejo del Tiempo</h2>
+      <span class="toggle-icon" id="time-management-icon">+</span>
     </div>
-
-    <div class="category">
-      <div class="category-header" onclick="toggleCategory('exercise-nutrition')">
-        <h2>Ejercicio y Alimentación</h2>
-        <span class="toggle-icon" id="exercise-nutrition-icon">+</span>
-      </div>
-      <div class="category-content" id="exercise-nutrition-content">
-        <ul>
-          <li>Realiza al menos 30 minutos de actividad física al día.</li>
-          <li>Evita comidas ultraprocesadas antes de estudiar.</li>
-          <li>Hidrátate adecuadamente y consume snacks saludables.</li>
-        </ul>
-      </div>
+    <div class="category-definition" id="time-management-definition"></div>
+    <div class="category-content" id="time-management-content">
+      <ul>
+        <li>Usa una agenda o planner semanal para organizar tareas.</li>
+        <li>Prioriza tareas importantes con la matriz de Eisenhower.</li>
+        <li>Evita la multitarea: concéntrate en una cosa a la vez.</li>
+      </ul>
     </div>
+  </div>
 
-    <div class="category">
-      <div class="category-header" onclick="toggleCategory('social-support')">
-        <h2>Vida Social y Apoyo Emocional</h2>
-        <span class="toggle-icon" id="social-support-icon">+</span>
-      </div>
-      <div class="category-content" id="social-support-content">
-        <ul>
-          <li>Habla con amigos o familiares cuando te sientas abrumado.</li>
-          <li>No dudes en acudir a un psicólogo o consejero si lo necesitas.</li>
-          <li>Participa en actividades grupales que te interesen.</li>
-        </ul>
-      </div>
+  <div class="category">
+    <div class="category-header" onclick="toggleCategory('relaxation')" data-uri="http://dbpedia.org/resource/Relaxation_(psychology)">
+      <h2>Relajación</h2>
+      <span class="toggle-icon" id="relaxation-icon">+</span>
     </div>
-
-    <div class="category">
-      <div class="category-header" onclick="toggleCategory('downloads')">
-        <h2>Recursos Descargables</h2>
-        <span class="toggle-icon" id="downloads-icon">+</span>
-      </div>
-      <div class="category-content" id="downloads-content">
-        <ul>
-          <li><a href="https://magicalpapers.com/download/planner_gratis.pdf" download>📅 Planner Semanal (PDF)</a></li>
-          <li><a href="https://www.unapragmatica.com/wp-content/uploads/2023/12/organizador-de-tareas-pendientes-pragma%C2%AE-unapragmatica.com.pdf" download>📌 Organizador de Tareas (PDF)</a></li>
-        </ul>
-      </div>
+    <div class="category-definition" id="relaxation-definition"></div>
+    <div class="category-content" id="relaxation-content">
+      <ul>
+        <li>Practica respiración profunda o meditación guiada diariamente.</li>
+        <li>Realiza pausas activas durante tus estudios.</li>
+        <li>Dedica tiempo a actividades que disfrutes.</li>
+      </ul>
     </div>
+  </div>
 
-    <div class="button-container">
-      <a href="/pomodoro">
-        <button class="pomodoro-button">Iniciar Temporizador Pomodoro ⏱️</button>
-      </a>
+  <div class="category">
+    <div class="category-header" onclick="toggleCategory('exercise-nutrition')" data-uri="http://dbpedia.org/resource/Physical_exercise">
+      <h2>Ejercicio y Alimentación</h2>
+      <span class="toggle-icon" id="exercise-nutrition-icon">+</span>
     </div>
+    <div class="category-definition" id="exercise-nutrition-definition"></div>
+    <div class="category-content" id="exercise-nutrition-content">
+      <ul>
+        <li>Realiza al menos 30 minutos de actividad física al día.</li>
+        <li>Evita comidas ultraprocesadas antes de estudiar.</li>
+        <li>Hidrátate adecuadamente y consume snacks saludables.</li>
+      </ul>
+    </div>
+  </div>
 
-  </section>
+  <div class="category">
+    <div class="category-header" onclick="toggleCategory('social-support')" data-uri="http://dbpedia.org/resource/Social_support">
+      <h2>Vida Social y Apoyo Emocional</h2>
+      <span class="toggle-icon" id="social-support-icon">+</span>
+    </div>
+    <div class="category-definition" id="social-support-definition"></div>
+    <div class="category-content" id="social-support-content">
+      <ul>
+        <li>Habla con amigos o familiares cuando te sientas abrumado.</li>
+        <li>No dudes en acudir a un psicólogo o consejero si lo necesitas.</li>
+        <li>Participa en actividades grupales que te interesen.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="category">
+    <div class="category-header" onclick="toggleCategory('downloads')">
+      <h2>Recursos Descargables</h2>
+      <span class="toggle-icon" id="downloads-icon">+</span>
+    </div>
+    <div class="category-content" id="downloads-content">
+      <ul>
+        <li><a href="https://magicalpapers.com/download/planner_gratis.pdf" download>📅 Planner Semanal (PDF)</a></li>
+        <li><a href="https://www.unapragmatica.com/wp-content/uploads/2023/12/organizador-de-tareas-pendientes-pragma%C2%AE-unapragmatica.com.pdf" download>📌 Organizador de Tareas (PDF)</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="button-container">
+    <a href="/pomodoro">
+      <button class="pomodoro-button">Iniciar Temporizador Pomodoro ⏱️</button>
+    </a>
+  </div>
+</section>
 
   <script>
+    async function fetchDbpediaDefinition(uri) {
+      const endpoint = 'https://dbpedia.org/sparql';
+      const query = `
+        SELECT ?comment WHERE {
+          <${uri}> rdfs:comment ?comment .
+          FILTER (lang(?comment) = 'es')
+        } LIMIT 1
+      `;
+      const url = `${endpoint}?query=${encodeURIComponent(query)}&format=json`;
+  
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        if (data.results.bindings.length > 0) {
+          return data.results.bindings[0].comment.value;
+        }
+      } catch (error) {
+        console.error('Error al consultar DBpedia:', error);
+      }
+      return null;
+    }
+  
+    document.addEventListener("DOMContentLoaded", async () => {
+      const headers = document.querySelectorAll(".category-header");
+      for (let header of headers) {
+        const uri = header.dataset.uri;
+        const match = header.getAttribute("onclick").match(/'([^']+)'/);
+        const id = match ? match[1] : null;
+        const definitionEl = document.getElementById(`${id}-definition`);
+        if (uri && definitionEl) {
+          const definition = await fetchDbpediaDefinition(uri);
+          if (definition) {
+            definitionEl.textContent = definition;
+          } else {
+            definitionEl.textContent = "(Definición no disponible en español)";
+          }
+        }
+      }
+    });
     function toggleCategory(categoryId) {
       const content = document.getElementById(`${categoryId}-content`);
       const icon = document.getElementById(`${categoryId}-icon`);
