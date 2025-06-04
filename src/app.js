@@ -318,8 +318,35 @@ app.get('/perfil', checkAuth, async (req, res) => {
 
     if (resultadoDoc.exists) {
       const data = resultadoDoc.data();
-      // Convertimos el objeto { sintoma1: valor, sintoma2: valor } en un arreglo de claves
       sintomas = Object.entries(data.sintomas || {});
+    }
+
+    // Obtener los links DBpedia desde rdf_perfiles
+    const rdfDoc = await db.collection('rdf_perfiles').doc(uid).get();
+    const sintomasDBpedia = rdfDoc.exists ? rdfDoc.data().sintomas || [] : [];
+
+    // Cargar descripciones en español desde DBpedia
+    const fetch = (await import('node-fetch')).default;
+    const descripciones = {};
+
+    for (const { sintoma, link } of sintomasDBpedia) {
+      try {
+        const response = await fetch(`${link}.json`);
+        const json = await response.json();
+
+        const recurso = Object.keys(json).find(key => key.includes(link));
+        const descripcion = json[recurso]?.['http://purl.org/dc/terms/description'];
+        const descripcionEs = descripcion?.find(entry => entry['@language'] === 'es');
+
+        if (descripcionEs) {
+          descripciones[sintoma] = {
+            descripcion: descripcionEs['@value'],
+            link
+          };
+        }
+      } catch (err) {
+        console.error(`No se pudo obtener la descripción de ${link}`, err.message);
+      }
     }
 
     res.render('perfil', {
@@ -332,12 +359,15 @@ app.get('/perfil', checkAuth, async (req, res) => {
       consejo,
       sintomas,
       comentariosRecibidos: userData.comentariosRecibidos || [],
+      descripcionesDBpedia: descripciones // <--- nuevo objeto con sintoma: {descripcion, link}
     });
+
   } catch (err) {
     console.error('Error cargando perfil:', err.message);
     res.status(500).send('Error al cargar el perfil');
   }
 });
+
 
 
 // Ruta protegida
