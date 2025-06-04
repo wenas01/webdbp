@@ -55,7 +55,73 @@
   align-items: center;
   padding: 30px;
 }
+.perfil-descripciones {
+  background-color: #eef7fb;
+  border-left: 5px solid #3498db;
+  border: 1px solid #d4e6f1;
+  border-radius: 10px;
+  padding: 25px;
+  margin-top: 25px;
+  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.1);
+  width: 100%;
+  max-width: 800px;
+}
 
+.perfil-descripciones h3 {
+  color: #21618c;
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.perfil-descripciones ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.perfil-descripciones li {
+  background-color: #ffffff;
+  border: 1px solid #cfe2f3;
+  border-radius: 12px;
+  padding: 15px 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  transition: background-color 0.3s ease;
+}
+
+.perfil-descripciones li:hover {
+  background-color: #f0f8ff;
+}
+
+.perfil-descripciones .sintoma-titulo {
+  font-weight: bold;
+  color: #1b4f72;
+  font-size: 1.05rem;
+}
+
+.perfil-descripciones .sintoma-descripcion {
+  margin-top: 8px;
+  font-size: 0.95rem;
+  color: #2e4053;
+  line-height: 1.5;
+}
+
+.perfil-descripciones .sintoma-link {
+  margin-top: 10px;
+  display: inline-block;
+  font-size: 0.9rem;
+  color: #2874a6;
+  text-decoration: none;
+}
+
+.perfil-descripciones .sintoma-link:hover {
+  text-decoration: underline;
+}
 </style>
 <html lang="es-PE">
 <head>
@@ -105,7 +171,25 @@
    <% } %>
   </div>
 
+   <% if (descripcionesDBpedia && Object.keys(descripcionesDBpedia).length > 0) { %>
+  <div class="perfil-descripciones">
+    <h3>Información de los síntomas desde DBpedia</h3>
+    <ul>
+      <% Object.entries(descripcionesDBpedia).forEach(([sintoma, info]) => { %>
+        <li>
+          <div class="sintoma-titulo"><%= sintoma.replace(/_/g, ' ') %></div>
+          <div class="sintoma-descripcion"><%= info.descripcion %></div>
+          <a class="sintoma-link" href="<%= info.link %>" target="_blank">Ver más en DBpedia</a>
+        </li>
+      <% }) %>
+    </ul>
+  </div>
+<% } %>
+
+
 </div>
+
+
 
 </body>
 </html>
