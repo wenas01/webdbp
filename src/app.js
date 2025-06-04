@@ -312,20 +312,20 @@ app.get('/perfil', checkAuth, async (req, res) => {
       consejo = 'Es importante que busques ayuda profesional para manejar el estrés.';
     }
 
-    // Obtener los síntomas desde la colección resultados_quiz
+    // Obtener síntomas del resultado del quiz
     const resultadoDoc = await db.collection('resultados_quiz').doc(uid).get();
     let sintomas = [];
 
     if (resultadoDoc.exists) {
       const data = resultadoDoc.data();
-      sintomas = Object.entries(data.sintomas || {});
+      sintomas = Object.entries(data.sintomas || {}); // [['ansiedad', 3], ...]
     }
 
-    // Obtener los links DBpedia desde rdf_perfiles
+    // Obtener enlaces RDF desde rdf_perfiles
     const rdfDoc = await db.collection('rdf_perfiles').doc(uid).get();
     const sintomasDBpedia = rdfDoc.exists ? rdfDoc.data().sintomas || [] : [];
 
-    // Cargar descripciones en español desde DBpedia
+    // Fetch para descripciones desde DBpedia
     const fetch = (await import('node-fetch')).default;
     const descripciones = {};
 
@@ -343,9 +343,13 @@ app.get('/perfil', checkAuth, async (req, res) => {
             descripcion: descripcionEs['@value'],
             link
           };
+        } else {
+          descripciones[sintoma] = { descripcion: 'No disponible en español', link };
         }
+
       } catch (err) {
         console.error(`No se pudo obtener la descripción de ${link}`, err.message);
+        descripciones[sintoma] = { descripcion: 'Error al cargar descripción.', link };
       }
     }
 
@@ -359,7 +363,7 @@ app.get('/perfil', checkAuth, async (req, res) => {
       consejo,
       sintomas,
       comentariosRecibidos: userData.comentariosRecibidos || [],
-      descripcionesDBpedia: descripciones // <--- nuevo objeto con sintoma: {descripcion, link}
+      descripcionesDBpedia: descripciones
     });
 
   } catch (err) {
@@ -367,7 +371,6 @@ app.get('/perfil', checkAuth, async (req, res) => {
     res.status(500).send('Error al cargar el perfil');
   }
 });
-
 
 
 // Ruta protegida
@@ -447,10 +450,10 @@ app.post('/guardar-sintomas', checkAuth, async (req, res) => {
       sintomas: sintomasDBpedia,
       fecha: new Date().toISOString()
     });
-
-    res.status(200).json({ message: 'Síntomas y links DBpedia guardados correctamente' });
-    res.status(200).json({ message: 'Síntomas y puntajes guardados correctamente' });
-  } catch (err) {
+	
+    res.status(200).json({ message: 'Síntomas y links DBpedia guardados correctamente' });});
+  
+    } catch (err) {
     console.error('Error al guardar los síntomas:', err);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
