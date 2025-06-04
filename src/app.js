@@ -1,20 +1,20 @@
 // Se importa la librería Express para manejar rutas y servidores HTTP
-import express from 'express';
+const express = require('express');
 
 // Se importa Firebase Admin para interactuar con Firebase y manejar autenticación, base de datos y notificaciones
-import admin from 'firebase-admin';
+const admin = require('firebase-admin');
 
 // Se importa node-fetch para hacer solicitudes HTTP a APIs externas
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 
 // Se importa cookie-parser para manejar cookies en el servidor
-import cookieParser from 'cookie-parser';
+const cookieParser = require('cookie-parser');
 
 // Se importa dotenv para cargar las variables de entorno desde un archivo .env
-import dotenv from 'dotenv';
+const dotenv = require('dotenv');
 
 // Se importa path para manejar rutas de archivos en el sistema operativo
-import path from 'path';
+const path = require('path');
 
 // Cargar las variables de entorno del archivo .env
 dotenv.config();
@@ -463,4 +463,4 @@ app.get('/logout', (req, res) => {
 
 
 
-export { app };
+module.exports = { app };
