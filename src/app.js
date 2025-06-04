@@ -312,21 +312,17 @@ app.get('/perfil', checkAuth, async (req, res) => {
       consejo = 'Es importante que busques ayuda profesional para manejar el estrés.';
     }
 
-    // Obtener síntomas del resultado del quiz
     const resultadoDoc = await db.collection('resultados_quiz').doc(uid).get();
     let sintomas = [];
 
     if (resultadoDoc.exists) {
       const data = resultadoDoc.data();
-      sintomas = Object.entries(data.sintomas || {}); // [['ansiedad', 3], ...]
+      sintomas = Object.entries(data.sintomas || {});
     }
 
-    // Obtener enlaces RDF desde rdf_perfiles
     const rdfDoc = await db.collection('rdf_perfiles').doc(uid).get();
     const sintomasDBpedia = rdfDoc.exists ? rdfDoc.data().sintomas || [] : [];
 
-    // Fetch para descripciones desde DBpedia
-    const fetch = (await import('node-fetch')).default;
     const descripciones = {};
 
     for (const { sintoma, link } of sintomasDBpedia) {
