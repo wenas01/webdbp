@@ -359,12 +359,24 @@ app.get('/nivel_muy_alto', (req, res) => {
 
 
 // Guardar puntaje
+app.post('/guardar-puntaje', checkAuth, async (req, res) => {
+  try {
+    const uid = req.user.uid;
+    const { puntaje } = req.body;
+    const userRef = db.collection('usuarios').doc(uid);
+    await userRef.set({ puntaje: Number(puntaje) }, { merge: true });
+    res.status(200).json({ message: 'Puntaje actualizado' });
+  } catch (err) {
+    console.error('Error al guardar el puntaje:', err);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
 app.post('/guardar-sintomas', checkAuth, async (req, res) => {
   try {
     const uid = req.user.uid;
-    const { respuestas } = req.body;
+    const { respuestas } = req.body; // Debe ser un objeto con sintoma: puntaje
 
-    // Filtrar síntomas con puntaje >= 2
+    // Filtrar los síntomas presentes (puntaje >= 2) y conservar el puntaje
     const sintomasFiltrados = Object.entries(respuestas)
       .filter(([_, valor]) => Number(valor) >= 2)
       .reduce((acc, [clave, valor]) => {
@@ -372,14 +384,13 @@ app.post('/guardar-sintomas', checkAuth, async (req, res) => {
         return acc;
       }, {});
 
-    // === 1. Guardar síntomas + puntaje en 'resultados_quiz' ===
+    // Guardar en la colección 'resultados_quiz' bajo el UID
     const ref = db.collection('resultados_quiz').doc(uid);
     await ref.set({
-      sintomas: sintomasFiltrados,
+      sintomas: sintomasFiltrados, // ahora es un objeto {sintoma1: puntaje1, sintoma2: puntaje2}
       fecha: new Date().toISOString()
     });
-
-    // === 2. Guardar síntomas + link en 'rdf_perfiles' ===
+    // === 3. Asociar links de DBpedia ===
     const dbpediaLinks = {
       alteraciones_sueno: "http://dbpedia.org/resource/Sleep_disorder",
       ansiedad_evaluaciones: "http://dbpedia.org/resource/Anxiety",
@@ -394,22 +405,23 @@ app.post('/guardar-sintomas', checkAuth, async (req, res) => {
     };
 
     const sintomasDBpedia = Object.keys(sintomasFiltrados)
-      .map(sintoma => {
-        const link = dbpediaLinks[sintoma];
-        return link ? { sintoma, link } : null;
-      })
-      .filter(Boolean); // Quitar síntomas sin link
+      .map(sintoma => ({
+        sintoma,
+        link: dbpediaLinks[sintoma] || null
+      }))
+      .filter(item => item.link !== null); // Elimina si no hay link
 
+    // === 4. Guardar en 'rdf_perfiles/{uid}' ===
     const rdfRef = db.collection('rdf_perfiles').doc(uid);
     await rdfRef.set({
       sintomas: sintomasDBpedia,
       fecha: new Date().toISOString()
     });
 
-    res.status(200).json({ message: 'Datos guardados correctamente en ambas colecciones' });
-
+    res.status(200).json({ message: 'Síntomas y links DBpedia guardados correctamente' });
+    res.status(200).json({ message: 'Síntomas y puntajes guardados correctamente' });
   } catch (err) {
-    console.error('Error al guardar los datos:', err);
+    console.error('Error al guardar los síntomas:', err);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
