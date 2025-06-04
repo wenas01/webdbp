@@ -359,18 +359,6 @@ app.get('/nivel_muy_alto', (req, res) => {
 
 
 // Guardar puntaje
-app.post('/guardar-puntaje', checkAuth, async (req, res) => {
-  try {
-    const uid = req.user.uid;
-    const { puntaje } = req.body;
-    const userRef = db.collection('usuarios').doc(uid);
-    await userRef.set({ puntaje: Number(puntaje) }, { merge: true });
-    res.status(200).json({ message: 'Puntaje actualizado' });
-  } catch (err) {
-    console.error('Error al guardar el puntaje:', err);
-    res.status(500).json({ error: 'Error interno del servidor' });
-  }
-});
 app.post('/guardar-sintomas', checkAuth, async (req, res) => {
   try {
     const uid = req.user.uid;
@@ -384,14 +372,14 @@ app.post('/guardar-sintomas', checkAuth, async (req, res) => {
         return acc;
       }, {});
 
-    // Guardar síntomas y puntajes en 'resultados_quiz'
+    // === 1. Guardar síntomas + puntaje en 'resultados_quiz' ===
     const ref = db.collection('resultados_quiz').doc(uid);
     await ref.set({
       sintomas: sintomasFiltrados,
       fecha: new Date().toISOString()
     });
 
-    // Mapeo de síntomas a enlaces DBpedia
+    // === 2. Guardar síntomas + link en 'rdf_perfiles' ===
     const dbpediaLinks = {
       alteraciones_sueno: "http://dbpedia.org/resource/Sleep_disorder",
       ansiedad_evaluaciones: "http://dbpedia.org/resource/Anxiety",
@@ -405,22 +393,23 @@ app.post('/guardar-sintomas', checkAuth, async (req, res) => {
       aislamiento_social: "http://dbpedia.org/resource/Social_withdrawal"
     };
 
-    // Obtener solo los links DBpedia de los síntomas presentes
-    const linksDBpedia = Object.keys(sintomasFiltrados)
-      .map(sintoma => dbpediaLinks[sintoma])
-      .filter(Boolean); // Filtrar los que tengan un link válido
+    const sintomasDBpedia = Object.keys(sintomasFiltrados)
+      .map(sintoma => {
+        const link = dbpediaLinks[sintoma];
+        return link ? { sintoma, link } : null;
+      })
+      .filter(Boolean); // Quitar síntomas sin link
 
-    // Guardar links DBpedia en colección 'rdf_perfiles'
     const rdfRef = db.collection('rdf_perfiles').doc(uid);
     await rdfRef.set({
-      dbpedia_links: linksDBpedia,
+      sintomas: sintomasDBpedia,
       fecha: new Date().toISOString()
     });
 
-    res.status(200).json({ message: 'Síntomas y enlaces DBpedia guardados correctamente' });
+    res.status(200).json({ message: 'Datos guardados correctamente en ambas colecciones' });
 
   } catch (err) {
-    console.error('Error al guardar síntomas o enlaces DBpedia:', err);
+    console.error('Error al guardar los datos:', err);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
