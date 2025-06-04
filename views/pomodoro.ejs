@@ -46,6 +46,30 @@
       background-color: #ec407a;
     }
 
+.button-container {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.home-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.8rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+.home-button:hover {
+  background-color: #5a6268;
+}
+
+
     .counter {
       margin-top: 20px;
       font-size: 1.2rem;
@@ -66,6 +90,11 @@
     Sesiones de estudio completadas: <span id="studyCount">0</span><br>
     Descansos completados: <span id="breakCount">0</span>
   </div>
+
+<div class="button-container">
+  <a href="/" class="home-button">🏠 Volver al Inicio</a>
+</div>
+
 
   <script>
     let studyDuration = 25 * 60;
@@ -125,6 +154,8 @@
     }
 
     updateDisplay();
+
+
   </script>
 </body>
 </html>
