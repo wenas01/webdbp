@@ -374,9 +374,9 @@ app.post('/guardar-puntaje', checkAuth, async (req, res) => {
 app.post('/guardar-sintomas', checkAuth, async (req, res) => {
   try {
     const uid = req.user.uid;
-    const { respuestas } = req.body; // Debe ser un objeto con sintoma: puntaje
+    const { respuestas } = req.body;
 
-    // Filtrar los síntomas presentes (puntaje >= 2) y conservar el puntaje
+    // Filtrar síntomas con puntaje >= 2
     const sintomasFiltrados = Object.entries(respuestas)
       .filter(([_, valor]) => Number(valor) >= 2)
       .reduce((acc, [clave, valor]) => {
@@ -384,19 +384,47 @@ app.post('/guardar-sintomas', checkAuth, async (req, res) => {
         return acc;
       }, {});
 
-    // Guardar en la colección 'resultados_quiz' bajo el UID
+    // Guardar síntomas y puntajes en 'resultados_quiz'
     const ref = db.collection('resultados_quiz').doc(uid);
     await ref.set({
-      sintomas: sintomasFiltrados, // ahora es un objeto {sintoma1: puntaje1, sintoma2: puntaje2}
+      sintomas: sintomasFiltrados,
       fecha: new Date().toISOString()
     });
 
-    res.status(200).json({ message: 'Síntomas y puntajes guardados correctamente' });
+    // Mapeo de síntomas a enlaces DBpedia
+    const dbpediaLinks = {
+      alteraciones_sueno: "http://dbpedia.org/resource/Sleep_disorder",
+      ansiedad_evaluaciones: "http://dbpedia.org/resource/Anxiety",
+      fatiga_cronica: "http://dbpedia.org/resource/Fatigue_(medical)",
+      dificultad_concentrarse: "http://dbpedia.org/resource/Attention",
+      cambios_alimentacion: "http://dbpedia.org/resource/Eating_disorder",
+      procrastinacion: "http://dbpedia.org/resource/Procrastination",
+      irritabilidad: "http://dbpedia.org/resource/Irritability",
+      pensamiento_catastrofico: "http://dbpedia.org/resource/Catastrophizing",
+      sintomas_fisicos: "http://dbpedia.org/resource/Physical_symptom",
+      aislamiento_social: "http://dbpedia.org/resource/Social_withdrawal"
+    };
+
+    // Obtener solo los links DBpedia de los síntomas presentes
+    const linksDBpedia = Object.keys(sintomasFiltrados)
+      .map(sintoma => dbpediaLinks[sintoma])
+      .filter(Boolean); // Filtrar los que tengan un link válido
+
+    // Guardar links DBpedia en colección 'rdf_perfiles'
+    const rdfRef = db.collection('rdf_perfiles').doc(uid);
+    await rdfRef.set({
+      dbpedia_links: linksDBpedia,
+      fecha: new Date().toISOString()
+    });
+
+    res.status(200).json({ message: 'Síntomas y enlaces DBpedia guardados correctamente' });
+
   } catch (err) {
-    console.error('Error al guardar los síntomas:', err);
+    console.error('Error al guardar síntomas o enlaces DBpedia:', err);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
+
 // Logout
 app.get('/logout', (req, res) => {
   res.clearCookie('__session');
