@@ -55,6 +55,83 @@
   align-items: center;
   padding: 30px;
 }
+
+/* Estilos para el botón volver al inicio */
+.back-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #a93226;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(169, 50, 38, 0.3);
+  transition: all 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 1000;
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.back-to-top:hover {
+  background-color: #8b2a1f;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(169, 50, 38, 0.4);
+}
+
+.back-to-top:active {
+  transform: translateY(-1px);
+}
+
+/* Alternativa: Botón rectangular al final de la página */
+.back-to-top-section {
+  text-align: center;
+  margin-top: 40px;
+  padding: 20px;
+}
+
+.back-to-top-btn {
+  background-color: #a93226;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(169, 50, 38, 0.2);
+}
+
+.back-to-top-btn:hover {
+  background-color: #8b2a1f;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(169, 50, 38, 0.3);
+}
+
+.back-to-top-btn i {
+  margin-right: 8px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .back-to-top {
+    width: 50px;
+    height: 50px;
+    font-size: 1rem;
+    bottom: 20px;
+    right: 20px;
+  }
+}
+
 </style>
 <html lang="es-PE">
 <head>
