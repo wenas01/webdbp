@@ -447,7 +447,7 @@ app.post('/guardar-sintomas', checkAuth, async (req, res) => {
       fecha: new Date().toISOString()
     });
 	
-    res.status(200).json({ message: 'Síntomas y links DBpedia guardados correctamente' });});
+    res.status(200).json({ message: 'Síntomas y links DBpedia guardados correctamente' });
   
     } catch (err) {
     console.error('Error al guardar los síntomas:', err);
