@@ -325,29 +325,37 @@ app.get('/perfil', checkAuth, async (req, res) => {
 
     const descripciones = {};
 
-    for (const { sintoma, link } of sintomasDBpedia) {
-      try {
-        const response = await fetch(`${link}.json`);
-        const json = await response.json();
+   for (const { sintoma, link } of sintomasDBpedia) {
+  try {
+    console.log(`Obteniendo: ${link}.json`);
+    const response = await fetch(`${link}.json`);
 
-        const recurso = Object.keys(json).find(key => key.includes(link));
-        const descripcion = json[recurso]?.['http://purl.org/dc/terms/description'];
-        const descripcionEs = descripcion?.find(entry => entry['@language'] === 'es');
+    if (!response.ok) throw new Error(`HTTP status ${response.status}`);
 
-        if (descripcionEs) {
-          descripciones[sintoma] = {
-            descripcion: descripcionEs['@value'],
-            link
-          };
-        } else {
-          descripciones[sintoma] = { descripcion: 'No disponible en español', link };
-        }
+    const json = await response.json();
 
-      } catch (err) {
-        console.error(`No se pudo obtener la descripción de ${link}`, err.message);
-        descripciones[sintoma] = { descripcion: 'Error al cargar descripción.', link };
-      }
+    const recurso = Object.keys(json).find(key => key.includes(link));
+    console.log(`Recurso encontrado: ${recurso}`);
+
+    const descripcion = json[recurso]?.['http://purl.org/dc/terms/description'];
+    console.log(`Descripción bruta: `, descripcion);
+
+    const descripcionEs = descripcion?.find(entry => entry['@language'] === 'es');
+
+    if (descripcionEs) {
+      descripciones[sintoma] = {
+        descripcion: descripcionEs['@value'],
+        link
+      };
+    } else {
+      descripciones[sintoma] = { descripcion: 'No disponible en español', link };
     }
+
+  } catch (err) {
+    console.error(`No se pudo obtener la descripción de ${link}`, err.message);
+    descripciones[sintoma] = { descripcion: 'Error al cargar descripción.', link };
+  }
+}
 
     res.render('perfil', {
       title: 'Estrés Académico - Perfil',
