@@ -198,17 +198,17 @@
    <% } %>
   </div>
 
-   <% if (descripcionesDBpedia && Object.keys(descripcionesDBpedia).length > 0) { %>
+  <% if (sintomasDBpedia && sintomasDBpedia.length > 0) { %>
   <div class="perfil-descripciones">
     <h3>Información de los síntomas desde DBpedia</h3>
-    <ul>
-      <% Object.entries(descripcionesDBpedia).forEach(([sintoma, info]) => { %>
-        <li>
+    <ul id="lista-sintomas">
+      <% sintomasDBpedia.forEach(({ sintoma, link }) => { %>
+        <li data-link="<%= link %>" data-sintoma="<%= sintoma %>">
           <div class="sintoma-titulo"><%= sintoma.replace(/_/g, ' ') %></div>
-          <div class="sintoma-descripcion"><%= info.descripcion %></div>
-          <a class="sintoma-link" href="<%= info.link %>" target="_blank">Ver más en DBpedia</a>
+          <div class="sintoma-descripcion">Cargando descripción...</div>
+          <a class="sintoma-link" href="<%= link %>" target="_blank">Ver más en DBpedia</a>
         </li>
-      <% }) %>
+      <% }); %>
     </ul>
   </div>
 <% } %>
@@ -220,6 +220,35 @@
 
 </div>
 
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    const lista = document.querySelectorAll('#lista-sintomas li');
 
+    for (const item of lista) {
+      const link = item.dataset.link;
+      const sintoma = item.dataset.sintoma;
+      const descripcionDiv = item.querySelector('.sintoma-descripcion');
+
+      try {
+        const response = await fetch(`${link}.json`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const json = await response.json();
+        const recurso = Object.keys(json).find(key => key.includes(link));
+        const descripciones = json[recurso]?.['http://purl.org/dc/terms/description'] || [];
+        const descripcionEs = descripciones.find(d => d['@language'] === 'es');
+
+        if (descripcionEs) {
+          descripcionDiv.textContent = descripcionEs['@value'];
+        } else {
+          descripcionDiv.textContent = 'No disponible en español.';
+        }
+      } catch (err) {
+        console.error(`Error cargando descripción para ${sintoma}:`, err.message);
+        descripcionDiv.textContent = 'Error al cargar la descripción.';
+      }
+    }
+  });
+</script>
 </body>
 </html>
