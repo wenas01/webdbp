@@ -94,7 +94,7 @@ async function checkAuth(req, res, next) {
 }
 
 // Middleware para agregar la información del usuario autenticado en las vistas
-export async function addUserToLocals(req, res, next) {
+async function addUserToLocals(req, res, next) {
   const token = req.signedCookies.__session;
   if (token) {
     try {
