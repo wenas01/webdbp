@@ -221,6 +221,60 @@
 </div>
 
 <script>
+  async function translateText(text, from = 'en', to = 'es') {
+    try {
+      const res = await fetch('https://libretranslate.de/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ q: text, source: from, target: to, format: 'text' })
+      });
+      const data = await res.json();
+      return data.translatedText + ' (Traducido automáticamente)';
+    } catch (err) {
+      console.error('Error al traducir:', err);
+      return text;
+    }
+  }
+
+  async function fetchDescripcionDBpedia(uri) {
+    const endpoint = 'https://dbpedia.org/sparql';
+
+    const buildQuery = (lang) => `
+      SELECT ?comment WHERE {
+        <${uri}> rdfs:comment ?comment .
+        FILTER (lang(?comment) = '${lang}')
+      } LIMIT 1
+    `;
+
+    const fetchComment = async (lang) => {
+      const url = `${endpoint}?query=${encodeURIComponent(buildQuery(lang))}&format=json`;
+      try {
+        const response = await fetch(url, {
+          headers: {
+            'Accept': 'application/sparql-results+json'
+          }
+        });
+        const data = await response.json();
+        if (data.results.bindings.length > 0) {
+          return data.results.bindings[0].comment.value;
+        }
+      } catch (error) {
+        console.error(`Error consultando DBpedia (${lang}):`, error);
+      }
+      return null;
+    };
+
+    const comentarioEs = await fetchComment('es');
+    if (comentarioEs) return comentarioEs;
+
+    const comentarioEn = await fetchComment('en');
+    if (comentarioEn) {
+      return await translateText(comentarioEn, 'en', 'es');
+    }
+
+    return null;
+  }
+
   document.addEventListener('DOMContentLoaded', async () => {
     const lista = document.querySelectorAll('#lista-sintomas li');
 
@@ -230,16 +284,10 @@
       const descripcionDiv = item.querySelector('.sintoma-descripcion');
 
       try {
-        const response = await fetch(`${link}.json`);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const descripcion = await fetchDescripcionDBpedia(link);
 
-        const json = await response.json();
-        const recurso = Object.keys(json).find(key => key.includes(link));
-        const descripciones = json[recurso]?.['http://purl.org/dc/terms/description'] || [];
-        const descripcionEs = descripciones.find(d => d['@language'] === 'es');
-
-        if (descripcionEs) {
-          descripcionDiv.textContent = descripcionEs['@value'];
+        if (descripcion) {
+          descripcionDiv.textContent = descripcion;
         } else {
           descripcionDiv.textContent = 'No disponible en español.';
         }
