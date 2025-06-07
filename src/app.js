@@ -323,39 +323,8 @@ app.get('/perfil', checkAuth, async (req, res) => {
     const rdfDoc = await db.collection('rdf_perfiles').doc(uid).get();
     const sintomasDBpedia = rdfDoc.exists ? rdfDoc.data().sintomas || [] : [];
 
-    const descripciones = {};
-
-   for (const { sintoma, link } of sintomasDBpedia) {
-  try {
-    console.log(`Obteniendo: ${link}.json`);
-    const response = await fetch(`${link}.json`);
-
-    if (!response.ok) throw new Error(`HTTP status ${response.status}`);
-
-    const json = await response.json();
-
-    const recurso = Object.keys(json).find(key => key.includes(link));
-    console.log(`Recurso encontrado: ${recurso}`);
-
-    const descripcion = json[recurso]?.['http://purl.org/dc/terms/description'];
-    console.log(`Descripción bruta: `, descripcion);
-
-    const descripcionEs = descripcion?.find(entry => entry['@language'] === 'es');
-
-    if (descripcionEs) {
-      descripciones[sintoma] = {
-        descripcion: descripcionEs['@value'],
-        link
-      };
-    } else {
-      descripciones[sintoma] = { descripcion: 'No disponible en español', link };
-    }
-
-  } catch (err) {
-    console.error(`No se pudo obtener la descripción de ${link}`, err.message);
-    descripciones[sintoma] = { descripcion: 'Error al cargar descripción.', link };
-  }
-}
+    // Ya no se obtienen descripciones desde el backend
+    // Solo se pasa la información al frontend
 
     res.render('perfil', {
       title: 'Estrés Académico - Perfil',
@@ -367,7 +336,7 @@ app.get('/perfil', checkAuth, async (req, res) => {
       consejo,
       sintomas,
       comentariosRecibidos: userData.comentariosRecibidos || [],
-      descripcionesDBpedia: descripciones
+      sintomasDBpedia // Enviamos solo los links al frontend
     });
 
   } catch (err) {
