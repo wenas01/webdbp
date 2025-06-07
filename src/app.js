@@ -400,14 +400,14 @@ app.post('/guardar-sintomas', checkAuth, async (req, res) => {
     const dbpediaLinks = {
       alteraciones_sueno: "http://dbpedia.org/resource/Sleep_disorder",
       ansiedad_evaluaciones: "http://dbpedia.org/resource/Anxiety",
-      fatiga_cronica: "http://dbpedia.org/resource/Fatigue_(medical)",
+           fatiga_cronica:     "http://dbpedia.org/resource/Post-traumatic_stress_disorder",
       dificultad_concentrarse: "http://dbpedia.org/resource/Attention",
       cambios_alimentacion: "http://dbpedia.org/resource/Eating_disorder",
       procrastinacion: "http://dbpedia.org/resource/Procrastination",
       irritabilidad: "http://dbpedia.org/resource/Irritability",
-      pensamiento_catastrofico: "http://dbpedia.org/resource/Catastrophizing",
-      sintomas_fisicos: "http://dbpedia.org/resource/Physical_symptom",
-      aislamiento_social: "http://dbpedia.org/resource/Social_withdrawal"
+      pensamiento_catastrofico: "http://dbpedia.org/resource/Symptom",         // sustituto
+  sintomas_fisicos: "http://dbpedia.org/resource/Symptom",                 // sustituto
+  aislamiento_social: "http://dbpedia.org/resource/Exclusion_social" 
     };
 
     const sintomasDBpedia = Object.keys(sintomasFiltrados)
