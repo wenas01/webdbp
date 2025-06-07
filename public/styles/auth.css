@@ -36,7 +36,7 @@ button {
   /* Estilizado del botón de envío */
   width: 100%;             /* Ocupa todo el ancho disponible */
   padding: 0.7rem;         /* Altura suficiente para ser fácil de pulsar */
-  background-color: #4CAF50; /* Color verde para acción positiva */
+  background-color: #2693a9; /* Color verde para acción positiva */
   color: white;            /* Texto blanco para contraste */
   border: none;            /* Sin borde */
   border-radius: 5px;      /* Bordes ligeramente redondeados */
