@@ -32,35 +32,7 @@ const bucket = admin.storage().bucket();
 const db = admin.firestore();
 
 const app = express();
-//----------Ruta de consejos---------
-app.get('/consejos', (req, res) => {
-  res.render('consejos', {
-    title: 'Consejos para el Estrés Académico'
-  });
-});
-//-----------Ruta a pomodoro--------------
-app.get('/pomodoro', checkAuth, async (req, res) => {
-  try {
-    const uid = req.user.uid;
 
-    // Obtener tareas del usuario
-    const tareasSnapshot = await db.collection('l_tareas').doc(uid).collection('tareas').get();
-
-    const tareas = tareasSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-
-    res.render('pomodoro', {
-      title: 'Temporizador Pomodoro',
-      tareas // lista de tareas del usuario autenticado
-    });
-
-  } catch (err) {
-    console.error('Error al cargar la vista de Pomodoro:', err);
-    res.status(500).send('Error al cargar la página de Pomodoro');
-  }
-});
 // ---------------- Configuración Express ----------------
 // Middleware para procesar JSON y datos formateados como URL
 app.use(express.json());
@@ -494,7 +466,35 @@ app.post('/agregar-tarea', checkAuth, async (req, res) => {
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
+//----------Ruta de consejos---------
+app.get('/consejos', (req, res) => {
+  res.render('consejos', {
+    title: 'Consejos para el Estrés Académico'
+  });
+});
+//-----------Ruta a pomodoro--------------
+app.get('/pomodoro', checkAuth, async (req, res) => {
+  try {
+    const uid = req.user.uid;
 
+    // Obtener tareas del usuario
+    const tareasSnapshot = await db.collection('l_tareas').doc(uid).collection('tareas').get();
+
+    const tareas = tareasSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    res.render('pomodoro', {
+      title: 'Temporizador Pomodoro',
+      tareas // lista de tareas del usuario autenticado
+    });
+
+  } catch (err) {
+    console.error('Error al cargar la vista de Pomodoro:', err);
+    res.status(500).send('Error al cargar la página de Pomodoro');
+  }
+});
 
 
 module.exports = { app };
