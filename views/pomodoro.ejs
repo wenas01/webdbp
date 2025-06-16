@@ -10,16 +10,24 @@
       background-color: #ffe6f0;
       color: #880e4f;
       font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
+      justify-content: flex-start;
+      min-height: 100vh;
     }
 
     h1 {
       font-size: 3rem;
+      margin-top: 20px;
+    }
+
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .timer {
@@ -46,55 +54,129 @@
       background-color: #ec407a;
     }
 
-.button-container {
-  text-align: center;
-  margin-top: 2rem;
-}
+    .button-container {
+      margin: 20px;
+    }
 
-.home-button {
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  padding: 0.8rem 1.8rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  text-decoration: none;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s ease;
-}
+    .home-button {
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.8rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
+    }
 
-.home-button:hover {
-  background-color: #5a6268;
-}
-
+    .home-button:hover {
+      background-color: #5a6268;
+    }
 
     .counter {
       margin-top: 20px;
       font-size: 1.2rem;
     }
+
+    .task-section {
+      width: 90%;
+      max-width: 600px;
+      margin-top: 40px;
+      background-color: #fff0f6;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .task-section h2 {
+      color: #ad1457;
+      margin-bottom: 10px;
+    }
+
+    .task-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .task-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      margin: 5px 0;
+      background-color: #fce4ec;
+      border-radius: 8px;
+    }
+
+    .task-list li.completed {
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+
+    .task-actions button {
+      background-color: #d81b60;
+      margin-left: 5px;
+      padding: 5px 10px;
+      font-size: 0.8rem;
+    }
+
+    .task-actions button.complete-btn {
+      background-color: #4caf50;
+    }
+
+    .task-actions button:hover {
+      opacity: 0.8;
+    }
   </style>
 </head>
 <body>
-  <h1>🍓 Temporizador Pomodoro 🍓 </h1>
-  <div class="timer" id="timer">25:00</div>
 
-  <div class="buttons">
-    <button onclick="startTimer()">Iniciar</button>
-    <button onclick="pauseTimer()">Pausar</button>
-    <button onclick="resetTimer()">Reiniciar</button>
+  <h1>🍓 Temporizador Pomodoro 🍓</h1>
+
+  <div class="main-content">
+    <div class="timer" id="timer">25:00</div>
+
+    <div class="buttons">
+      <button onclick="startTimer()">Iniciar</button>
+      <button onclick="pauseTimer()">Pausar</button>
+      <button onclick="resetTimer()">Reiniciar</button>
+    </div>
+
+    <div class="counter">
+      Sesiones de estudio completadas: <span id="studyCount">0</span><br>
+      Descansos completados: <span id="breakCount">0</span>
+    </div>
   </div>
 
-  <div class="counter">
-    Sesiones de estudio completadas: <span id="studyCount">0</span><br>
-    Descansos completados: <span id="breakCount">0</span>
+  <div class="task-section">
+    <h2>📋 Lista de Tareas</h2>
+    <ul class="task-list" id="taskList">
+      <% tareas.forEach(t => { %>
+        <li class="<%= t.completada ? 'completed' : '' %>" data-id="<%= t.id %>">
+          <span><%= t.descripcion %></span>
+          <div class="task-actions">
+            <% if (!t.completada) { %>
+              <button class="complete-btn" onclick="completarTarea('<%= t.id %>')">✅ Completar</button>
+            <% } %>
+            <button onclick="eliminarTarea('<%= t.id %>')">🗑 Eliminar</button>
+          </div>
+        </li>
+      <% }) %>
+    </ul>
   </div>
-
-<div class="button-container">
-  <a href="/" class="home-button">🏠 Volver al Inicio</a>
-</div>
-
+  <div class="task-section">
+    <h2>➕ Agregar Nueva Tarea</h2>
+    <form id="formNuevaTarea">
+      <input type="text" id="inputTarea" placeholder="Escribe una tarea..." required />
+      <button type="submit">Agregar</button>
+    </form>
+  </div>
+  <div class="button-container">
+    <a href="/" class="home-button">🏠 Volver al Inicio</a>
+  </div>
 
   <script>
     let studyDuration = 25 * 60;
@@ -125,10 +207,12 @@
         if (currentTime <= 0) {
           clearInterval(timerInterval);
           isRunning = false;
-          if (isStudySession) {
+         if (isStudySession) {
             studyCount++;
             studyCountDisplay.textContent = studyCount;
             currentTime = breakDuration;
+          
+            guardarSesionPomodoro(); // ✅ Invoca el guardado de sesión
           } else {
             breakCount++;
             breakCountDisplay.textContent = breakCount;
@@ -136,7 +220,7 @@
           }
           isStudySession = !isStudySession;
           updateDisplay();
-          startTimer(); // comienza automáticamente la siguiente sesión
+          startTimer();
         }
       }, 1000);
     }
@@ -155,6 +239,72 @@
 
     updateDisplay();
 
+    async function completarTarea(id) {
+      try {
+        const res = await fetch('/completar-tarea', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ tareaId: id })
+        });
+        if (res.ok) {
+          location.reload();
+        }
+      } catch (err) {
+        console.error('Error al completar tarea:', err);
+      }
+    }
+
+    async function eliminarTarea(id) {
+      try {
+        const res = await fetch(`/eliminar-tarea/${id}`, {
+          method: 'DELETE'
+        });
+        if (res.ok) {
+          location.reload();
+        }
+      } catch (err) {
+        console.error('Error al eliminar tarea:', err);
+      }
+    }
+  // === Guardar sesión Pomodoro cuando se complete una sesión de estudio ===
+async function guardarSesionPomodoro() {
+  try {
+    await fetch('/guardar-pomodoro', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        horaEntrada: new Date().toISOString(),
+        sesionesCompletadas: studyCount,
+        horaSalida: null // Se puede actualizar luego si quieres registrar cierre manual
+      })
+    });
+  } catch (error) {
+    console.error('Error al guardar sesión Pomodoro:', error);
+  }
+}
+
+// === Registrar nueva tarea desde formulario ===
+document.getElementById('formNuevaTarea').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const descripcion = document.getElementById('inputTarea').value.trim();
+  if (!descripcion) return;
+
+  try {
+    const res = await fetch('/agregar-tarea', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ descripcion })
+    });
+    if (res.ok) {
+      document.getElementById('inputTarea').value = '';
+      location.reload();
+    }
+  } catch (err) {
+    console.error('Error al agregar tarea:', err);
+  }
+});
 
   </script>
 </body>
