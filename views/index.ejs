@@ -42,7 +42,7 @@
 		<div class="main-content">
 			<div class="section">
 				<div class="category">
-				<div class="category-header" data-uri="http://dbpedia.org/resource/Academic_stress">
+				<div class="category-header" data-uri="http://dbpedia.org/resource/Stress_(medicine)">
 				  <h2>CAUSAS</h2>
 				</div>
 				<div class="category-content" id="academic-stress-causes">
@@ -80,13 +80,13 @@
 
 			<div class="section warning-signs">
 				<div class="category">
-				    <div class="category-header" data-uri="http://dbpedia.org/resource/Physical_symptom">
-				      <h2>SIGNOS DE ALERTA</h2>
-				    </div>
-				    <div class="category-content" id="warning-signs-description">
-				      <p>Cargando descripción...</p>
-				    </div>
+				  <div class="category-header" data-uri="http://dbpedia.org/resource/Physical_symptom">
+				    <h2>SIGNOS DE ALERTA</h2>
 				  </div>
+				  <div class="category-content">
+				    <p>Cargando descripción...</p>
+				  </div>
+				</div>
 				<div class="resource-links">
 					<div class="resource-link">
 						<a href="https://youtu.be/q9tM64Meyj0">Señales de alerta escolar</a>
@@ -363,36 +363,45 @@
 	</script>
 </body>
 <script>
-async function obtenerDescripcionDBpedia(uri, lang = 'es') {
+async function obtenerDescripcionDBpedia(uri) {
   const endpoint = 'https://dbpedia.org/sparql';
+
   const query = `
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
     SELECT ?comment WHERE {
       <${uri}> rdfs:comment ?comment .
-      FILTER (lang(?comment) = "${lang}")
+      FILTER (lang(?comment) = "es")
     }
     LIMIT 1
   `;
-
   const url = `${endpoint}?query=${encodeURIComponent(query)}&format=json`;
 
   try {
     const response = await fetch(url);
     const data = await response.json();
-    const comment = data.results.bindings[0]?.comment.value || 'No se encontró descripción.';
-    return comment;
+    const comentario = data.results.bindings[0]?.comment.value;
+    return comentario || "No se encontró ninguna descripción en español.";
   } catch (error) {
-    console.error('Error al obtener comentario:', error);
-    return 'Error al conectar con DBpedia.';
+    console.error("Error al obtener comentario:", error);
+    return "Error al conectar con DBpedia.";
   }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const header = document.querySelector('.category-header');
-  const uri = header.getAttribute('data-uri');
-  const content = document.getElementById('academic-stress-causes');
-  const descripcion = await obtenerDescripcionDBpedia(uri);
-  content.innerHTML = `<p>${descripcion}</p>`;
+  const categorias = document.querySelectorAll('.category');
+
+  for (const categoria of categorias) {
+    const header = categoria.querySelector('.category-header');
+    const content = categoria.querySelector('.category-content');
+
+    if (header && content) {
+      const uri = header.getAttribute('data-uri');
+      if (uri) {
+        const descripcion = await obtenerDescripcionDBpedia(uri);
+        content.innerHTML = `<p>${descripcion}</p>`;
+      }
+    }
+  }
 });
 </script>
 </html>
