@@ -187,6 +187,7 @@
     let timerInterval;
     let studyCount = 0;
     let breakCount = 0;
+    let horaEntrada = new Date().toISOString();
 
     const timerDisplay = document.getElementById("timer");
     const studyCountDisplay = document.getElementById("studyCount");
@@ -238,7 +239,21 @@
     }
 
     updateDisplay();
+window.addEventListener('beforeunload', () => {
+    if (studyCount > 0) { // Solo enviar si hubo sesiones completadas
+      const data = {
+        horaEntrada: horaEntrada,
+        horaSalida: new Date().toISOString(),
+        sesionesCompletadas: studyCount
+      };
 
+      const blob = new Blob([JSON.stringify(data)], {
+        type: 'application/json'
+      });
+
+      navigator.sendBeacon('/guardar-pomodoro', blob);
+    }
+  });
     async function completarTarea(id) {
       try {
         const res = await fetch('/completar-tarea', {
@@ -298,9 +313,21 @@ document.getElementById('formNuevaTarea').addEventListener('submit', async funct
       body: JSON.stringify({ descripcion })
     });
     if (res.ok) {
-      document.getElementById('inputTarea').value = '';
-      location.reload();
-    }
+        const nuevaTarea = await res.json(); // asegúrate que el backend te devuelva la tarea
+      
+        const li = document.createElement('li');
+        li.setAttribute('data-id', nuevaTarea.id);
+        li.innerHTML = `
+          <span>${nuevaTarea.descripcion}</span>
+          <div class="task-actions">
+            <button class="complete-btn" onclick="completarTarea('${nuevaTarea.id}')">✅ Completar</button>
+            <button onclick="eliminarTarea('${nuevaTarea.id}')">🗑 Eliminar</button>
+          </div>
+        `;
+      
+        document.getElementById('taskList').appendChild(li);
+        document.getElementById('inputTarea').value = '';
+      }
   } catch (err) {
     console.error('Error al agregar tarea:', err);
   }
