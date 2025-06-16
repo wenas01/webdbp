@@ -39,10 +39,27 @@ app.get('/consejos', (req, res) => {
   });
 });
 //-----------Ruta a pomodoro--------------
-app.get('/pomodoro', (req, res) => {
-  res.render('pomodoro', {
-    title: 'Temporizador Pomodoro'
-  });
+app.get('/pomodoro', checkAuth, async (req, res) => {
+  try {
+    const uid = req.user.uid;
+
+    // Obtener tareas del usuario
+    const tareasSnapshot = await db.collection('l_tareas').doc(uid).collection('tareas').get();
+
+    const tareas = tareasSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    res.render('pomodoro', {
+      title: 'Temporizador Pomodoro',
+      tareas // lista de tareas del usuario autenticado
+    });
+
+  } catch (err) {
+    console.error('Error al cargar la vista de Pomodoro:', err);
+    res.status(500).send('Error al cargar la página de Pomodoro');
+  }
 });
 // ---------------- Configuración Express ----------------
 // Middleware para procesar JSON y datos formateados como URL
@@ -436,6 +453,46 @@ app.post('/guardar-sintomas', checkAuth, async (req, res) => {
 app.get('/logout', (req, res) => {
   res.clearCookie('__session');
   res.redirect('/login');
+});
+
+// POST: Guardar una sesión de Pomodoro
+app.post('/registrar-pomodoro', checkAuth, async (req, res) => {
+  try {
+    const uid = req.user.uid;
+    const { horaInicio, sesionesCompletadas, horaFin } = req.body;
+
+    const ref = db.collection('r_pomodoro').doc(uid).collection('sesiones').doc();
+    await ref.set({
+      horaInicio: horaInicio || new Date().toISOString(),
+      sesionesCompletadas: Number(sesionesCompletadas) || 0,
+      horaFin: horaFin || null,
+      timestamp: new Date()
+    });
+
+    res.status(200).json({ message: 'Sesión Pomodoro registrada correctamente' });
+  } catch (err) {
+    console.error('Error al registrar Pomodoro:', err);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+// POST: Agregar nueva tarea
+app.post('/agregar-tarea', checkAuth, async (req, res) => {
+  try {
+    const uid = req.user.uid;
+    const { descripcion } = req.body;
+
+    const ref = db.collection('l_tareas').doc(uid).collection('tareas').doc();
+    await ref.set({
+      descripcion,
+      completada: false,
+      creada: new Date()
+    });
+
+    res.status(200).json({ message: 'Tarea agregada correctamente' });
+  } catch (err) {
+    console.error('Error al agregar tarea:', err);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
 });
 
 
