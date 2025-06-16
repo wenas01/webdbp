@@ -421,6 +421,65 @@ async function obtenerDescripcionDBpedia(uri) {
   return comentario;
 }
 
+<script>
+async function traducirATexto(textoIngles) {
+  try {
+    const respuesta = await fetch("https://libretranslate.de/translate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        q: textoIngles,
+        source: "en",
+        target: "es",
+        format: "text"
+      })
+    });
+    const data = await respuesta.json();
+    return data.translatedText + " (Traducido automáticamente)";
+  } catch (error) {
+    console.error("Error al traducir:", error);
+    return "[EN] " + textoIngles;
+  }
+}
+
+async function obtenerDescripcionDBpedia(uri) {
+  const endpoint = 'https://dbpedia.org/sparql';
+
+  async function fetchComment(lang) {
+    const query = `
+      PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+      SELECT ?comment WHERE {
+        <${uri}> rdfs:comment ?comment .
+        FILTER (lang(?comment) = "${lang}")
+      }
+      LIMIT 1
+    `;
+    const url = `${endpoint}?query=${encodeURIComponent(query)}&format=json`;
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      return data.results.bindings[0]?.comment.value || null;
+    } catch (error) {
+      console.error(`Error al obtener comentario (${lang}):`, error);
+      return null;
+    }
+  }
+
+  // Paso 1: Buscar comentario en español
+  let comentario = await fetchComment("es");
+
+  // Paso 2: Si no hay, buscar en inglés y traducir
+  if (!comentario) {
+    const comentarioIngles = await fetchComment("en");
+    comentario = comentarioIngles
+      ? await traducirATexto(comentarioIngles)
+      : "No se encontró ninguna descripción.";
+  }
+
+  return comentario;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   const categorias = document.querySelectorAll('.category');
 
@@ -439,4 +498,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 </script>
+
 </html>
