@@ -271,34 +271,44 @@ window.addEventListener('beforeunload', () => {
       }
     }
 
-    async function eliminarTarea(id) {
-      try {
-        const res = await fetch(`/eliminar-tarea/${id}`, {
-          method: 'DELETE'
-        });
-        if (res.ok) {
-          location.reload();
-        }
-      } catch (err) {
-        console.error('Error al eliminar tarea:', err);
-      }
-    }
-  // === Guardar sesión Pomodoro cuando se complete una sesión de estudio ===
-async function guardarSesionPomodoro() {
+async function completarTarea(id) {
   try {
-    await fetch('/guardar-pomodoro', {
+    const res = await fetch('/completar-tarea', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        horaEntrada: new Date().toISOString(),
-        sesionesCompletadas: studyCount,
-        horaSalida: null // Se puede actualizar luego si quieres registrar cierre manual
-      })
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ tareaId: id })
     });
-  } catch (error) {
-    console.error('Error al guardar sesión Pomodoro:', error);
+
+    if (res.ok) {
+      // Marcar tarea como completada en el DOM
+      const li = document.querySelector(`li[data-id="${id}"]`);
+      li.classList.add('completed');
+      const btn = li.querySelector('.complete-btn');
+      if (btn) btn.remove(); // eliminar botón "completar"
+    }
+  } catch (err) {
+    console.error('Error al completar tarea:', err);
   }
 }
+
+async function eliminarTarea(id) {
+  try {
+    const res = await fetch(`/eliminar-tarea/${id}`, {
+      method: 'DELETE'
+    });
+
+    if (res.ok) {
+      // Eliminar el elemento de la lista del DOM
+      const li = document.querySelector(`li[data-id="${id}"]`);
+      if (li) li.remove();
+    }
+  } catch (err) {
+    console.error('Error al eliminar tarea:', err);
+  }
+}
+
 
 // === Registrar nueva tarea desde formulario ===
 document.getElementById('formNuevaTarea').addEventListener('submit', async function (e) {
