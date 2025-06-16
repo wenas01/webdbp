@@ -428,23 +428,23 @@ app.get('/logout', (req, res) => {
 });
 
 // POST: Guardar una sesión de Pomodoro
-app.post('/registrar-pomodoro', checkAuth, async (req, res) => {
+app.post('/guardar-pomodoro', checkAuth, async (req, res) => {
   try {
+    const { horaEntrada, sesionesCompletadas, horaSalida } = req.body;
     const uid = req.user.uid;
-    const { horaInicio, sesionesCompletadas, horaFin } = req.body;
 
-    const ref = db.collection('r_pomodoro').doc(uid).collection('sesiones').doc();
-    await ref.set({
-      horaInicio: horaInicio || new Date().toISOString(),
-      sesionesCompletadas: Number(sesionesCompletadas) || 0,
-      horaFin: horaFin || null,
-      timestamp: new Date()
+    await db.collection('r_pomodoro').doc(uid).collection('sesiones').add({
+      hora_entrada: horaEntrada,
+      hora_salida: horaSalida || null,
+      sesiones: sesionesCompletadas || 0,
+      descansos: 0, // Puedes actualizar esto si lo llevas en frontend también
+      timestamp: admin.firestore.FieldValue.serverTimestamp()
     });
 
-    res.status(200).json({ message: 'Sesión Pomodoro registrada correctamente' });
-  } catch (err) {
-    console.error('Error al registrar Pomodoro:', err);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    res.status(200).json({ mensaje: 'Sesión guardada' });
+  } catch (error) {
+    console.error('Error al guardar sesión Pomodoro:', error);
+    res.status(500).json({ error: 'No se pudo guardar la sesión' });
   }
 });
 // POST: Agregar nueva tarea
@@ -453,19 +453,55 @@ app.post('/agregar-tarea', checkAuth, async (req, res) => {
     const uid = req.user.uid;
     const { descripcion } = req.body;
 
-    const ref = db.collection('l_tareas').doc(uid).collection('tareas').doc();
-    await ref.set({
+    const nueva = await db.collection('l_tareas').doc(uid).collection('tareas').add({
       descripcion,
-      completada: false,
-      creada: new Date()
+      completada: false
     });
 
-    res.status(200).json({ message: 'Tarea agregada correctamente' });
-  } catch (err) {
-    console.error('Error al agregar tarea:', err);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    res.status(200).json({ id: nueva.id, descripcion, completada: false });
+  } catch (error) {
+    console.error('Error al agregar tarea:', error);
+    res.status(500).json({ error: 'No se pudo agregar tarea' });
   }
 });
+// Completar tarea
+app.post('/completar-tarea', checkAuth, async (req, res) => {
+  try {
+    const { tareaId } = req.body;
+    const uid = req.user.uid;
+
+    await db.collection('l_tareas')
+      .doc(uid)
+      .collection('tareas')
+      .doc(tareaId)
+      .update({ completada: true });
+
+    res.status(200).json({ mensaje: 'Tarea completada' });
+  } catch (error) {
+    console.error('Error al completar tarea:', error);
+    res.status(500).json({ error: 'No se pudo completar la tarea' });
+  }
+});
+
+// Eliminar tarea
+app.delete('/eliminar-tarea/:id', checkAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const uid = req.user.uid;
+
+    await db.collection('l_tareas')
+      .doc(uid)
+      .collection('tareas')
+      .doc(id)
+      .delete();
+
+    res.status(200).json({ mensaje: 'Tarea eliminada' });
+  } catch (error) {
+    console.error('Error al eliminar tarea:', error);
+    res.status(500).json({ error: 'No se pudo eliminar la tarea' });
+  }
+});
+
 //----------Ruta de consejos---------
 app.get('/consejos', (req, res) => {
   res.render('consejos', {
