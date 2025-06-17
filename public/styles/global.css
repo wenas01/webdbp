@@ -415,7 +415,7 @@ nav ul li a:hover::before,
 
 /* Warning Signs Section */
 .warning-signs {
-background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 159, 64, 0.1));
+background: white;
 border-left: 5px solid #2693a9;
 }
 
