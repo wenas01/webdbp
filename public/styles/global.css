@@ -21,8 +21,8 @@
 
 .auth-required-message .btn {
     margin-right: 5px;
-    background-color: #2693a9;
-    border-color: #2693a9;
+    background-color: #1e7a8c;
+    border-color:#1e7a8c;
     color: white;
     text-decoration: none;
     padding: 5px 15px;
@@ -256,7 +256,7 @@ nav ul li a:hover::before,
     padding: 20px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid #2693a9;
 }
 
 .article-card:hover {
@@ -274,12 +274,12 @@ nav ul li a:hover::before,
 }
 
 .article-card a:hover {
-    color: #667eea;
+    color: #2693a9;
 }
 
 .article-card i {
     font-size: 1.2rem;
-    color: #667eea;
+    color: #2693a9;
 }
 
 /* Profile avatar */
@@ -416,11 +416,11 @@ nav ul li a:hover::before,
 /* Warning Signs Section */
 .warning-signs {
 background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 159, 64, 0.1));
-border-left: 5px solid #ff6b6b;
+border-left: 5px solid #2693a9;
 }
 
 .warning-signs h3 {
-color: #c53030;
+color: #2693a9;
 }
 
 .nav-link {
@@ -853,7 +853,7 @@ color: #c53030;
 
 .forum-username {
 	font-weight: bold;
-	color: #8aa6f3;
+	color: #2693a9;
 }
 
 .account-section {
@@ -877,7 +877,7 @@ color: #c53030;
 	display: block;
 	margin-bottom: 5px;
 	font-weight: bold;
-	color: #80d9d9;
+	color: #2693a9;
 }
 
 .form-group input {
