@@ -730,12 +730,243 @@ nav ul li a:hover::before,
 }
 
 /* Footer */
+/* FOOTER MEJORADO - Reemplaza solo la sección footer en tu global.css */
+
+/* Footer principal - mantiene tu estilo pero mejorado */
 footer {
     background: var(--gradient-primary);
     color: white;
-    text-align: center;
-    padding: 30px;
+    padding: 50px 30px 30px 30px;
     clip-path: polygon(0 15%, 100% 0, 100% 100%, 0 100%);
+    margin-top: 50px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Contenedor del footer */
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-top: 20px; /* Compensar el clip-path */
+}
+
+/* Grid del contenido del footer */
+.footer-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+/* Secciones del footer */
+.footer-section h4 {
+    color: #ffffff;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.footer-section h4::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+/* Sección sobre nosotros */
+.footer-about {
+    max-width: 350px;
+}
+
+.footer-about p {
+    line-height: 1.6;
+    margin-bottom: 15px;
+    opacity: 0.9;
+    font-size: 0.95rem;
+}
+
+/* Enlaces del footer */
+.footer-links ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 12px;
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    padding: 5px 0;
+    font-size: 0.95rem;
+}
+
+.footer-links a:hover {
+    color: #ffffff;
+    transform: translateX(5px);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+.footer-links a i {
+    margin-right: 10px;
+    width: 16px;
+}
+
+/* Sección de redes sociales mejorada */
+.social-section {
+    text-align: center;
+}
+
+.social-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 12px 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    color: white;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-width: 180px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.social-link:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Colores específicos para cada red social al hacer hover */
+.social-link.whatsapp:hover { 
+    background: rgba(37, 211, 102, 0.3);
+    border-color: rgba(37, 211, 102, 0.5);
+}
+
+.social-link.discord:hover { 
+    background: rgba(114, 137, 218, 0.3);
+    border-color: rgba(114, 137, 218, 0.5);
+}
+
+.social-link.telegram:hover { 
+    background: rgba(0, 136, 204, 0.3);
+    border-color: rgba(0, 136, 204, 0.5);
+}
+
+.social-icon {
+    width: 22px;
+    height: 22px;
+    margin-right: 10px;
+    border-radius: 4px;
+}
+
+/* Divisor del footer */
+.footer-divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    margin: 30px 0 20px 0;
+}
+
+/* Parte inferior del footer */
+.footer-bottom {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.footer-bottom p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+.footer-bottom .heart {
+    color: #ff6b6b;
+    animation: heartbeat 1.5s ease-in-out infinite;
+    display: inline-block;
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* Responsive Design - se adapta a tu media query existente */
+@media (max-width: 768px) {
+    footer {
+        padding: 40px 20px 20px 20px;
+        clip-path: polygon(0 8%, 100% 0, 100% 100%, 0 100%);
+    }
+    
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 25px;
+        text-align: center;
+    }
+
+    .footer-about {
+        max-width: 100%;
+    }
+
+    .social-links {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .social-link {
+        min-width: auto;
+        padding: 10px 15px;
+        font-size: 0.8rem;
+    }
+
+    .social-link span {
+        display: none;
+    }
+
+    .social-icon {
+        margin-right: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    footer {
+        padding: 35px 15px 15px 15px;
+    }
+
+    .footer-container {
+        padding-top: 15px;
+    }
+
+    .social-link {
+        padding: 8px 12px;
+    }
 }
 
 /* enlaces dentro del dropdown centrados */
