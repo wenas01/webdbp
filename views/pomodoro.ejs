@@ -3,179 +3,366 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pomodoro Rosa</title>
+  <title>Pomodoro Cian</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Roboto:wght@300;400;500&display=swap');
+    
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      background-color: #ffe6f0;
-      color: #880e4f;
+      background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #80deea 100%);
+      color: #006064;
       font-family: 'Poppins', sans-serif;
       margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
+      padding: 20px;
       min-height: 100vh;
     }
 
-    h1 {
-      font-size: 3rem;
-      margin-top: 20px;
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto auto;
+      gap: 30px;
+      grid-template-areas: 
+        "header header"
+        "timer tasks"
+        "controls tasks";
     }
 
-    .main-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+        grid-template-areas: 
+          "header"
+          "timer"
+          "controls"
+          "tasks";
+      }
+    }
+
+    .header {
+      grid-area: header;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      margin: 0;
+      background: linear-gradient(45deg, #00838f, #0097a7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .timer-section {
+      grid-area: timer;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 150, 167, 0.2);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
     }
 
     .timer {
-      font-size: 4rem;
+      font-size: 5rem;
+      font-weight: 700;
+      color: #00838f;
       margin: 20px 0;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .timer-label {
+      font-size: 1.2rem;
+      color: #00695c;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    .controls-section {
+      grid-area: controls;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(0, 150, 167, 0.2);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
     }
 
     .buttons {
-      margin: 15px;
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
     }
 
     button {
-      background-color: #f06292;
+      background: linear-gradient(45deg, #00acc1, #00bcd4);
       color: white;
       border: none;
-      padding: 10px 20px;
-      font-size: 1rem;
-      margin: 5px;
-      border-radius: 10px;
+      padding: 12px 24px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 12px;
       cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3);
+      min-width: 120px;
     }
 
     button:hover {
-      background-color: #ec407a;
+      background: linear-gradient(45deg, #0097a7, #00acc1);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 188, 212, 0.4);
     }
 
-    .button-container {
-      margin: 20px;
-    }
-
-    .home-button {
-      background-color: #6c757d;
-      color: white;
-      border: none;
-      padding: 0.8rem 1.8rem;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      text-decoration: none;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      transition: background-color 0.3s ease;
-    }
-
-    .home-button:hover {
-      background-color: #5a6268;
+    button:active {
+      transform: translateY(0);
     }
 
     .counter {
+      text-align: center;
+      font-size: 1.1rem;
+      color: #00695c;
+      background: rgba(178, 235, 242, 0.5);
+      padding: 20px;
+      border-radius: 15px;
       margin-top: 20px;
-      font-size: 1.2rem;
+    }
+
+    .counter-item {
+      display: inline-block;
+      margin: 10px 20px;
+      text-align: center;
+    }
+
+    .counter-number {
+      display: block;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #00838f;
     }
 
     .task-section {
-      width: 90%;
-      max-width: 600px;
-      margin-top: 40px;
-      background-color: #fff0f6;
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      grid-area: tasks;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(0, 150, 167, 0.2);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      max-height: 70vh;
+      overflow-y: auto;
     }
 
     .task-section h2 {
-      color: #ad1457;
-      margin-bottom: 10px;
+      color: #00838f;
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+      text-align: center;
+    }
+
+    .add-task-form {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      padding: 20px;
+      background: rgba(224, 247, 250, 0.5);
+      border-radius: 15px;
+    }
+
+    .add-task-form input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #b2ebf2;
+      border-radius: 10px;
+      font-size: 1rem;
+      color: #00695c;
+      background: white;
+      transition: border-color 0.3s ease;
+    }
+
+    .add-task-form input:focus {
+      outline: none;
+      border-color: #00acc1;
+      box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1);
+    }
+
+    .add-task-form button {
+      padding: 12px 20px;
+      min-width: auto;
+      white-space: nowrap;
     }
 
     .task-list {
       list-style: none;
       padding: 0;
+      margin: 0;
     }
 
     .task-list li {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px;
-      margin: 5px 0;
-      background-color: #fce4ec;
-      border-radius: 8px;
+      padding: 15px 20px;
+      margin: 10px 0;
+      background: linear-gradient(135deg, #e0f7fa, #f0fdff);
+      border-radius: 12px;
+      border-left: 4px solid #00bcd4;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 188, 212, 0.1);
+    }
+
+    .task-list li:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(0, 188, 212, 0.2);
     }
 
     .task-list li.completed {
       text-decoration: line-through;
       opacity: 0.6;
+      background: linear-gradient(135deg, #f5f5f5, #eeeeee);
+      border-left-color: #9e9e9e;
+    }
+
+    .task-text {
+      flex: 1;
+      font-size: 1rem;
+      color: #00695c;
+      font-weight: 500;
+    }
+
+    .task-actions {
+      display: flex;
+      gap: 8px;
     }
 
     .task-actions button {
-      background-color: #d81b60;
-      margin-left: 5px;
-      padding: 5px 10px;
-      font-size: 0.8rem;
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      min-width: auto;
+      margin: 0;
     }
 
     .task-actions button.complete-btn {
-      background-color: #4caf50;
+      background: linear-gradient(45deg, #4caf50, #66bb6a);
     }
 
-    .task-actions button:hover {
-      opacity: 0.8;
+    .task-actions button.complete-btn:hover {
+      background: linear-gradient(45deg, #43a047, #4caf50);
+    }
+
+    .task-actions button.delete-btn {
+      background: linear-gradient(45deg, #f44336, #ef5350);
+    }
+
+    .task-actions button.delete-btn:hover {
+      background: linear-gradient(45deg, #d32f2f, #f44336);
+    }
+
+    .home-button {
+      background: linear-gradient(45deg, #607d8b, #78909c);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      box-shadow: 0 4px 15px rgba(96, 125, 139, 0.3);
+      transition: all 0.3s ease;
+      margin: 20px auto;
+      text-align: center;
+    }
+
+    .home-button:hover {
+      background: linear-gradient(45deg, #546e7a, #607d8b);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(96, 125, 139, 0.4);
+    }
+
+    .home-container {
+      text-align: center;
+      margin-top: 30px;
+      grid-column: 1 / -1;
+    }
+
+    /* Scrollbar personalizada */
+    .task-section::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .task-section::-webkit-scrollbar-track {
+      background: rgba(178, 235, 242, 0.2);
+      border-radius: 4px;
+    }
+
+    .task-section::-webkit-scrollbar-thumb {
+      background: linear-gradient(45deg, #00acc1, #00bcd4);
+      border-radius: 4px;
+    }
+
+    .task-section::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(45deg, #0097a7, #00acc1);
     }
   </style>
 </head>
 <body>
-
-  <h1>🍓 Temporizador Pomodoro 🍓</h1>
-
-  <div class="main-content">
-    <div class="timer" id="timer">25:00</div>
-
-    <div class="buttons">
-      <button onclick="startTimer()">Iniciar</button>
-      <button onclick="pauseTimer()">Pausar</button>
-      <button onclick="resetTimer()">Reiniciar</button>
+  <div class="container">
+    <div class="header">
+      <h1>🌊 Temporizador Pomodoro 🌊</h1>
     </div>
 
-    <div class="counter">
-      Sesiones de estudio completadas: <span id="studyCount">0</span><br>
-      Descansos completados: <span id="breakCount">0</span>
+    <div class="timer-section">
+      <div class="timer-label" id="sessionLabel">Sesión de Estudio</div>
+      <div class="timer" id="timer">25:00</div>
     </div>
-  </div>
 
-  <div class="task-section">
-    <h2>📋 Lista de Tareas</h2>
-    <ul class="task-list" id="taskList">
-      <% tareas.forEach(t => { %>
-        <li class="<%= t.completada ? 'completed' : '' %>" data-id="<%= t.id %>">
-          <span><%= t.descripcion %></span>
-          <div class="task-actions">
-            <% if (!t.completada) { %>
-              <button class="complete-btn" onclick="completarTarea('<%= t.id %>')">✅ Completar</button>
-            <% } %>
-            <button onclick="eliminarTarea('<%= t.id %>')">🗑 Eliminar</button>
-          </div>
-        </li>
-      <% }) %>
-    </ul>
-  </div>
-  <div class="task-section">
-    <h2>➕ Agregar Nueva Tarea</h2>
-    <form id="formNuevaTarea">
-      <input type="text" id="inputTarea" placeholder="Escribe una tarea..." required />
-      <button type="submit">Agregar</button>
-    </form>
-  </div>
-  <div class="button-container">
-    <a href="/" class="home-button">🏠 Volver al Inicio</a>
+    <div class="controls-section">
+      <div class="buttons">
+        <button onclick="startTimer()">▶️ Iniciar</button>
+        <button onclick="pauseTimer()">⏸️ Pausar</button>
+        <button onclick="resetTimer()">🔄 Reiniciar</button>
+      </div>
+
+      <div class="counter">
+        <div class="counter-item">
+          <span class="counter-number" id="studyCount">0</span>
+          <span>Sesiones de Estudio</span>
+        </div>
+        <div class="counter-item">
+          <span class="counter-number" id="breakCount">0</span>
+          <span>Descansos</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="task-section">
+      <h2>📋 Lista de Tareas</h2>
+      
+      <form class="add-task-form" id="formNuevaTarea">
+        <input type="text" id="inputTarea" placeholder="Escribe una nueva tarea..." required />
+        <button type="submit">➕ Agregar</button>
+      </form>
+
+      <ul class="task-list" id="taskList">
+        <!-- Las tareas se cargarán aquí dinámicamente -->
+      </ul>
+    </div>
+
+    <div class="home-container">
+      <a href="/" class="home-button">🏠 Volver al Inicio</a>
+    </div>
   </div>
 
   <script>
@@ -188,15 +375,20 @@
     let studyCount = 0;
     let breakCount = 0;
     let horaEntrada = new Date().toISOString();
+    let tasks = []; // Array para manejar las tareas localmente
 
     const timerDisplay = document.getElementById("timer");
     const studyCountDisplay = document.getElementById("studyCount");
     const breakCountDisplay = document.getElementById("breakCount");
+    const sessionLabel = document.getElementById("sessionLabel");
+    const taskList = document.getElementById("taskList");
 
     function updateDisplay() {
       const minutes = String(Math.floor(currentTime / 60)).padStart(2, '0');
       const seconds = String(currentTime % 60).padStart(2, '0');
       timerDisplay.textContent = `${minutes}:${seconds}`;
+      
+      sessionLabel.textContent = isStudySession ? "Sesión de Estudio" : "Descanso";
     }
 
     function startTimer() {
@@ -208,12 +400,11 @@
         if (currentTime <= 0) {
           clearInterval(timerInterval);
           isRunning = false;
-         if (isStudySession) {
+          if (isStudySession) {
             studyCount++;
             studyCountDisplay.textContent = studyCount;
             currentTime = breakDuration;
-          
-            guardarSesionPomodoro(); // ✅ Invoca el guardado de sesión
+            guardarSesionPomodoro();
           } else {
             breakCount++;
             breakCountDisplay.textContent = breakCount;
@@ -221,7 +412,8 @@
           }
           isStudySession = !isStudySession;
           updateDisplay();
-          startTimer();
+          // Auto-start next session
+          setTimeout(() => startTimer(), 1000);
         }
       }, 1000);
     }
@@ -238,111 +430,81 @@
       updateDisplay();
     }
 
-    updateDisplay();
-window.addEventListener('beforeunload', () => {
-    if (studyCount > 0) { // Solo enviar si hubo sesiones completadas
-      const data = {
-        horaEntrada: horaEntrada,
-        horaSalida: new Date().toISOString(),
-        sesionesCompletadas: studyCount
-      };
-
-      const blob = new Blob([JSON.stringify(data)], {
-        type: 'application/json'
-      });
-
-      navigator.sendBeacon('/guardar-pomodoro', blob);
-    }
-  });
-    async function completarTarea(id) {
-      try {
-        const res = await fetch('/completar-tarea', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ tareaId: id })
-        });
-        if (res.ok) {
-          location.reload();
-        }
-      } catch (err) {
-        console.error('Error al completar tarea:', err);
-      }
+    function guardarSesionPomodoro() {
+      // Función para guardar la sesión (implementar según tu backend)
+      console.log('Sesión guardada:', studyCount);
     }
 
-async function completarTarea(id) {
-  try {
-    const res = await fetch('/completar-tarea', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ tareaId: id })
-    });
-
-    if (res.ok) {
-      // Marcar tarea como completada en el DOM
-      const li = document.querySelector(`li[data-id="${id}"]`);
-      li.classList.add('completed');
-      const btn = li.querySelector('.complete-btn');
-      if (btn) btn.remove(); // eliminar botón "completar"
-    }
-  } catch (err) {
-    console.error('Error al completar tarea:', err);
-  }
-}
-
-async function eliminarTarea(id) {
-  try {
-    const res = await fetch(`/eliminar-tarea/${id}`, {
-      method: 'DELETE'
-    });
-
-    if (res.ok) {
-      // Eliminar el elemento de la lista del DOM
-      const li = document.querySelector(`li[data-id="${id}"]`);
-      if (li) li.remove();
-    }
-  } catch (err) {
-    console.error('Error al eliminar tarea:', err);
-  }
-}
-
-
-// === Registrar nueva tarea desde formulario ===
-document.getElementById('formNuevaTarea').addEventListener('submit', async function (e) {
-  e.preventDefault();
-  const descripcion = document.getElementById('inputTarea').value.trim();
-  if (!descripcion) return;
-
-  try {
-    const res = await fetch('/agregar-tarea', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ descripcion })
-    });
-    if (res.ok) {
-        const nuevaTarea = await res.json(); // asegúrate que el backend te devuelva la tarea
-      
+    // Manejo de tareas
+    function renderTasks() {
+      taskList.innerHTML = '';
+      tasks.forEach(task => {
         const li = document.createElement('li');
-        li.setAttribute('data-id', nuevaTarea.id);
+        li.setAttribute('data-id', task.id);
+        li.className = task.completada ? 'completed' : '';
+        
         li.innerHTML = `
-          <span>${nuevaTarea.descripcion}</span>
+          <span class="task-text">${task.descripcion}</span>
           <div class="task-actions">
-            <button class="complete-btn" onclick="completarTarea('${nuevaTarea.id}')">✅ Completar</button>
-            <button onclick="eliminarTarea('${nuevaTarea.id}')">🗑 Eliminar</button>
+            ${!task.completada ? `<button class="complete-btn" onclick="completarTarea('${task.id}')">✅ Completar</button>` : ''}
+            <button class="delete-btn" onclick="eliminarTarea('${task.id}')">🗑️ Eliminar</button>
           </div>
         `;
-      
-        document.getElementById('taskList').appendChild(li);
-        document.getElementById('inputTarea').value = '';
-      }
-  } catch (err) {
-    console.error('Error al agregar tarea:', err);
-  }
-});
+        
+        taskList.appendChild(li);
+      });
+    }
 
+    function completarTarea(id) {
+      const task = tasks.find(t => t.id === id);
+      if (task) {
+        task.completada = true;
+        renderTasks();
+      }
+    }
+
+    function eliminarTarea(id) {
+      tasks = tasks.filter(t => t.id !== id);
+      renderTasks();
+    }
+
+    // Agregar nueva tarea
+    document.getElementById('formNuevaTarea').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const descripcion = document.getElementById('inputTarea').value.trim();
+      if (!descripcion) return;
+
+      const nuevaTarea = {
+        id: Date.now().toString(),
+        descripcion: descripcion,
+        completada: false
+      };
+
+      tasks.push(nuevaTarea);
+      renderTasks();
+      document.getElementById('inputTarea').value = '';
+    });
+
+    // Manejar cierre de ventana
+    window.addEventListener('beforeunload', () => {
+      if (studyCount > 0) {
+        const data = {
+          horaEntrada: horaEntrada,
+          horaSalida: new Date().toISOString(),
+          sesionesCompletadas: studyCount
+        };
+
+        const blob = new Blob([JSON.stringify(data)], {
+          type: 'application/json'
+        });
+
+        navigator.sendBeacon('/guardar-pomodoro', blob);
+      }
+    });
+
+    // Inicializar
+    updateDisplay();
+    renderTasks();
   </script>
 </body>
 </html>
