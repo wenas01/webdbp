@@ -437,7 +437,7 @@ color: #c53030;
     background-color: #f2feff;
     padding: 20px;
     border-radius: 8px;
-    max-width: 800px; /* Constrain the width */
+    max-width: 1200px; /* Constrain the width */
     margin: 0 auto; /* Center the forum container horizontally */
     display: flex; /* Use Flexbox for content centering */
     flex-direction: column; /* Stack children vertically */
