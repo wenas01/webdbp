@@ -666,11 +666,11 @@ color: #2693a9;
 
 .accepted-reply {
     background: linear-gradient(135deg, #f0fff4, #e6ffed);
-    border-left-color: #4CAF50;
+    border-left-color: #2693a9;
 }
 
 .accepted-badge {
-    background: #4CAF50;
+    background: #2693a9;
     color: white;
     padding: 3px 8px;
     border-radius: 12px;
@@ -888,7 +888,7 @@ color: #2693a9;
 }
 
 /* Buttons */
-.btn {
+.btn {	
     background: var(--gradient-primary);
     color: white;
     padding: 12px 25px;
@@ -1119,7 +1119,7 @@ footer {
 }
 
 .footer-bottom .heart {
-    color: #ff6b6b;
+    color: #63cfe7;
     animation: heartbeat 1.5s ease-in-out infinite;
     display: inline-block;
 }
