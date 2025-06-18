@@ -1314,6 +1314,12 @@ footer {
     transition: transform 0.3s ease;
 }
 
+/* Borde azul cian para la sección de causas */
+.causes-section {
+    border-left: 4px solid #00bcd4;
+    padding-left: 20px;
+}
+
 /* Animations */
 @keyframes fadeIn {
     from { 
