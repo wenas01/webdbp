@@ -275,6 +275,20 @@
 </footer>
 
 	<script>
+
+	function toggleVideos(section) {
+        const videosDiv = document.getElementById('videos-' + section);
+        const toggleBtn = event.target.closest('.video-toggle-btn');
+        
+        if (videosDiv.style.display === 'none' || videosDiv.style.display === '') {
+            videosDiv.style.display = 'grid';
+            toggleBtn.innerHTML = '<i class="fas fa-video"></i> Ocultar Videos <i class="fas fa-chevron-up toggle-icon"></i>';
+        } else {
+            videosDiv.style.display = 'none';
+            toggleBtn.innerHTML = '<i class="fas fa-video"></i> Ver Videos Relacionados <i class="fas fa-chevron-down toggle-icon"></i>';
+        }
+    }
+
 		document.addEventListener('DOMContentLoaded', function() {
     const newTopicBtn = document.getElementById('new-topic-btn');
     const newTopicForm = document.getElementById('new-topic-form');
@@ -336,26 +350,6 @@
         } else {
             alert('Por favor, completa el título y contenido del tema.');
         }
-    });
-
-    // Función para mostrar/ocultar videos (agregar al inicio, fuera del DOMContentLoaded)
-    function toggleVideos(section) {
-        const videosDiv = document.getElementById('videos-' + section);
-        const toggleBtn = event.target.closest('.video-toggle-btn');
-        
-        if (videosDiv.style.display === 'none' || videosDiv.style.display === '') {
-            videosDiv.style.display = 'grid';
-            toggleBtn.innerHTML = '<i class="fas fa-video"></i> Ocultar Videos <i class="fas fa-chevron-up toggle-icon"></i>';
-        } else {
-            videosDiv.style.display = 'none';
-            toggleBtn.innerHTML = '<i class="fas fa-video"></i> Ver Videos Relacionados <i class="fas fa-chevron-down toggle-icon"></i>';
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        // Tu código JavaScript existente permanece aquí...
-        const newTopicBtn = document.getElementById('new-topic-btn');
-        // ... resto del código existente
     });
 
     // Función para manejar las respuestas a los temas
