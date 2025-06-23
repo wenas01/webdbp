@@ -366,100 +366,103 @@
   </div>
 
   <script>
-    let studyDuration = 1 * 60;
-    let breakDuration = 1 * 60;
-    let currentTime = studyDuration;
-    let isRunning = false;
-    let isStudySession = true;
-    let timerInterval;
-    let studyCount = 0;
-    let breakCount = 0;
-    let horaEntrada = new Date().toISOString();
-    let tasks = []; // Array para manejar las tareas localmente
-
-    const timerDisplay = document.getElementById("timer");
-    const studyCountDisplay = document.getElementById("studyCount");
-    const breakCountDisplay = document.getElementById("breakCount");
-    const sessionLabel = document.getElementById("sessionLabel");
-    const taskList = document.getElementById("taskList");
-
-    function updateDisplay() {
-      const minutes = String(Math.floor(currentTime / 60)).padStart(2, '0');
-      const seconds = String(currentTime % 60).padStart(2, '0');
-      timerDisplay.textContent = `${minutes}:${seconds}`;
-      
-      sessionLabel.textContent = isStudySession ? "Sesión de Estudio" : "Descanso";
-    }
-
-    function startTimer() {
-  if (isRunning) return;
-  isRunning = true;
-
-  // Actualizamos horaEntrada SOLO si inicia sesión de estudio
-  if (isStudySession) {
-    horaEntrada = new Date().toISOString();
+  let studyDuration = 1 * 60;
+  let breakDuration = 1 * 60;
+  let currentTime = studyDuration;
+  let isRunning = false;
+  let isStudySession = true;
+  let timerInterval;
+  let studyCount = 0;
+  let breakCount = 0;
+  let horaEntrada = new Date().toISOString();
+  
+  const timerDisplay = document.getElementById("timer");
+  const studyCountDisplay = document.getElementById("studyCount");
+  const breakCountDisplay = document.getElementById("breakCount");
+  const sessionLabel = document.getElementById("sessionLabel");
+  const taskList = document.getElementById("taskList");
+  
+  function updateDisplay() {
+    const minutes = String(Math.floor(currentTime / 60)).padStart(2, '0');
+    const seconds = String(currentTime % 60).padStart(2, '0');
+    timerDisplay.textContent = `${minutes}:${seconds}`;
+    
+    sessionLabel.textContent = isStudySession ? "Sesión de Estudio" : "Descanso";
   }
-
-  timerInterval = setInterval(() => {
-    currentTime--;
-    updateDisplay();
-    if (currentTime <= 0) {
-      clearInterval(timerInterval);
-      isRunning = false;
-      if (isStudySession) {
-        studyCount++;
-        studyCountDisplay.textContent = studyCount;
-        currentTime = breakDuration;
-        guardarSesionPomodoro(); // Guarda aquí la sesión con la horaEntrada actualizada arriba
-      } else {
-        breakCount++;
-        breakCountDisplay.textContent = breakCount;
-        currentTime = studyDuration;
-      }
-      isStudySession = !isStudySession;
-      updateDisplay();
-      // Auto-start next session
-      setTimeout(() => startTimer(), 1000);
+  
+  function startTimer() {
+    if (isRunning) return;
+    isRunning = true;
+  
+    // Actualizamos horaEntrada solo al iniciar sesión de estudio
+    if (isStudySession) {
+      horaEntrada = new Date().toISOString();
     }
+  
+    timerInterval = setInterval(() => {
+      currentTime--;
+      updateDisplay();
+      if (currentTime <= 0) {
+        clearInterval(timerInterval);
+        isRunning = false;
+  
+        if (isStudySession) {
+          studyCount++;
+          studyCountDisplay.textContent = studyCount;
+          currentTime = breakDuration;
+        } else {
+          breakCount++;
+          breakCountDisplay.textContent = breakCount;
+          currentTime = studyDuration;
+        }
+  
+        // Guardar sesión tanto al acabar estudio como descanso
+        guardarSesionPomodoro();
+  
+        isStudySession = !isStudySession;
+        updateDisplay();
+  
+        // Auto-start next session
+        setTimeout(() => startTimer(), 1000);
+      }
     }, 1000);
   }
-
-    function pauseTimer() {
-      clearInterval(timerInterval);
-      isRunning = false;
-    }
-
-    function resetTimer() {
-      clearInterval(timerInterval);
-      isRunning = false;
-      currentTime = isStudySession ? studyDuration : breakDuration;
-      updateDisplay();
-    }
-
-    function guardarSesionPomodoro() {
-      fetch('/guardar-pomodoro', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-          // Si usas token o autenticación, agrégalo aquí, ej:
-          // 'Authorization': 'Bearer ' + token,
-        },
-        body: JSON.stringify({
-          horaEntrada,           // La hora cuando comenzó la tanda, ya la tienes definida
-          sesionesCompletadas: studyCount,
-          descansos: breakCount
-        })
+  
+  function pauseTimer() {
+    clearInterval(timerInterval);
+    isRunning = false;
+  }
+  
+  function resetTimer() {
+    clearInterval(timerInterval);
+    isRunning = false;
+    currentTime = isStudySession ? studyDuration : breakDuration;
+    updateDisplay();
+  }
+  
+  function guardarSesionPomodoro() {
+    fetch('/guardar-pomodoro', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+        // Si usas token o autenticación, agrégalo aquí
+      },
+      body: JSON.stringify({
+        // Solo enviamos horaEntrada si es sesión de estudio,
+        // si es descanso enviamos null para no sobrescribirlo en backend
+        horaEntrada: isStudySession ? horaEntrada : null,
+        sesionesCompletadas: studyCount,
+        descansos: breakCount
       })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Sesión guardada:', data);
-        // Opcional: resetear horaEntrada para la próxima tanda
-        horaEntrada = new Date().toISOString();
-      })
-      .catch(error => {
-        console.error('Error al guardar sesión:', error);
-      });
-    }
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Sesión guardada:', data);
+    })
+    .catch(error => {
+      console.error('Error al guardar sesión:', error);
+    });
+  }
 
     // Manejo de tareas
     function renderTasks() {
