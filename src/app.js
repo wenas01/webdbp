@@ -430,14 +430,13 @@ app.get('/logout', (req, res) => {
 // POST: Guardar una sesión de Pomodoro
 app.post('/guardar-pomodoro', checkAuth, async (req, res) => {
   try {
-    const { horaEntrada, sesionesCompletadas, horaSalida } = req.body;
+    const { horaEntrada, sesionesCompletadas, descansos } = req.body; // incluye descansos
     const uid = req.user.uid;
 
     await db.collection('r_pomodoro').doc(uid).collection('sesiones').add({
       hora_entrada: horaEntrada,
-      hora_salida: horaSalida || null,
       sesiones: sesionesCompletadas || 0,
-      descansos: 0, // Puedes actualizar esto si lo llevas en frontend también
+      descansos: descansos || 0,       // ahora también guardas descansos
       timestamp: admin.firestore.FieldValue.serverTimestamp()
     });
 
