@@ -430,15 +430,20 @@ app.get('/logout', (req, res) => {
 // POST: Guardar una sesión de Pomodoro
 app.post('/guardar-pomodoro', checkAuth, async (req, res) => {
   try {
-    const { horaEntrada, sesionesCompletadas, descansos } = req.body; // incluye descansos
+    const { horaEntrada, sesionesCompletadas, descansos } = req.body;
     const uid = req.user.uid;
 
-    await db.collection('r_pomodoro').doc(uid).collection('sesiones').add({
-      hora_entrada: horaEntrada,
-      sesiones: sesionesCompletadas || 0,
-      descansos: descansos || 0,       // ahora también guardas descansos
+    // Obtener la fecha actual en formato YYYY-MM-DD para usarla como ID del doc
+    const today = new Date().toISOString().split('T')[0];
+
+    const docRef = db.collection('r_pomodoro').doc(uid).collection('sesiones').doc(today);
+
+    await docRef.set({
+      hora_entrada: horaEntrada, // Se actualiza cada vez con la hora de la última tanda
+      sesiones: admin.firestore.FieldValue.increment(sesionesCompletadas || 0),
+      descansos: admin.firestore.FieldValue.increment(descansos || 0),
       timestamp: admin.firestore.FieldValue.serverTimestamp()
-    });
+    }, { merge: true });
 
     res.status(200).json({ mensaje: 'Sesión guardada' });
   } catch (error) {
