@@ -431,8 +431,28 @@
     }
 
     function guardarSesionPomodoro() {
-      // Función para guardar la sesión (implementar según tu backend)
-      console.log('Sesión guardada:', studyCount);
+      fetch('/guardar-pomodoro', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+          // Si usas token o autenticación, agrégalo aquí, ej:
+          // 'Authorization': 'Bearer ' + token,
+        },
+        body: JSON.stringify({
+          horaEntrada,           // La hora cuando comenzó la tanda, ya la tienes definida
+          sesionesCompletadas: studyCount,
+          descansos: breakCount
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Sesión guardada:', data);
+        // Opcional: resetear horaEntrada para la próxima tanda
+        horaEntrada = new Date().toISOString();
+      })
+      .catch(error => {
+        console.error('Error al guardar sesión:', error);
+      });
     }
 
     // Manejo de tareas
