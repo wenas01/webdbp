@@ -365,11 +365,13 @@
     </div>
   </div>
 
-  <script>
-  // Asumimos que esta variable viene del backend en el HTML
-  // Ejemplo en EJS: let tasks = <%- JSON.stringify(tareas) %>;
-  // Si no existe, inicializamos como array vacío para evitar errores
+<script>
   let tasks = window.tasks || [];
+  let sesion = window.sesion || { sesiones: 0, descansos: 0 };
+
+  let studyCount = sesion.sesiones || 0;
+  let breakCount = sesion.descansos || 0;
+  let horaEntrada = new Date().toISOString();
 
   let studyDuration = 1 * 60;
   let breakDuration = 1 * 60;
@@ -377,9 +379,6 @@
   let isRunning = false;
   let isStudySession = true;
   let timerInterval;
-  let studyCount = 0;
-  let breakCount = 0;
-  let horaEntrada = new Date().toISOString();
 
   const timerDisplay = document.getElementById("timer");
   const studyCountDisplay = document.getElementById("studyCount");
@@ -391,8 +390,9 @@
     const minutes = String(Math.floor(currentTime / 60)).padStart(2, '0');
     const seconds = String(currentTime % 60).padStart(2, '0');
     timerDisplay.textContent = `${minutes}:${seconds}`;
-
     sessionLabel.textContent = isStudySession ? "Sesión de Estudio" : "Descanso";
+    studyCountDisplay.textContent = studyCount;
+    breakCountDisplay.textContent = breakCount;
   }
 
   function startTimer() {
@@ -412,16 +412,13 @@
 
         if (isStudySession) {
           studyCount++;
-          studyCountDisplay.textContent = studyCount;
-          currentTime = breakDuration;
         } else {
           breakCount++;
-          breakCountDisplay.textContent = breakCount;
-          currentTime = studyDuration;
         }
 
         guardarSesionPomodoro();
 
+        currentTime = isStudySession ? breakDuration : studyDuration;
         isStudySession = !isStudySession;
         updateDisplay();
 
@@ -445,25 +442,22 @@
   function guardarSesionPomodoro() {
     fetch('/guardar-pomodoro', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         horaEntrada: isStudySession ? horaEntrada : null,
         sesionesCompletadas: studyCount,
         descansos: breakCount
       })
     })
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
       console.log('Sesión guardada:', data);
     })
-    .catch(error => {
-      console.error('Error al guardar sesión:', error);
+    .catch(err => {
+      console.error('Error al guardar sesión:', err);
     });
   }
 
-  // Renderiza las tareas en la lista
   function renderTasks() {
     taskList.innerHTML = '';
     tasks.forEach(task => {
@@ -483,7 +477,6 @@
     });
   }
 
-  // Completar tarea: llama al backend y actualiza localmente si OK
   function completarTarea(id) {
     fetch('/completar-tarea', {
       method: 'POST',
@@ -501,7 +494,6 @@
     .catch(console.error);
   }
 
-  // Eliminar tarea: llama al backend y actualiza localmente si OK
   function eliminarTarea(id) {
     fetch(`/eliminar-tarea/${id}`, {
       method: 'DELETE'
@@ -514,7 +506,6 @@
     .catch(console.error);
   }
 
-  // Agregar nueva tarea al backend y luego renderiza
   document.getElementById('formNuevaTarea').addEventListener('submit', function (e) {
     e.preventDefault();
     const descripcion = document.getElementById('inputTarea').value.trim();
@@ -527,20 +518,20 @@
     })
     .then(res => res.json())
     .then(data => {
-      tasks.push(data);  // data incluye id, descripcion, completada
+      tasks.push(data);
       renderTasks();
       document.getElementById('inputTarea').value = '';
     })
     .catch(console.error);
   });
 
-  // Manejar cierre de ventana (puedes mejorar para enviar estados completos si quieres)
   window.addEventListener('beforeunload', () => {
-    if (studyCount > 0) {
+    if (studyCount > 0 || breakCount > 0) {
       const data = {
         horaEntrada: horaEntrada,
         horaSalida: new Date().toISOString(),
-        sesionesCompletadas: studyCount
+        sesionesCompletadas: studyCount,
+        descansos: breakCount
       };
 
       const blob = new Blob([JSON.stringify(data)], {
@@ -551,7 +542,6 @@
     }
   });
 
-  // Inicialización
   updateDisplay();
   renderTasks();
 </script>
