@@ -433,17 +433,16 @@ app.post('/guardar-pomodoro', checkAuth, async (req, res) => {
     const { horaEntrada, sesionesCompletadas, descansos } = req.body;
     const uid = req.user.uid;
 
-    // Obtener la fecha actual en formato YYYY-MM-DD para usarla como ID del doc
     const today = new Date().toISOString().split('T')[0];
 
     const docRef = db.collection('r_pomodoro').doc(uid).collection('sesiones').doc(today);
 
     await docRef.set({
-      hora_entrada: horaEntrada, // Se actualiza cada vez con la hora de la última tanda
-      sesiones: admin.firestore.FieldValue.increment(sesionesCompletadas || 0),
-      descansos: admin.firestore.FieldValue.increment(descansos || 0),
+      hora_entrada: horaEntrada || null,
+      sesiones: sesionesCompletadas || 0,
+      descansos: descansos || 0,
       timestamp: admin.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
+    });
 
     res.status(200).json({ mensaje: 'Sesión guardada' });
   } catch (error) {
@@ -451,6 +450,7 @@ app.post('/guardar-pomodoro', checkAuth, async (req, res) => {
     res.status(500).json({ error: 'No se pudo guardar la sesión' });
   }
 });
+
 // POST: Agregar nueva tarea
 app.post('/agregar-tarea', checkAuth, async (req, res) => {
   try {
@@ -517,17 +517,25 @@ app.get('/pomodoro', checkAuth, async (req, res) => {
   try {
     const uid = req.user.uid;
 
-    // Obtener tareas del usuario
     const tareasSnapshot = await db.collection('l_tareas').doc(uid).collection('tareas').get();
-
     const tareas = tareasSnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
     }));
 
+    const today = new Date().toISOString().split('T')[0];
+    const sesionDoc = await db.collection('r_pomodoro').doc(uid).collection('sesiones').doc(today).get();
+
+    const sesion = sesionDoc.exists ? sesionDoc.data() : {
+      hora_entrada: null,
+      sesiones: 0,
+      descansos: 0
+    };
+
     res.render('pomodoro', {
       title: 'Temporizador Pomodoro',
-      tareas // lista de tareas del usuario autenticado
+      tareas,
+      sesion // se pasa al frontend
     });
 
   } catch (err) {
@@ -535,6 +543,7 @@ app.get('/pomodoro', checkAuth, async (req, res) => {
     res.status(500).send('Error al cargar la página de Pomodoro');
   }
 });
+
 
 
 module.exports = { app };
