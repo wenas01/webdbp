@@ -392,31 +392,37 @@
     }
 
     function startTimer() {
-      if (isRunning) return;
-      isRunning = true;
-      timerInterval = setInterval(() => {
-        currentTime--;
-        updateDisplay();
-        if (currentTime <= 0) {
-          clearInterval(timerInterval);
-          isRunning = false;
-          if (isStudySession) {
-            studyCount++;
-            studyCountDisplay.textContent = studyCount;
-            currentTime = breakDuration;
-            guardarSesionPomodoro();
-          } else {
-            breakCount++;
-            breakCountDisplay.textContent = breakCount;
-            currentTime = studyDuration;
-          }
-          isStudySession = !isStudySession;
-          updateDisplay();
-          // Auto-start next session
-          setTimeout(() => startTimer(), 1000);
-        }
-      }, 1000);
+  if (isRunning) return;
+  isRunning = true;
+
+  // Actualizamos horaEntrada SOLO si inicia sesión de estudio
+  if (isStudySession) {
+    horaEntrada = new Date().toISOString();
+  }
+
+  timerInterval = setInterval(() => {
+    currentTime--;
+    updateDisplay();
+    if (currentTime <= 0) {
+      clearInterval(timerInterval);
+      isRunning = false;
+      if (isStudySession) {
+        studyCount++;
+        studyCountDisplay.textContent = studyCount;
+        currentTime = breakDuration;
+        guardarSesionPomodoro(); // Guarda aquí la sesión con la horaEntrada actualizada arriba
+      } else {
+        breakCount++;
+        breakCountDisplay.textContent = breakCount;
+        currentTime = studyDuration;
+      }
+      isStudySession = !isStudySession;
+      updateDisplay();
+      // Auto-start next session
+      setTimeout(() => startTimer(), 1000);
     }
+    }, 1000);
+  }
 
     function pauseTimer() {
       clearInterval(timerInterval);
