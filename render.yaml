@@ -7,7 +7,7 @@ services:
     startCommand: node app.js
     envVars:
       - key: SERVICE_ACCOUNT_JSON
-        value: '{"type":"service_account","project_id":"..."}' # todo en una sola línea
+        value: '{"type":"service_account","project_id":"TU_PROJECT_ID","private_key_id":"abc123","private_key":"-----BEGIN PRIVATE KEY-----\\nMIIB...\\n-----END PRIVATE KEY-----\\n","client_email":"firebase-adminsdk-xxx@TU_PROJECT_ID.iam.gserviceaccount.com","client_id":"1234567890","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-xxx%40TU_PROJECT_ID.iam.gserviceaccount.com","universe_domain":"googleapis.com"}'
       - key: FIREBASE_API_KEY
         value: AIzaSyCnzc0qkZ-SxOADsaBkTcUH0l9lTzYkBtk
       - key: COOKIE_SECRET
