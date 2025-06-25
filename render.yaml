@@ -7,8 +7,8 @@ services:
     startCommand: node app.js
     envVars:
       - key: SERVICE_ACCOUNT_JSON
-        value: <aquí tu JSON minificado o usa fromDatabase si lo configurarás desde el panel>
+        fromDatabase: true  # ← Mejor que poner el JSON largo aquí
       - key: FIREBASE_API_KEY
-        value: TU_API_KEY
+        fromDatabase: true  # Te lo pedirá en el panel Render
       - key: COOKIE_SECRET
         value: supersecreto12345
