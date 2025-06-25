@@ -7,7 +7,7 @@ services:
     startCommand: node src/app.js
     envVars:
       - key: SERVICE_ACCOUNT_JSON
-        value: '{"type":"service_account","project_id":"estres-5ab99","private_key_id":"abc123456","private_key":"-----BEGIN PRIVATE KEY-----\\nMIIEv...\\n-----END PRIVATE KEY-----\\n","client_email":"firebase-adminsdk-xyz@estres-5ab99.iam.gserviceaccount.com","client_id":"1234567890","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-xyz%40estres-5ab99.iam.gserviceaccount.com","universe_domain":"googleapis.com"}'
+        value: '{"type":"service_account","project_id":"estres-5ab99","private_key_id":"123abc456","private_key":"-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkq...abc...\\n-----END PRIVATE KEY-----\\n","client_email":"firebase-adminsdk-abc@estres-5ab99.iam.gserviceaccount.com","client_id":"1234567890","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-abc%40estres-5ab99.iam.gserviceaccount.com","universe_domain":"googleapis.com"}'
       - key: FIREBASE_API_KEY
         value: TU_API_KEY_AQUÍ
       - key: COOKIE_SECRET
