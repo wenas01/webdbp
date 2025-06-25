@@ -7,6 +7,8 @@ services:
     startCommand: node app.js
     envVars:
       - key: SERVICE_ACCOUNT_JSON
+        value: '{"type":"service_account","project_id":"..."}' # todo en una sola línea
       - key: FIREBASE_API_KEY
+        value: AIzaSyCnzc0qkZ-SxOADsaBkTcUH0l9lTzYkBtk
       - key: COOKIE_SECRET
         value: supersecreto12345
