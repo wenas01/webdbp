@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: estres-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node app.js
+    envVars:
+      - key: SERVICE_ACCOUNT_JSON
+        value: <aquí tu JSON minificado o usa fromDatabase si lo configurarás desde el panel>
+      - key: FIREBASE_API_KEY
+        value: TU_API_KEY
+      - key: COOKIE_SECRET
+        value: supersecreto12345
